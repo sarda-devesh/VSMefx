@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MicrosoftVisualStudioCompositionAppHostToolsPath Condition=" '$(MicrosoftVisualStudioCompositionAppHostToolsPath)' == '' ">$(MicrosoftVisualStudioCompositionAppHostToolsRootPath)$(MicrosoftVisualStudioCompositionAppHostToolsSubPath)</MicrosoftVisualStudioCompositionAppHostToolsPath>
+    <CompositionConfigurationBaseName>$(TargetName).Composition</CompositionConfigurationBaseName>
+    <CompositionConfigurationCacheName>$(CompositionConfigurationBaseName).cache</CompositionConfigurationCacheName>
+    <MEFLogOutputPath Condition=" '$(LogOutputPath)' == '' ">$(IntermediateOutputPath)</MEFLogOutputPath>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <PrepareResourceNamesDependsOn>
+      GenerateCompositionBootstrapSourceFile;
+      $(PrepareResourceNamesDependsOn)
+    </PrepareResourceNamesDependsOn>
+    <GenerateMEFCompositionCacheDependsOn>
+      ResolveReferences;
+    </GenerateMEFCompositionCacheDependsOn>
+    <GetCopyToOutputDirectoryItemsDependsOn>
+      $(GetCopyToOutputDirectoryItemsDependsOn);
+      GenerateMEFCompositionCache;
+    </GetCopyToOutputDirectoryItemsDependsOn>
+  </PropertyGroup>
+
+  <UsingTask TaskName="CreateComposition" AssemblyFile="$(MicrosoftVisualStudioCompositionAppHostToolsPath)Microsoft.VisualStudio.Composition.AppHost.dll" />
+  <UsingTask TaskName="CreateContainerFactoryBootstrapFile" AssemblyFile="$(MicrosoftVisualStudioCompositionAppHostToolsPath)Microsoft.VisualStudio.Composition.AppHost.dll" />
+
+  <Target Name="GenerateCompositionBootstrapSourceFile"
+          BeforeTargets="BeforeCompile">
+    <PropertyGroup>
+      <ContainerFactoryBootstrapFile>$(IntermediateOutputPath)ContainerFactory.cs</ContainerFactoryBootstrapFile>
+    </PropertyGroup>
+    <ItemGroup>
+      <Compile Include="$(ContainerFactoryBootstrapFile)" />
+    </ItemGroup>
+
+    <CreateContainerFactoryBootstrapFile
+      BootstrapFile="$(ContainerFactoryBootstrapFile)"
+      RootNamespace="$(RootNamespace)"
+      CompositionCacheFile="$(CompositionConfigurationCacheName)"/>
+  </Target>
+
+  <Target Name="GenerateMEFCompositionCache" AfterTargets="Build" DependsOnTargets="$(GenerateMEFCompositionCacheDependsOn)">
+    <ItemGroup>
+      <MEFCatalogAssembly Include="@(IntermediateAssembly)" />
+      <MEFCatalogAssembly Include="@(ReferencePath)" Condition=" '%(ReferencePath.MEFAssembly)'=='true' " />
+      <FileWrites Include="$(OutputPath)$(CompositionConfigurationCacheName)" />
+      <MEFCatalogAssemblySearchPath Include="$(TargetDir)" />
+      <MEFReferenceAssembly Include="@(ReferencePath)" />
+      <!-- Register the cache as a content item so that if this project is just a library, the .exe will get the cache file. -->
+      <ContentWithTargetPath Include="$(OutputPath)$(CompositionConfigurationCacheName)">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <TargetPath>$(CompositionConfigurationCacheName)</TargetPath>
+        <Visible>false</Visible>
+      </ContentWithTargetPath>
+    </ItemGroup>
+
+    <CreateComposition
+      CatalogAssemblies="@(MEFCatalogAssembly)"
+      ReferenceAssemblies="@(MEFReferenceAssembly)"
+      ContinueOnDiscoveryErrors="$(ContinueOnMEFDiscoveryErrors)"
+      ContinueOnCompositionErrors="$(ContinueOnMEFCompositionErrors)"
+      DgmlOutputPath="$(MEFLogOutputPath)$(CompositionConfigurationBaseName).dgml"
+      CompositionCacheFile="$(OutputPath)$(CompositionConfigurationCacheName)"
+      CatalogAssemblySearchPath="@(MEFCatalogAssemblySearchPath)"
+      LogOutputPath="$(MEFLogOutputPath)"
+      NoWarn="$(NoWarn)">
+      <Output TaskParameter="FileWrites" ItemName="FileWrites" />
+    </CreateComposition>
+  </Target>
+</Project>
