@@ -9,6 +9,15 @@ using VSMefx.Commands;
 
 namespace VSMefx
 {
+
+    /*
+     *  [Export] MajorRevision
+     *  [Export] MinorRevision
+     *  [Import] MefCalculator.MefCalculatorInterfaces+ICalculator
+     * 
+     */
+
+
     class Program
     {
         static void Main(string[] args)
@@ -27,25 +36,41 @@ namespace VSMefx
         {
             ConfigCreator creator = new ConfigCreator(options.files, options.folders);
             await creator.Initialize();
-            if(options.listParts || options.partDetails.Count() > 0)
+            PartInfo infoGetter = new PartInfo(creator, options);
+
+            if (options.listParts)
             {
-                PartInfo infoGetter = new PartInfo(creator, options);
-                if (options.listParts)
+                Console.WriteLine("Parts in Catalog are ");
+                infoGetter.listAllParts();
+                Console.WriteLine();
+            }
+
+            if (options.partDetails.Count() > 0)
+            {
+                foreach (string partName in options.partDetails)
                 {
-                    Console.WriteLine("Parts in Catalog are ");
-                    infoGetter.listAllParts();
+                    infoGetter.getPartInfo(partName);
                     Console.WriteLine();
                 }
-                if (options.partDetails.Count() > 0)
+            }
+
+            if(options.exportDetails.Count() > 0)
+            {
+                foreach(string exportType in options.exportDetails)
                 {
-                    foreach (string partName in options.partDetails)
-                    {
-                        infoGetter.getPartInfo(partName);
-                        Console.WriteLine();
-                    }
+                    infoGetter.listTypeExporter(exportType);
+                    Console.WriteLine();
                 }
             }
-            
+
+            if(options.importDetails.Count() > 0)
+            {
+                foreach(string importType in options.importDetails)
+                {
+                    infoGetter.listTypeImporter(importType);
+                    Console.WriteLine();
+                }
+            }
         }
 
         static void HandleParseError(IEnumerable<Error> errs)

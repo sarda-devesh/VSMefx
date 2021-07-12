@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>-p -t MefCalculator.ExportTest ExtendedOperations.Modulo --files MefCalculator.dll SimpleCalculator2.exe -d Extensions</StartArguments>
+    <StartArguments>-t MefCalculator.ExportTest -e MajorRevision -i MefCalculator.MefCalculatorInterfaces+ICalculator --files MefCalculator.dll SimpleCalculator2.exe -d Extensions</StartArguments>
     <StartWorkingDirectory>C:\Users\Pankaj\Documents\Software\MEF\MEF-Sample\bin\Debug\</StartWorkingDirectory>
   </PropertyGroup>
 </Project>

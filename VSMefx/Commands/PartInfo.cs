@@ -21,8 +21,7 @@ namespace VSMefx.Commands
             ComposableCatalog catalog = this.Creator.catalog;
             foreach (ComposablePartDefinition part in catalog.Parts)
             {
-                string Name = getName(part.Type, "[Part]"); 
-                Console.WriteLine(Name);
+                Console.WriteLine(getName(part, "[Part]"));
             }
             
         }
@@ -46,8 +45,39 @@ namespace VSMefx.Commands
             }
         }
 
-        private string getName(Type type, string verboseLabel = "")
+        public void listTypeExporter(string typeName)
         {
+            Console.WriteLine("Exporting parts for " + typeName + ":");
+            foreach (var part in this.Creator.catalog.Parts)
+            {
+                foreach(var export in part.ExportingMembers)
+                {
+                    if(export.Key.Name.Equals(typeName))
+                    {
+                        Console.WriteLine(getName(part, "[Part]"));
+                    }
+                }
+            }
+        }
+
+        public void listTypeImporter(string typeName)
+        {
+            Console.WriteLine("Importing parts for " + typeName + ":");
+            foreach(var part in this.Creator.catalog.Parts)
+            {
+                foreach(var import in part.Imports)
+                {
+                    if(import.ImportDefinition.ContractName.Equals(typeName))
+                    {
+                        Console.WriteLine(getName(part, "[Part]"));
+                    }
+                }
+            }
+        }
+
+        private string getName(ComposablePartDefinition part, string verboseLabel = "")
+        {
+            Type type = part.Type;
             if(this.Options.verbose)
             {
                  return verboseLabel + " " + type.AssemblyQualifiedName;
