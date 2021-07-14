@@ -31,5 +31,11 @@ namespace VSMefx
         [Option('e', "exporters")]
         public IEnumerable<string> exportDetails { get; set; }
 
+        [Option('r', "rejected")]
+        public IEnumerable<string> rejectedDetails { get; set; }
+
+        [Option('g', "graph")]
+        public bool saveGraph { get; set; }
+
     }
 }

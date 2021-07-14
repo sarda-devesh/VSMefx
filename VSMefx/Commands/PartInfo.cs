@@ -75,16 +75,6 @@ namespace VSMefx.Commands
             }
         }
 
-        private string getName(ComposablePartDefinition part, string verboseLabel = "")
-        {
-            Type type = part.Type;
-            if(this.Options.verbose)
-            {
-                 return verboseLabel + " " + type.AssemblyQualifiedName;
-            } else
-            {
-                return type.FullName;
-            }
-        }
+       
     }
 }

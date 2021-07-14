@@ -93,7 +93,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\Command.cs" />
+    <Compile Include="Commands\GraphCreator.cs" />
     <Compile Include="Commands\PartInfo.cs" />
+    <Compile Include="Commands\PartNode.cs" />
+    <Compile Include="Commands\RejectionTracer.cs" />
     <Compile Include="ConfigCreator.cs" />
     <Compile Include="CLIOptions.cs" />
     <Compile Include="Program.cs" />
@@ -106,6 +109,11 @@
   <ItemGroup>
     <Analyzer Include="..\packages\Microsoft.VisualStudio.Composition.Analyzers.16.9.20\analyzers\dotnet\Microsoft.VisualStudio.Composition.Analyzers.dll" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\DgmlBuilder-master\src\DgmlBuilder\DgmlBuilder.csproj">
+      <Project>{8958ab93-7266-4fb4-a5da-a6b265e99087}</Project>
+      <Name>DgmlBuilder</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

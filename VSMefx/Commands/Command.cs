@@ -31,6 +31,19 @@ namespace VSMefx.Commands
             return null;
         }
 
+        protected string getName(ComposablePartDefinition part, string verboseLabel = "")
+        {
+            Type type = part.Type;
+            if (this.Options.verbose)
+            {
+                return verboseLabel + " " + type.AssemblyQualifiedName;
+            }
+            else
+            {
+                return type.FullName;
+            }
+        }
+
     }
 
     public class CommandData

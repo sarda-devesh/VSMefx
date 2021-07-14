@@ -53,3 +53,5 @@ C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\zh-Hant\Microsoft
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\obj\Debug\VSMefx.csproj.CopyComplete
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\obj\Debug\VSMefx.exe
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\obj\Debug\VSMefx.pdb
+C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\OpenSoftware.DgmlBuilder.dll
+C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\OpenSoftware.DgmlBuilder.pdb

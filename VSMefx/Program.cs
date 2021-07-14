@@ -11,12 +11,10 @@ namespace VSMefx
 {
 
     /*
-     *  [Export] MajorRevision
-     *  [Export] MinorRevision
-     *  [Import] MefCalculator.MefCalculatorInterfaces+ICalculator
-     * 
-     */
-
+     * Basic Structure Information Test:
+     * -p -t MefCalculator.ExportTest -e MajorRevision -i MefCalculator.MefCalculatorInterfaces+ICalculator --files MefCalculator.dll SimpleCalculator2.exe -d Extensions
+     * ExtendedOperations.Modulo
+    */
 
     class Program
     {
@@ -69,6 +67,21 @@ namespace VSMefx
                 {
                     infoGetter.listTypeImporter(importType);
                     Console.WriteLine();
+                }
+            }
+
+            if(options.rejectedDetails.Count() > 0)
+            {
+                RejectionTracer tracer = new RejectionTracer(creator, options);
+                if(options.rejectedDetails.Contains("all"))
+                {
+                    tracer.listAllRejections();
+                }  else
+                {
+                    foreach(string rejectPart in options.rejectedDetails)
+                    {
+                        tracer.listReject(rejectPart);
+                    }
                 }
             }
         }

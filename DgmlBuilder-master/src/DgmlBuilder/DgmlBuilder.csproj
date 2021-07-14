@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>OpenSoftware.DgmlBuilder</AssemblyName>
+    <RootNamespace>OpenSoftware.DgmlTools</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Merijn de Jonge</Authors>
+    <Company>OpenSoftware</Company>
+    <Description>DgmlBuilder is a library for easily creating Dgml graphs.</Description>
+    <PackageProjectUrl>https://github.com/merijndejonge/DgmlBuilder</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/merijndejonge/DgmlBuilder.git</RepositoryUrl>
+    <Copyright>Merijn de Jonge</Copyright>
+    <PackageTags>DGML modeling visualization</PackageTags>
+    <Version>1.14</Version>
+    <FileVersion>1.1.0.0</FileVersion>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+    <AssemblyOriginatorKeyFile>DgmlBuilder.snk</AssemblyOriginatorKeyFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Title>OpenSoftware.DgmlBuilder</Title>
+    <PackageVersion>1.15</PackageVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
