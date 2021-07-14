@@ -137,6 +137,7 @@ namespace VSMefx.Commands
                 GraphCreator creater = new GraphCreator(relevantNodes);
                 string fileName = partName.Replace(".", "_") + ".dgml";
                 creater.saveGraph(fileName);
+                Console.WriteLine();
             }
         }
 
@@ -145,7 +146,6 @@ namespace VSMefx.Commands
             if (Options.verbose)
             {
                 Console.WriteLine(current.verboseMessage);
-                Console.WriteLine();
             }
             else
             {
