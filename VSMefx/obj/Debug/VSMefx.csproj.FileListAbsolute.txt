@@ -1,5 +1,3 @@
-C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\obj\Debug\VSMefx.csproj.AssemblyReference.cache
-C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\obj\Debug\VSMefx.csproj.CoreCompileInputs.cache
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\VSMefx.exe.config
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\VSMefx.exe
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\VSMefx.pdb
@@ -7,6 +5,7 @@ C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\CommandLine.dll
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\Microsoft.VisualStudio.Composition.dll
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\Microsoft.VisualStudio.Composition.NetFxAttributes.dll
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\Microsoft.VisualStudio.Validation.dll
+C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\OpenSoftware.DgmlBuilder.dll
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\System.Collections.Immutable.dll
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\System.Composition.AttributedModel.dll
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\System.Composition.Convention.dll
@@ -16,6 +15,7 @@ C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\System.Compositio
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\System.Reflection.Metadata.dll
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\System.Reflection.TypeExtensions.dll
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\System.Threading.Tasks.Dataflow.dll
+C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\OpenSoftware.DgmlBuilder.pdb
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\CommandLine.xml
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\Microsoft.VisualStudio.Composition.xml
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\Microsoft.VisualStudio.Composition.NetFxAttributes.xml
@@ -50,8 +50,8 @@ C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\ru\Microsoft.Visu
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\tr\Microsoft.VisualStudio.Validation.resources.dll
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\zh-Hans\Microsoft.VisualStudio.Validation.resources.dll
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\zh-Hant\Microsoft.VisualStudio.Validation.resources.dll
+C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\obj\Debug\VSMefx.csproj.AssemblyReference.cache
+C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\obj\Debug\VSMefx.csproj.CoreCompileInputs.cache
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\obj\Debug\VSMefx.csproj.CopyComplete
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\obj\Debug\VSMefx.exe
 C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\obj\Debug\VSMefx.pdb
-C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\OpenSoftware.DgmlBuilder.dll
-C:\Users\Pankaj\Documents\Github Repos\VSMefx\VSMefx\bin\Debug\OpenSoftware.DgmlBuilder.pdb

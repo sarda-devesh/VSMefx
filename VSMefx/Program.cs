@@ -12,15 +12,15 @@ namespace VSMefx
 
     /*
      * Basic Structure Information Test:
-     * -p -t MefCalculator.ExportTest -e MajorRevision -i MinorRevision --files MefCalculator.dll SimpleCalculator2.dll -d Extensions
+     * -p -t MefCalculator.ExportTest -e MefCalculator.MefCalculatorInterfaces+IOperation -i MajorRevision --files MefCalculator.dll  
+     * -d Extensions
      * 
      * Graph Generation All:
-     * -g -r all --files MefCalculator.dll SimpleCalculator2.dll -d Extensions 
+     * -g -r all --files MefCalculator.dll -d Extensions 
      * 
      * Graph Generation Specific:
-     * -gv -r ExtendedOperations.Modulo --files MefCalculator.dll SimpleCalculator2.dll -d Extensions 
-     * 
-     * ExtendedOperations.Modulo
+     * -gv -r ExtendedOperations.Modulo --files MefCalculator.dll -d Extensions 
+     *
     */
 
     class Program

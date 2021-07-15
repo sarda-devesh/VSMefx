@@ -45,14 +45,16 @@ namespace VSMefx.Commands
             }
         }
 
+        //TODO: Preprocess the below commands to find the exporters/importers for parts?
+
         public void listTypeExporter(string typeName)
         {
             Console.WriteLine("Exporting parts for " + typeName + ":");
             foreach (var part in this.Creator.catalog.Parts)
-            {
-                foreach(var export in part.ExportingMembers)
+            { 
+                foreach(var export in part.ExportDefinitions)
                 {
-                    if(export.Key.Name.Equals(typeName))
+                    if(export.Value.ContractName.Equals(typeName))
                     {
                         Console.WriteLine(getName(part, "[Part]"));
                     }
