@@ -39,7 +39,7 @@ namespace VSMefx
         
         static async Task RunOptions(CLIOptions options)
         {
-            ConfigCreator creator = new ConfigCreator(options.files, options.folders);
+            ConfigCreator creator = new ConfigCreator(options.files, options.folders, options.whiteListFile);
             await creator.Initialize();
             PartInfo infoGetter = new PartInfo(creator, options);
 

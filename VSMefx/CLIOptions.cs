@@ -37,5 +37,8 @@ namespace VSMefx
         [Option('g', "graph")]
         public bool saveGraph { get; set; }
 
+        [Option('w', "whitelist", Default = (string) "" )]
+        public string whiteListFile { get; set; }
+
     }
 }

@@ -15,6 +15,8 @@ namespace VSMefx
         public ComposableCatalog catalog { get; private set; }
         public CompositionConfiguration config { get; private set; }
 
+        public List<string> WhiteListedParts { get; private set; }
+
         private bool AddFile(string folderPath, string fileName)
         {
             fileName = fileName.Trim();
@@ -56,6 +58,26 @@ namespace VSMefx
             }
         }
 
+        private void ReadWhiteListFile(string currentFolder, string fileName)
+        {
+            string filePath = Path.Combine(currentFolder, fileName); 
+            if(!File.Exists(filePath))
+            {
+                Console.WriteLine("Couldn't find file " + fileName); 
+            }
+            try
+            {
+                string[] lines = File.ReadAllLines(filePath); 
+                foreach(string partName in lines)
+                {
+                    WhiteListedParts.Add(partName.Trim());
+                }
+            }catch(Exception e)
+            {
+                Console.WriteLine("Encountered error when trying to process the file: " + e.Message); 
+            }
+        } 
+
         public async Task Initialize()
         {
             PartDiscovery discovery = PartDiscovery.Combine(
@@ -66,9 +88,10 @@ namespace VSMefx
             this.config = CompositionConfiguration.Create(this.catalog);
         }
 
-        public ConfigCreator(IEnumerable<string> files, IEnumerable<string> folders)
+        public ConfigCreator(IEnumerable<string> files, IEnumerable<string> folders, string WhiteListFile = "")
         {
             this.AssemblyPaths = new List<string>();
+            this.WhiteListedParts = new List<string>(); 
             string currentFolder = Directory.GetCurrentDirectory();
             if (files != null)
             {
@@ -87,6 +110,10 @@ namespace VSMefx
                     string folderPath = Path.Combine(currentFolder, folder);
                     SearchFolder(folderPath);
                 }
+            }
+            if(WhiteListFile.Length > 0)
+            {
+                ReadWhiteListFile(currentFolder, WhiteListFile); 
             }
         }
     }
