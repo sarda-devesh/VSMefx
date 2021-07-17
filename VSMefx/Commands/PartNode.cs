@@ -15,6 +15,8 @@ namespace VSMefx.Commands
         public HashSet<PartNode> rejectsCaused; //Points to the "parents" of the current node
         public int Level { get; private set; }
 
+        public bool IsWhiteListed { get; private set;  }
+
         public PartNode(ComposablePartDefinition definition, string message, int currLevel)
         {
             this.part = definition;
@@ -22,6 +24,7 @@ namespace VSMefx.Commands
             importRejects = new HashSet<PartNode>();
             rejectsCaused = new HashSet<PartNode>();
             this.Level = currLevel;
+            this.IsWhiteListed = false; 
         }
 
         public string getName()
@@ -42,6 +45,16 @@ namespace VSMefx.Commands
         public void addParent(PartNode node)
         {
             rejectsCaused.Add(node);
+        }
+
+        public void setWhiteListed(bool value)
+        {
+            this.IsWhiteListed = value; 
+        }
+
+        public bool showNode()
+        {
+            return (!this.IsWhiteListed || this.importRejects.Count() > 0); 
         }
 
     }

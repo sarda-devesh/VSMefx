@@ -2,7 +2,6 @@
 <DirectedGraph xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" DataVirtualized="false" NeighborhoodDistance="0" xmlns="http://schemas.microsoft.com/vs/2009/dgml">
   <Nodes>
     <Node Id="MefCalculator.AddIn" Category="3" />
-    <Node Id="ExtendedOperations.ImportTest" Category="3" />
     <Node Id="ExtendedOperations.ChainOne" Category="2" />
     <Node Id="ExtendedOperations.Modulo" Category="1" />
   </Nodes>

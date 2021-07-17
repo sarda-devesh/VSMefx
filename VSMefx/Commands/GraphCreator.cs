@@ -16,7 +16,7 @@ namespace VSMefx.Commands
 
         public GraphCreator(Dictionary<string, PartNode> graph)
         {
-            this.rejectionGraph = graph;
+            this.filterGraph(graph);
             var nodeCreator = new[]
             {
                 new NodeBuilder<PartNode>(nodeConverter)
@@ -55,6 +55,19 @@ namespace VSMefx.Commands
             } 
             this.DGML.WriteToFile(outputFileName);
             Console.WriteLine("Saved rejection graph to " + outputFileName);
+        }
+
+        private void filterGraph(Dictionary<string,PartNode>  graph)
+        {
+            this.rejectionGraph = new Dictionary<string, PartNode>(); 
+            foreach(var pair in graph)
+            {
+                if(pair.Value.showNode())
+                {
+                    this.rejectionGraph.Add(pair.Key, pair.Value); 
+                }
+            }
+            Console.WriteLine("Count of Output Graph is " + this.rejectionGraph.Count()); 
         }
 
         private Node nodeConverter(PartNode current)

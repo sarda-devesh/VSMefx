@@ -15,7 +15,7 @@ namespace VSMefx
         public ComposableCatalog catalog { get; private set; }
         public CompositionConfiguration config { get; private set; }
 
-        public List<string> WhiteListedParts { get; private set; }
+        public HashSet<string> WhiteListedParts { get; private set; }
 
         private bool AddFile(string folderPath, string fileName)
         {
@@ -91,7 +91,7 @@ namespace VSMefx
         public ConfigCreator(IEnumerable<string> files, IEnumerable<string> folders, string WhiteListFile = "")
         {
             this.AssemblyPaths = new List<string>();
-            this.WhiteListedParts = new List<string>(); 
+            this.WhiteListedParts = new HashSet<string>(); 
             string currentFolder = Directory.GetCurrentDirectory();
             if (files != null)
             {

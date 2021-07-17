@@ -20,6 +20,7 @@ namespace VSMefx.Commands
             var errors = config.CompositionErrors;
             int levelNumber = errors.Count();
             this.maxLevels = levelNumber;
+            HashSet<String> whiteListedParts = this.Creator.WhiteListedParts; 
             while (errors.Count() > 0)
             {
                 var currentLevel = errors.Peek();
@@ -30,19 +31,25 @@ namespace VSMefx.Commands
                     {
                         ComposablePartDefinition definition = part.Definition;
                         PartNode currentNode = new PartNode(definition, element.Message, levelNumber);
+                        string currentName = currentNode.getName();
+                        if (whiteListedParts.Contains(currentName)) {
+                            currentNode.setWhiteListed(true); 
+                        }
                         var imports = part.Definition.Imports;
                         foreach(var import in imports)
-                        {
+                        { 
                             string importName = import.ImportDefinition.ContractName;
                             if(rejectionGraph.ContainsKey(importName))
                             {
                                 PartNode childNode = rejectionGraph[importName];
-                                childNode.addParent(currentNode);
-                                currentNode.addChild(childNode);
-                            }
+                                if(!childNode.IsWhiteListed)
+                                {
+                                    childNode.addParent(currentNode);
+                                    currentNode.addChild(childNode);
+                                }
+                            } 
                         }
-                        string currentName = currentNode.getName();
-                        if(rejectionGraph.ContainsKey(currentNode.getName()))
+                        if(rejectionGraph.ContainsKey(currentName))
                         {
                             throw new Exception("Node already present in graph, potential issue with duplicates");
                         }
@@ -63,10 +70,11 @@ namespace VSMefx.Commands
         private void listErrorsinLevel(int currentLevel)
         {
             Console.WriteLine("Listing errors in level " + currentLevel);
+            HashSet<String> whiteList = this.Creator.WhiteListedParts; 
             foreach(var pair in this.rejectionGraph)
             {
                 PartNode node = pair.Value;
-                if(node.Level.Equals(currentLevel))
+                if(!node.IsWhiteListed && node.Level.Equals(currentLevel))
                 {
                     writeNodeDetail(node);
                     
@@ -101,6 +109,13 @@ namespace VSMefx.Commands
                 return;
             }
             Console.WriteLine("Printing Rejection Graph Info for " + partName + "\n");
+            //Check if the partName was part of the whiteList
+            HashSet<string> whiteList = this.Creator.WhiteListedParts;
+            if(whiteList.Contains(partName))
+            {
+                Console.WriteLine();
+                return; 
+            }
             Dictionary<string, PartNode> relevantNodes = null;
             if (Options.saveGraph)
             {
@@ -118,14 +133,18 @@ namespace VSMefx.Commands
                     PartNode current = currentLevelNodes.Dequeue();
                     if(Options.saveGraph)
                     {
+                        Console.WriteLine("Adding Node " + current.getName() + " to graph"); 
                         relevantNodes.Add(current.getName(), current);
                     }
-                    writeNodeDetail(current);
+                    
                     if (current.importRejects.Count() > 0)
                     {
                         foreach(var node in current.importRejects)
                         {
-                            currentLevelNodes.Enqueue(node);
+                            if (!node.IsWhiteListed)
+                            {
+                                currentLevelNodes.Enqueue(node);
+                            }
                         }
                     }
                 }
