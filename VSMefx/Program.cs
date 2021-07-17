@@ -36,7 +36,7 @@ namespace VSMefx
         {
             setWorkingDirectory(); 
             CommandLine.Parser.Default.ParseArguments<CLIOptions>(args)
-            .WithParsed<CLIOptions>(async options =>
+            .WithParsed(async options =>
             {
                 await RunOptions(options);
                 Console.WriteLine("Finished running command");
@@ -103,7 +103,11 @@ namespace VSMefx
 
         static void HandleParseError(IEnumerable<Error> errs)
         {
-            Console.WriteLine("Encountered errors");
+            Console.WriteLine("Encountered the following errors:");
+            foreach(var error in errs)
+            {
+                Console.WriteLine(error);
+            }
         }
     }
 }

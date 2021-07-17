@@ -105,17 +105,18 @@ namespace VSMefx.Commands
         {
             if (!rejectionGraph.ContainsKey(partName))
             {
-                Console.WriteLine("No Rejection Issues associated with " + partName);
+                Console.WriteLine("No Rejection Issues associated with " + partName + "\n");
                 return;
+            }
+            HashSet<string> whiteList = this.Creator.WhiteListedParts;
+            if (whiteList.Contains(partName))
+            {
+                Console.WriteLine("Not running rejection analysis since part " + partName + " is present in whitelist\n"); 
+                return; 
             }
             Console.WriteLine("Printing Rejection Graph Info for " + partName + "\n");
             //Check if the partName was part of the whiteList
-            HashSet<string> whiteList = this.Creator.WhiteListedParts;
-            if(whiteList.Contains(partName))
-            {
-                Console.WriteLine();
-                return; 
-            }
+            
             Dictionary<string, PartNode> relevantNodes = null;
             if (Options.saveGraph)
             {
@@ -133,10 +134,9 @@ namespace VSMefx.Commands
                     PartNode current = currentLevelNodes.Dequeue();
                     if(Options.saveGraph)
                     {
-                        Console.WriteLine("Adding Node " + current.getName() + " to graph"); 
                         relevantNodes.Add(current.getName(), current);
                     }
-                    
+                    writeNodeDetail(current);
                     if (current.importRejects.Count() > 0)
                     {
                         foreach(var node in current.importRejects)
