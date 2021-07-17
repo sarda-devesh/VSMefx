@@ -3,11 +3,7 @@ A Composition Analysis Tool for VS-MEF
 
 ## Example Commands 
 
-Before you run any of the test commands listed below, please ensure that you have your working directory properly configured. 
-To configure the working directory, open the Properties for the VsMefx project, which you can access by right clicking the VsMefx project, and switch to the Debug tab in the Properties Window. In the Start Options portion of the Debug Tab, set the working directory to the
-[Basic Test Folder](Tests/Basic)
-
-Once you have configured the working directory, you can specify the command you want to run in the Command Line Options in the Start Options portion. 
+The application currently sets the working directory based on the testFolder field in the Program.cs file. If the testFolder is a subFolder in the Tests directory then the program sets the currently working directory to the specified testFolder. If the testFolder is a empty string then the currently working directory will be set to Tests. File and folder paths needed to be specified relative to the currently working directory for the application to be able to process them. 
 
 ### Part Information Getter 
 

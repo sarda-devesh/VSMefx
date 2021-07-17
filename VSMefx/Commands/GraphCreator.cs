@@ -67,7 +67,6 @@ namespace VSMefx.Commands
                     this.rejectionGraph.Add(pair.Key, pair.Value); 
                 }
             }
-            Console.WriteLine("Count of Output Graph is " + this.rejectionGraph.Count()); 
         }
 
         private Node nodeConverter(PartNode current)

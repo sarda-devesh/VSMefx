@@ -28,8 +28,14 @@ namespace VSMefx
                 if (ValidExtensions.Contains(extension))
                 {
                     string fullPath = Path.Combine(folderPath, fileName);
-                    this.AssemblyPaths.Add(fullPath);
-                    isSucessful = true;
+                    if(File.Exists(fullPath))
+                    {
+                        this.AssemblyPaths.Add(fullPath);
+                        isSucessful = true;
+                    } else
+                    {
+                        isSucessful = false;
+                    }
                 }
                 else
                 {
@@ -63,7 +69,8 @@ namespace VSMefx
             string filePath = Path.Combine(currentFolder, fileName); 
             if(!File.Exists(filePath))
             {
-                Console.WriteLine("Couldn't find file " + fileName); 
+                Console.WriteLine("Couldn't find file " + fileName);
+                return;
             }
             try
             {
@@ -99,7 +106,7 @@ namespace VSMefx
                 {
                     if(!AddFile(currentFolder, file))
                     {
-                        Console.WriteLine(file + " is not a valid input file");
+                        Console.WriteLine("Couldn't find file " + file);
                     }
                 }
             }
@@ -108,7 +115,14 @@ namespace VSMefx
                 foreach(string folder in folders)
                 {
                     string folderPath = Path.Combine(currentFolder, folder);
-                    SearchFolder(folderPath);
+                    if (Directory.Exists(folderPath))
+                    {
+                        SearchFolder(folderPath);
+                    } else
+                    {
+                        Console.WriteLine("Couldn't find folder " + folder);
+                    }
+                    
                 }
             }
             if(WhiteListFile.Length > 0)

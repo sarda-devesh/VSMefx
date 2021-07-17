@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,23 +12,29 @@ using VSMefx.Commands;
 namespace VSMefx
 {
 
-    /*
-     * Basic Structure Information Test:
-     * -p -t MefCalculator.ExportTest -e MefCalculator.MefCalculatorInterfaces+IOperation -i MajorRevision --files MefCalculator.dll  
-     * -d Extensions
-     * 
-     * Graph Generation All:
-     * -g -r all --files MefCalculator.dll -d Extensions 
-     * 
-     * Graph Generation Specific:
-     * -gv -r ExtendedOperations.Modulo --files MefCalculator.dll -d Extensions 
-     *
-    */
-
     class Program
     {
+
+        private static readonly string testFolder = "Basic"; 
+        private static void setWorkingDirectory()
+        {
+            string currentFile = Assembly.GetExecutingAssembly().Location;
+            string currentFolder = Path.GetDirectoryName(currentFile);
+            string rootFolder = Path.GetFullPath(Path.Combine(currentFolder, "..\\..\\.."));
+            string testLocation = Path.Combine(rootFolder, "Tests");
+            if(testFolder.Length > 0)
+            {
+                testLocation = Path.Combine(testLocation, testFolder); 
+            }
+            if (Directory.Exists(testLocation))
+            {
+                Directory.SetCurrentDirectory(testLocation);
+            }
+        }
+
         static void Main(string[] args)
         {
+            setWorkingDirectory(); 
             CommandLine.Parser.Default.ParseArguments<CLIOptions>(args)
             .WithParsed<CLIOptions>(async options =>
             {
