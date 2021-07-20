@@ -5,17 +5,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Composition;
+using System.Text.RegularExpressions;
 
 namespace VSMefx
 {
     public class ConfigCreator
     {
         private static string[] ValidExtensions = { "dll", "exe" };
+
         public List<string> AssemblyPaths { get; private set; }  
         public ComposableCatalog catalog { get; private set; }
         public CompositionConfiguration config { get; private set; }
 
-        public HashSet<string> WhiteListedParts { get; private set; }
+        private HashSet<Regex> WhiteListExpressions { get; set; }
+        private HashSet<string> WhiteListParts { get; set; }
+        private bool usingRegex { get; set; }
+
+        private static readonly TimeSpan maxRegexTime = new TimeSpan(0, 0, 5);
+        private static readonly RegexOptions options = RegexOptions.IgnoreCase;
 
         private bool AddFile(string folderPath, string fileName)
         {
@@ -75,15 +82,45 @@ namespace VSMefx
             try
             {
                 string[] lines = File.ReadAllLines(filePath); 
-                foreach(string partName in lines)
+                foreach(string description in lines)
                 {
-                    WhiteListedParts.Add(partName.Trim());
+                    string name = description.Trim();
+                    if(this.usingRegex)
+                    {
+                        string pattern = @"^" + name + @"$";
+                        this.WhiteListExpressions.Add(new Regex(pattern, options, maxRegexTime));
+                    } else
+                    {
+                        this.WhiteListParts.Add(name);
+                    }
                 }
             }catch(Exception e)
             {
                 Console.WriteLine("Encountered error when trying to process the file: " + e.Message); 
             }
         } 
+
+        public bool isWhiteListed(string partName)
+        {
+            if(!this.usingRegex)
+            {
+                return this.WhiteListParts.Contains(partName);
+            }
+            foreach(Regex test in this.WhiteListExpressions)
+            {
+                try
+                {
+                    if(test.IsMatch(partName))
+                    {
+                        return true;
+                    }
+                }catch(Exception e)
+                {
+                    Console.WriteLine("Encountered " + e.Message + " when testing " + partName + " against " + test.ToString());
+                }
+            }
+            return false; 
+        }
 
         public async Task Initialize()
         {
@@ -95,11 +132,11 @@ namespace VSMefx
             this.config = CompositionConfiguration.Create(this.catalog);
         }
 
-        public ConfigCreator(IEnumerable<string> files, IEnumerable<string> folders, string WhiteListFile = "")
+        public ConfigCreator(CLIOptions options)
         {
             this.AssemblyPaths = new List<string>();
-            this.WhiteListedParts = new HashSet<string>(); 
             string currentFolder = Directory.GetCurrentDirectory();
+            IEnumerable<string> files = options.files; 
             if (files != null)
             {
                 foreach(string file in files)
@@ -110,6 +147,7 @@ namespace VSMefx
                     }
                 }
             }
+            IEnumerable<string> folders = options.folders; 
             if(folders != null)
             {
                 foreach(string folder in folders)
@@ -125,9 +163,18 @@ namespace VSMefx
                     
                 }
             }
-            if(WhiteListFile.Length > 0)
+            this.usingRegex = options.useRegex;
+            if (this.usingRegex)
             {
-                ReadWhiteListFile(currentFolder, WhiteListFile); 
+                this.WhiteListExpressions = new HashSet<Regex>();
+            }
+            else
+            {
+                this.WhiteListParts = new HashSet<string>();
+            }
+            if (options.whiteListFile.Length > 0)
+            {
+                ReadWhiteListFile(currentFolder, options.whiteListFile); 
             }
         }
     }

@@ -10,7 +10,7 @@ namespace VSMefx
     public class CLIOptions
     {
 
-        [Option('v', "verbose")]
+        [Option('v', "verbose", Default = false)]
         public bool verbose { get; set; }
 
         [Option('f', "files")]
@@ -34,11 +34,13 @@ namespace VSMefx
         [Option('r', "rejected")]
         public IEnumerable<string> rejectedDetails { get; set; }
 
-        [Option('g', "graph")]
+        [Option('g', "graph", Default = false)]
         public bool saveGraph { get; set; }
 
-        [Option('w', "whitelist", Default = (string) "" )]
+        [Option('w', "whitelist", Default =  "" )]
         public string whiteListFile { get; set; }
 
+        [Option('x', "regex", Default = false)]
+        public bool useRegex { get; set;  }
     }
 }

@@ -20,7 +20,7 @@ namespace VSMefx.Commands
             var errors = config.CompositionErrors;
             int levelNumber = errors.Count();
             this.maxLevels = levelNumber;
-            HashSet<String> whiteListedParts = this.Creator.WhiteListedParts; 
+          
             while (errors.Count() > 0)
             {
                 var currentLevel = errors.Peek();
@@ -32,9 +32,7 @@ namespace VSMefx.Commands
                         ComposablePartDefinition definition = part.Definition;
                         PartNode currentNode = new PartNode(definition, element.Message, levelNumber);
                         string currentName = currentNode.getName();
-                        if (whiteListedParts.Contains(currentName)) {
-                            currentNode.setWhiteListed(true); 
-                        }
+                        currentNode.setWhiteListed(this.Creator.isWhiteListed(currentName));
                         var imports = part.Definition.Imports;
                         foreach(var import in imports)
                         { 
@@ -70,7 +68,6 @@ namespace VSMefx.Commands
         private void listErrorsinLevel(int currentLevel)
         {
             Console.WriteLine("Listing errors in level " + currentLevel);
-            HashSet<String> whiteList = this.Creator.WhiteListedParts; 
             foreach(var pair in this.rejectionGraph)
             {
                 PartNode node = pair.Value;
@@ -108,8 +105,7 @@ namespace VSMefx.Commands
                 Console.WriteLine("No Rejection Issues associated with " + partName + "\n");
                 return;
             }
-            HashSet<string> whiteList = this.Creator.WhiteListedParts;
-            if (whiteList.Contains(partName))
+            if (rejectionGraph[partName].IsWhiteListed)
             {
                 Console.WriteLine("Not running rejection analysis since part " + partName + " is present in whitelist\n"); 
                 return; 
