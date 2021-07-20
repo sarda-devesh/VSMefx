@@ -9,13 +9,17 @@ namespace VSMefx.Commands
 {
     public class PartInfo : Command
     {
-        public static string CommandName = "PartInfo"; 
 
         public PartInfo(ConfigCreator DerivedInfo, CLIOptions Arguments) : base(DerivedInfo, Arguments)
         {
 
         }
 
+        /*
+         * <summary>
+         * Method to print basic information associated with all the parts in the catalog
+         * </summary>
+         */
         public void listAllParts()
         {
             ComposableCatalog catalog = this.Creator.catalog;
@@ -26,6 +30,11 @@ namespace VSMefx.Commands
             
         }
 
+        /*
+         * <summary>
+         * Method to present detailed information about the imports/exports of a given part
+         * </summary>
+         */
         public void getPartInfo(string partName)
         {
             ComposablePartDefinition definition = this.getPart(partName); 
@@ -35,10 +44,12 @@ namespace VSMefx.Commands
                 return;
             }
             Console.WriteLine("Printing out details for part " + partName);
+            //Print details about the exports of the given part
             foreach(var export in definition.ExportingMembers)
             {
                 Console.WriteLine("[Export] " + export.Key.Name);
             }
+            //Print details about the parts/type the current part imports
             foreach(var import in definition.Imports)
             {
                 Console.WriteLine("[Import] " + import.ImportDefinition.ContractName);
@@ -47,6 +58,11 @@ namespace VSMefx.Commands
 
         //TODO: Preprocess the below commands to find the exporters/importers for parts?
 
+        /*
+         * <summary> 
+         * Method to list all the exporting parts of a given type
+         * </summary>
+         */
         public void listTypeExporter(string typeName)
         {
             Console.WriteLine("Exporting parts for " + typeName + ":");
@@ -61,6 +77,12 @@ namespace VSMefx.Commands
                 }
             }
         }
+
+        /*
+         * <summary>
+         * Method to detail all the parts that import a given part/type 
+         * </summary>
+         */
 
         public void listTypeImporter(string typeName)
         {

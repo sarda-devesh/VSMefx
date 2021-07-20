@@ -11,19 +11,27 @@ namespace VSMefx
 {
     public class ConfigCreator
     {
-        private static string[] ValidExtensions = { "dll", "exe" };
+        private static string[] ValidExtensions = { "dll", "exe" }; //File extensions that are considered valid 
 
-        public List<string> AssemblyPaths { get; private set; }  
-        public ComposableCatalog catalog { get; private set; }
-        public CompositionConfiguration config { get; private set; }
+        private List<string> AssemblyPaths { get; set; }  //Complete path of all the files we want to include in our analysis
+        public ComposableCatalog catalog { get; private set; } //Catalog of all the parts we found
+        public CompositionConfiguration config { get; private set; } //Configuration associated with the parts we found
 
-        private HashSet<Regex> WhiteListExpressions { get; set; }
-        private HashSet<string> WhiteListParts { get; set; }
-        private bool usingRegex { get; set; }
+        private HashSet<Regex> WhiteListExpressions { get; set; } //If using regex, store the input regular expression
+        private HashSet<string> WhiteListParts { get; set; } //If not using regex, store the part names to be excluded
+        private bool usingRegex { get; set; } //A boolean indicating if we are using regex or not 
 
+        //Constants associated with the Regex's for the expressions specified in the whitelist
         private static readonly TimeSpan maxRegexTime = new TimeSpan(0, 0, 5);
         private static readonly RegexOptions options = RegexOptions.IgnoreCase;
 
+        /*
+         * <summary>
+         * Method to add a given file to the list of all the assembly paths. 
+         * A file is added to the list of path if it contains a valid extension and actually exists
+         * </summary>
+         * <returns> A boolean indicating if the file was added to the list of paths </returns>
+         */
         private bool AddFile(string folderPath, string fileName)
         {
             fileName = fileName.Trim();
@@ -52,6 +60,13 @@ namespace VSMefx
             return isSucessful;
         }
 
+        /*
+         * <summary>
+         * Method to add valid files from the current folder and its subfolders to the list of paths
+         * </summary>
+         * <param name="currentPath>The complete path to the folder we want to add files from</param>
+         */
+
         private void SearchFolder(string currentPath)
         {
             DirectoryInfo currentDir = new DirectoryInfo(currentPath);
@@ -70,6 +85,15 @@ namespace VSMefx
                 }
             }
         }
+
+        /*
+         * <summary>
+         * Method to process the input files based on whether we are using regex or not. 
+         * Prints any issues encountered while processing the input file back to the user. 
+         * </summary>
+         * <param name = "currentFolder">The complete path to the folder that the file is present in</param>
+         * <param name = "fileName">The relative path to the file from the current folder </param>
+         */
 
         private void ReadWhiteListFile(string currentFolder, string fileName)
         {
@@ -100,6 +124,13 @@ namespace VSMefx
             }
         } 
 
+        /*
+         * <summary>
+         * Method to check if a given part is present in the whitelist or not
+         * </summary>
+         * <param name="partName">The name of the part we want to check</param>
+         * <returns> A boolean indicating if the specified part was included in the whitelist or not</returns>
+         */
         public bool isWhiteListed(string partName)
         {
             if(!this.usingRegex)
@@ -122,6 +153,12 @@ namespace VSMefx
             return false; 
         }
 
+        /*
+         * <summary>
+         * Method to intialize the catalog and configuration objects from the input files
+         * </summary>
+         */
+
         public async Task Initialize()
         {
             PartDiscovery discovery = PartDiscovery.Combine(
@@ -135,6 +172,7 @@ namespace VSMefx
         public ConfigCreator(CLIOptions options)
         {
             this.AssemblyPaths = new List<string>();
+            //Add all the files in the input argument to the list of paths 
             string currentFolder = Directory.GetCurrentDirectory();
             IEnumerable<string> files = options.files; 
             if (files != null)
@@ -147,6 +185,7 @@ namespace VSMefx
                     }
                 }
             }
+            //Add all the valid files in the input folders to the list of paths
             IEnumerable<string> folders = options.folders; 
             if(folders != null)
             {
@@ -163,6 +202,7 @@ namespace VSMefx
                     
                 }
             }
+            //Read and process the whitelist file, if one is present
             this.usingRegex = options.useRegex;
             if (this.usingRegex)
             {

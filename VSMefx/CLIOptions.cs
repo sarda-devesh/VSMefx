@@ -7,6 +7,12 @@ using CommandLine;
 
 namespace VSMefx
 {
+
+    /*
+     * <summary>
+     * Class used by Command Line Parser to load input arguments into
+     * </summary>
+     */
     public class CLIOptions
     {
 

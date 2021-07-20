@@ -9,13 +9,28 @@ namespace VSMefx.Commands
 {
     public class PartNode
     {
-        public ComposablePartDefinition part { get; set; }
-        public string verboseMessage { get; set; }
-        public HashSet<PartNode> importRejects; //Points to the "children" of the current node
-        public HashSet<PartNode> rejectsCaused; //Points to the "parents" of the current node
-        public int Level { get; private set; }
+        public ComposablePartDefinition part { get; set; } //Represents the part associated with the current node
+        public string verboseMessage { get; set; } //Rejection Message(s) associated with the current part
 
-        public bool IsWhiteListed { get; private set;  }
+        /*
+         * <summary>
+         * Stores the "children" of the current node, which represents parts that the current
+         * node imports that have import issues themselves
+         * </summary>
+         */
+        public HashSet<PartNode> importRejects;
+
+        /*
+         * <summary>
+         * Stores the "parent" of the current node, which represents parts that the current
+         * node caused import issues in due to its failure 
+         * </summary>
+         */
+
+        public HashSet<PartNode> rejectsCaused; 
+        public int Level { get; private set; } //An indicator of its depth in the rejection stack 
+
+        public bool IsWhiteListed { get; private set;  } //A boolean if this part was specified in the whitelist file
 
         public PartNode(ComposablePartDefinition definition, string message, int currLevel)
         {
@@ -32,6 +47,12 @@ namespace VSMefx.Commands
             return part.Type.FullName;
         }
 
+        /*
+         * <summary>
+         * Method to check if the given node imports any parts with import issues
+         * </summary>
+         * <returns> A boolean indicating it the given node is a leaf node</return>
+         */
         public bool isLeafNode()
         {
             return importRejects.Count() == 0;
@@ -51,6 +72,13 @@ namespace VSMefx.Commands
         {
             this.IsWhiteListed = value; 
         }
+
+        /*
+         * <summary>
+         * A node is showing in the output graph if it is not whitlisted or has non-whitelisted children
+         * </summary>
+         * <returns> A boolean indicating if the current node should be shown in the output graph </returns>
+         */
 
         public bool showNode()
         {

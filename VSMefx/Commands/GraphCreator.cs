@@ -11,12 +11,13 @@ namespace VSMefx.Commands
 {
     class GraphCreator
     {
-        private Dictionary<string, PartNode> rejectionGraph { set; get; }
-        private DirectedGraph DGML { get; set; }
+        private Dictionary<string, PartNode> rejectionGraph { set; get; } //The nodes present in the output graph
+        private DirectedGraph DGML { get; set; } //The output graph 
 
         public GraphCreator(Dictionary<string, PartNode> graph)
         {
             this.filterGraph(graph);
+            //Tell the DGML creator how to create nodes, categorize them and create edges between 
             var nodeCreator = new[]
             {
                 new NodeBuilder<PartNode>(nodeConverter)
@@ -44,6 +45,12 @@ namespace VSMefx.Commands
             return this.DGML;
         }
 
+        /*
+         * <summary>
+         * Method to save the generated graph to an output file
+         * </summary>
+         * <param name="outputFileName"> The complete path of the file to which we want to save the DGML graph </param>
+         */
         public void saveGraph(string outputFileName)
         {
             int extensionIndex = outputFileName.LastIndexOf('.');
@@ -57,6 +64,11 @@ namespace VSMefx.Commands
             Console.WriteLine("Saved rejection graph to " + outputFileName);
         }
 
+        /*
+         * <summary>
+         * Method to only include the nodes that should be shown in the output graph
+         * </summary>
+         */
         private void filterGraph(Dictionary<string,PartNode>  graph)
         {
             this.rejectionGraph = new Dictionary<string, PartNode>(); 
@@ -69,6 +81,13 @@ namespace VSMefx.Commands
             }
         }
 
+        /*
+         * <summary>
+         * Method to convert from custom Node representation to the DGML node representation
+         * <summary>
+         * <param name="current">The PartNode object which we want to convert</param>
+         * <returns> A DGML Node representation of the input PartNode </returns>
+         */
         private Node nodeConverter(PartNode current)
         {
             Node converted = new Node
@@ -79,6 +98,13 @@ namespace VSMefx.Commands
             return converted;
         }
 
+        /*
+         * <summary>
+         * Method to get all the outgoing edges from the current node
+         * </summary>
+         * <param name="current">The PartNode whose outgoing edges we want to find </param>
+         * <returns> A list of Links that represent the outgoing edges for the input node </returns>
+         */
         private IEnumerable<Link> edgeGenerator(PartNode current)
         {
             foreach(var parentNode in current.rejectsCaused)
@@ -94,6 +120,15 @@ namespace VSMefx.Commands
                 } 
             }
         }
+
+        /*
+         * <summary>
+         * Method to check if a given potential edge is valid or not
+         * </summary>
+         * <param name="Source">The PartNode that would be the source of the potential edge </param>
+         * <param name="Target">The PartNode that would be the destination of the potential edge </param>
+         * <returns> A boolean indicating if the specified edge should be included in the graph or not </returns>
+         */
 
         private bool validEdge(PartNode source, PartNode target)
         {

@@ -15,7 +15,13 @@ namespace VSMefx
     class Program
     {
 
-        private static readonly string testFolder = "Basic"; 
+        private static readonly string testFolder = "Basic"; //Name of the test folder to navigate to
+
+        /*
+         *  <summary>
+         *  Configure the working directory of the current application for testing purposes based on the testFolder string. 
+         *  </summary> 
+         */ 
         private static void setWorkingDirectory()
         {
             string currentFile = Assembly.GetExecutingAssembly().Location;
@@ -34,7 +40,7 @@ namespace VSMefx
 
         static void Main(string[] args)
         {
-            setWorkingDirectory(); 
+            setWorkingDirectory(); //TODO: Remove this call in the main application since this for the current repo's file structure
             CommandLine.Parser.Default.ParseArguments<CLIOptions>(args)
             .WithParsed(async options =>
             {
@@ -44,20 +50,26 @@ namespace VSMefx
             .WithNotParsed(HandleParseError);
             Console.ReadKey();
         }
+
+        /* 
+         * <summary>
+         * Performs the operations and commands specified in the input arguments 
+         * <summary>
+         */
         
         static async Task RunOptions(CLIOptions options)
         {
             ConfigCreator creator = new ConfigCreator(options);
             await creator.Initialize();
             PartInfo infoGetter = new PartInfo(creator, options);
-
+            //Listing all the parts present in the input files/folders
             if (options.listParts)
             {
                 Console.WriteLine("Parts in Catalog are ");
                 infoGetter.listAllParts();
                 Console.WriteLine();
             }
-
+            //Get more detailed information about a specific part 
             if (options.partDetails.Count() > 0)
             {
                 foreach (string partName in options.partDetails)
@@ -66,7 +78,7 @@ namespace VSMefx
                     Console.WriteLine();
                 }
             }
-
+            //Get parts that export a given type
             if(options.exportDetails.Count() > 0)
             {
                 foreach(string exportType in options.exportDetails)
@@ -75,7 +87,7 @@ namespace VSMefx
                     Console.WriteLine();
                 }
             }
-
+            //Get parts that import a given part or type
             if(options.importDetails.Count() > 0)
             {
                 foreach(string importType in options.importDetails)
@@ -84,7 +96,7 @@ namespace VSMefx
                     Console.WriteLine();
                 }
             }
-
+            //Perform rejection tracing as well as visualization if specified
             if(options.rejectedDetails.Count() > 0)
             {
                 RejectionTracer tracer = new RejectionTracer(creator, options);
@@ -101,9 +113,14 @@ namespace VSMefx
             }
         }
 
+        /*
+         * <summary>
+         * Display the errors from the Command Line Parser to the user 
+         * </summary>
+         */
         static void HandleParseError(IEnumerable<Error> errs)
         {
-            Console.WriteLine("Encountered the following errors:");
+            Console.WriteLine("Encountered the following errors in parsing the input command: ");
             foreach(var error in errs)
             {
                 Console.WriteLine(error);
