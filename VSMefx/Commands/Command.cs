@@ -17,10 +17,17 @@ namespace VSMefx.Commands
         protected ConfigCreator Creator { get; private set; } //Stores the catalog and config information for the input files 
         protected CLIOptions Options { get; private set; } //The command line arguments specified by the user 
 
+        private Dictionary<string, ComposablePartDefinition> partInformation { get; set; }
+
         public Command(ConfigCreator DerivedInfo, CLIOptions Arguments)
         {
             this.Creator = DerivedInfo;
             this.Options = Arguments;
+            this.partInformation = new Dictionary<string, ComposablePartDefinition>();
+            foreach (ComposablePartDefinition part in Creator.catalog.Parts)
+            {
+                partInformation.Add(part.Type.FullName, part); 
+            }
         }
 
         /*
@@ -34,15 +41,11 @@ namespace VSMefx.Commands
 
         protected ComposablePartDefinition getPart(string partName)
         {
-            
-            foreach(ComposablePartDefinition part in Creator.catalog.Parts)
+            if(!this.partInformation.ContainsKey(partName))
             {
-                if(part.Type.FullName.Equals(partName))
-                {
-                    return part; 
-                }
+                return null;
             }
-            return null;
+            return this.partInformation[partName]; 
         }
 
         /*

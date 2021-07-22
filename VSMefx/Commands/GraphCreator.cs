@@ -14,9 +14,11 @@ namespace VSMefx.Commands
         private Dictionary<string, PartNode> rejectionGraph { set; get; } //The nodes present in the output graph
         private DirectedGraph DGML { get; set; } //The output graph 
 
+        private static readonly string WhiteListProperty = "whitelisted"; 
+
         public GraphCreator(Dictionary<string, PartNode> graph)
         {
-            this.filterGraph(graph);
+            this.rejectionGraph = graph;
             //Tell the DGML creator how to create nodes, categorize them and create edges between 
             var nodeCreator = new[]
             {
@@ -30,11 +32,16 @@ namespace VSMefx.Commands
             {
                 new CategoryBuilder<PartNode>(x => new Category { Id = x.Level.ToString() } )
             };
+            var styleCreator = new[]
+            {
+                new StyleBuilder<Node>(WhiteListedNode)
+            };
             var builder = new DgmlBuilder
             {
                 NodeBuilders = nodeCreator, 
                 LinkBuilders = edgeCreator, 
-                CategoryBuilders = categoryCreator
+                CategoryBuilders = categoryCreator,
+                StyleBuilders = styleCreator
             };
             IEnumerable<PartNode> nodes = rejectionGraph.Values;
             this.DGML = builder.Build(nodes);
@@ -66,23 +73,6 @@ namespace VSMefx.Commands
 
         /*
          * <summary>
-         * Method to only include the nodes that should be shown in the output graph
-         * </summary>
-         */
-        private void filterGraph(Dictionary<string,PartNode>  graph)
-        {
-            this.rejectionGraph = new Dictionary<string, PartNode>(); 
-            foreach(var pair in graph)
-            {
-                if(pair.Value.showNode())
-                {
-                    this.rejectionGraph.Add(pair.Key, pair.Value); 
-                }
-            }
-        }
-
-        /*
-         * <summary>
          * Method to convert from custom Node representation to the DGML node representation
          * <summary>
          * <param name="current">The PartNode object which we want to convert</param>
@@ -90,11 +80,20 @@ namespace VSMefx.Commands
          */
         private Node nodeConverter(PartNode current)
         {
+            string property; 
+            if(current.IsWhiteListed)
+            {
+                property = WhiteListProperty;
+            } else
+            {
+                property = "Error"; 
+            }
             Node converted = new Node
             {
                 Id = current.getName(),
-                Category = current.Level.ToString()
+                Category = property
             };
+            converted.Properties.Add("Level", current.Level.ToString());
             return converted;
         }
 
@@ -135,6 +134,18 @@ namespace VSMefx.Commands
             string sourceName = source.getName();
             string targetName = target.getName();
             return (rejectionGraph.ContainsKey(sourceName) && rejectionGraph.ContainsKey(targetName));
+        }
+
+        private static Style WhiteListedNode(Node node)
+        {
+            return new Style
+            {
+                GroupLabel = WhiteListProperty,
+                Setter = new List<Setter>
+                {
+                    new Setter {Property = "Background", Value = "#FFFFFF" }
+                }
+            };
         }
 
     }

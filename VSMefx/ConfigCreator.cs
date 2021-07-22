@@ -11,7 +11,7 @@ namespace VSMefx
 {
     public class ConfigCreator
     {
-        private static string[] ValidExtensions = { "dll", "exe" }; //File extensions that are considered valid 
+        private static string[] ValidExtensions = { "dll", "exe"}; //File extensions that are considered valid 
 
         private List<string> AssemblyPaths { get; set; }  //Complete path of all the files we want to include in our analysis
         public ComposableCatalog catalog { get; private set; } //Catalog of all the parts we found

@@ -66,11 +66,8 @@ namespace VSMefx.Commands
                             if (rejectionGraph.ContainsKey(importName))
                             {
                                 PartNode childNode = rejectionGraph[importName];
-                                if(!childNode.IsWhiteListed)
-                                {
-                                    childNode.addParent(currentNode); //Make the current node a "parent" of the import Node
-                                    currentNode.addChild(childNode); //Make the import node a "child" of the current Node
-                                }
+                                childNode.addParent(currentNode); //Make the current node a "parent" of the import Node
+                                currentNode.addChild(childNode); //Make the import node a "child" of the current Node
                             } 
                         }
                         //If we have already processed the current part before - potential error with the rejection stack
@@ -105,8 +102,7 @@ namespace VSMefx.Commands
             foreach(var pair in this.rejectionGraph)
             {
                 PartNode node = pair.Value;
-                //Don't display any rejection issues if the node is whitelisted
-                if(!node.IsWhiteListed && node.Level.Equals(currentLevel))
+                if(node.Level.Equals(currentLevel))
                 {
                     writeNodeDetail(node);
                     
@@ -127,7 +123,7 @@ namespace VSMefx.Commands
          */
         public void listAllRejections ()
         {
-            for(int level = 1; level <= maxLevels; level++)
+            for(int level = maxLevels; level > 0; level--)
             {
                 listErrorsinLevel(level);
             }
@@ -156,12 +152,6 @@ namespace VSMefx.Commands
             {
                 Console.WriteLine("No Rejection Issues associated with " + partName + "\n");
                 return;
-            }
-            //Deal with the case that given part was whitelisted by the user
-            if (rejectionGraph[partName].IsWhiteListed)
-            {
-                Console.WriteLine("Not running rejection analysis since part " + partName + " is present in whitelist\n"); 
-                return; 
             }
             Console.WriteLine("Printing Rejection Graph Info for " + partName + "\n");
             //Store just the nodes that are involved in the current rejection chain to use when generating the graph
@@ -199,10 +189,7 @@ namespace VSMefx.Commands
                     {
                         foreach(var node in current.importRejects)
                         {
-                            if (!node.IsWhiteListed)
-                            {
-                                currentLevelNodes.Enqueue(node);
-                            }
+                            currentLevelNodes.Enqueue(node);
                         }
                     }
                 }
@@ -227,14 +214,23 @@ namespace VSMefx.Commands
          */
         private void writeNodeDetail(PartNode current)
         {
+            string message; 
+            if(current.IsWhiteListed)
+            {
+                message = "[Whitelisted] "; 
+            } else
+            {
+                message = "";
+            }
             if (Options.verbose)
             {
-                Console.WriteLine(current.verboseMessage);
+                message += current.verboseMessage;
             }
             else
             {
-                Console.WriteLine(getName(current.part, "[Part]"));
+                message += getName(current.part, "[Part]");
             }
+            Console.WriteLine(message);
         }
 
     }

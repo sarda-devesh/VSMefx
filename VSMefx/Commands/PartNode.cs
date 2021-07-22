@@ -73,17 +73,5 @@ namespace VSMefx.Commands
             this.IsWhiteListed = value; 
         }
 
-        /*
-         * <summary>
-         * A node is showing in the output graph if it is not whitlisted or has non-whitelisted children
-         * </summary>
-         * <returns> A boolean indicating if the current node should be shown in the output graph </returns>
-         */
-
-        public bool showNode()
-        {
-            return (!this.IsWhiteListed || this.importRejects.Count() > 0); 
-        }
-
     }
 }
