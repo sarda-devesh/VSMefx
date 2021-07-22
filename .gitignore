@@ -386,3 +386,11 @@ FodyWeavers.xsd
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+#Custom Stuff
+Tests/**/*.json
+packages/*
+**/bin/*
+**/obj/*
+*.vs*
+**/*config
