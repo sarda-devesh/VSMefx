@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace VSMefx
 {
-    public class ConfigCreator
+    class ConfigCreator
     {
         private static string[] ValidExtensions = { "dll", "exe"}; //File extensions that are considered valid 
         private List<string> AssemblyPaths { get; set; }  //Complete path of all the files we want to include in our analysis

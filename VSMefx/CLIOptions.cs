@@ -13,7 +13,7 @@ namespace VSMefx
      * Class used by Command Line Parser to load input arguments into
      * </summary>
      */
-    public class CLIOptions
+    class CLIOptions
     {
 
         [Option('v', "verbose", Default = false)]

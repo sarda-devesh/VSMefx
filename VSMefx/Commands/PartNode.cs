@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace VSMefx.Commands
 {
-    public class PartNode
+    class PartNode
     {
         public ComposablePartDefinition Part { get; set; } //Represents the part associated with the current node
         public string VerboseMessage { get; set; } //Rejection Message(s) associated with the current part
@@ -18,7 +18,7 @@ namespace VSMefx.Commands
          * node imports that have import issues themselves
          * </summary>
          */
-        public HashSet<PartNode> ImportRejects;
+        public HashSet<PartEdge> ImportRejects;
 
         /*
          * <summary>
@@ -27,7 +27,7 @@ namespace VSMefx.Commands
          * </summary>
          */
 
-        public HashSet<PartNode> RejectsCaused; 
+        public HashSet<PartEdge> RejectsCaused; 
         public int Level { get; private set; } //An indicator of its depth in the rejection stack 
 
         public bool IsWhiteListed { get; private set;  } //A boolean if this part was specified in the whitelist file
@@ -36,8 +36,8 @@ namespace VSMefx.Commands
         {
             this.Part = Definition;
             this.VerboseMessage = Message;
-            ImportRejects = new HashSet<PartNode>();
-            RejectsCaused = new HashSet<PartNode>();
+            ImportRejects = new HashSet<PartEdge>();
+            RejectsCaused = new HashSet<PartEdge>();
             this.Level = CurrLevel;
             this.IsWhiteListed = false; 
         }
@@ -58,14 +58,14 @@ namespace VSMefx.Commands
             return ImportRejects.Count() == 0;
         }
 
-        public void AddChild(PartNode Node)
+        public void AddChild(PartNode Node, string Description = "")
         {
-            ImportRejects.Add(Node);
+            ImportRejects.Add(new PartEdge(Node, Description));
         }
 
-        public void AddParent(PartNode Node)
+        public void AddParent(PartNode Node, string Description = "")
         {
-            RejectsCaused.Add(Node);
+            RejectsCaused.Add(new PartEdge(Node, Description));
         }
 
         public void SetWhiteListed(bool Value)
@@ -73,5 +73,20 @@ namespace VSMefx.Commands
             this.IsWhiteListed = Value; 
         }
 
+    }
+
+    /// <summary>
+    /// A class to represent a simple edge between nodes
+    /// </summary>
+    class PartEdge
+    {
+        public PartNode Target; //The node that is at the head of the directed edge
+        public string Label; //A label to display when drawing the directed edge 
+
+        public PartEdge(PartNode Other, string Description)
+        {
+            this.Target = Other;
+            this.Label = Description;
+        }
     }
 }

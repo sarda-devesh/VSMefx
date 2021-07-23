@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.Composition;
 
 namespace VSMefx.Commands
 {
-    public class PartInfo : Command
+    class PartInfo : Command
     {
 
         public PartInfo(ConfigCreator DerivedInfo, CLIOptions Arguments) : base(DerivedInfo, Arguments)
@@ -79,7 +79,6 @@ namespace VSMefx.Commands
         /// Method to list all the importing parts of a given type
         /// </summary>
         /// <param name="TypeName"> The type whose importing parts we want details about </param>
-
         public void ListTypeImporter(string TypeName)
         {
             Console.WriteLine("Importing parts for " + TypeName + ":");

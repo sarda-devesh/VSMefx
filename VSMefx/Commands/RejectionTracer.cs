@@ -8,7 +8,7 @@ using OpenSoftware.DgmlTools.Model;
 
 namespace VSMefx.Commands
 {
-    public class RejectionTracer : Command
+    class RejectionTracer : Command
     {
         
          /// <summary>
@@ -36,48 +36,29 @@ namespace VSMefx.Commands
             var Errors = Config.CompositionErrors;
             int LevelNumber = Errors.Count();
             this.MaxLevels = LevelNumber;
-            Console.WriteLine("Generating error graph from composition errors"); 
             while (Errors.Count() > 0)
             {
                 //Process all the parts present in the current level of the stack
                 var CurrentLevel = Errors.Peek();
-                Console.WriteLine("Proccesing elements in level " + LevelNumber); 
                 foreach (var Element in CurrentLevel)
                 {
-                    var part = Element.Parts.First();
-                    Console.WriteLine("Currently processing part " + part.Definition.Type.FullName);
-                    Console.WriteLine("Element Message is " + Element.Message);
+                    var Part = Element.Parts.First();
                     //Create a PartNode object from the definition of the current Part
-                    ComposablePartDefinition Definition = part.Definition;
+                    ComposablePartDefinition Definition = Part.Definition;
                     PartNode CurrentNode = new PartNode(Definition, Element.Message, LevelNumber);
                     string CurrentName = CurrentNode.GetName();
                     CurrentNode.SetWhiteListed(this.Creator.isWhiteListed(CurrentName));
                     //Get the imports for the current part to update the pointers associated with the current node
-                    var Imports = part.Definition.Imports;
-                    foreach (var Import in Imports)
+                    foreach(var Import in Part.Definition.Imports)
                     {
                         string ImportName = Import.ImportDefinition.ContractName;
-                        Console.WriteLine("The import name is " + ImportName);
-                        
-                        // As stated in the documentation for CompositionConfiguration, errors near the top of the stack
-                        // cause errors in elements near the point of the stack. Thus, we check the graph for the import
-                        // since any import that has rejection issues would have already been processed. 
-                         
-                        if (RejectionGraph.ContainsKey(ImportName))
+                        string ImportLabel = Import.ImportingMember.Name;
+                        if(RejectionGraph.ContainsKey(ImportName))
                         {
                             PartNode ChildNode = RejectionGraph[ImportName];
-                            ChildNode.AddParent(CurrentNode); //Make the current node a "parent" of the import Node
-                            CurrentNode.AddChild(ChildNode); //Make the import node a "child" of the current Node
+                            ChildNode.AddParent(CurrentNode, ImportLabel);
+                            CurrentNode.AddChild(ChildNode, ImportLabel);
                         }
-                    }
-                    foreach(var Export in part.Definition.ExportDefinitions)
-                    {
-                        Console.WriteLine("Export is " + Export.Value.ContractName);
-                    }
-                    //If we have already processed the current part before - potential error with the rejection stack
-                    if (RejectionGraph.ContainsKey(CurrentName))
-                    {
-                        throw new Exception("Node already present in graph, potential issue with duplicates");
                     }
                     RejectionGraph.Add(CurrentName, CurrentNode);
                 }
@@ -85,7 +66,6 @@ namespace VSMefx.Commands
                 Errors = Errors.Pop();
                 LevelNumber -= 1;
             }
-            Console.WriteLine();
         }
 
         public RejectionTracer(ConfigCreator DerivedInfo, CLIOptions Arguments) : base(DerivedInfo, Arguments)
@@ -193,9 +173,9 @@ namespace VSMefx.Commands
                     //Add the non whitelised "children" of the current node to the queue for future processing
                     if (Current.ImportRejects.Count() > 0)
                     {
-                        foreach(var ChildNode in Current.ImportRejects)
+                        foreach(var ChildEdge in Current.ImportRejects)
                         {
-                            CurrentLevelNodes.Enqueue(ChildNode);
+                            CurrentLevelNodes.Enqueue(ChildEdge.Target);
                         }
                     }
                 }

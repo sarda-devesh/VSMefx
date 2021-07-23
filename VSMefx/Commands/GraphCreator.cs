@@ -102,14 +102,15 @@ namespace VSMefx.Commands
         /// <returns> A list of Links that represent the outgoing edges for the input node </returns>
         private IEnumerable<Link> EdgeGenerator(PartNode Current)
         {
-            foreach(var parentNode in Current.RejectsCaused)
+            foreach(var OutgoingEdge in Current.RejectsCaused)
             {
-                if(ValidEdge(Current, parentNode))
+                if(ValidEdge(Current, OutgoingEdge))
                 {
                     Link Edge = new Link
                     {
                         Source = Current.GetName(),
-                        Target = parentNode.GetName()
+                        Target = OutgoingEdge.Target.GetName(),
+                        Label = OutgoingEdge.Label
                     };
                     yield return Edge; 
                 } 
@@ -120,12 +121,12 @@ namespace VSMefx.Commands
         /// Method to check if a given potential edge is valid or not
         /// </summary>
         /// <param name="Source">The PartNode that would be the source of the potential edge </param>
-        /// <param name="Target">The PartNode that would be the destination of the potential edge </param>
+        /// <param name="Edge">The PartEdge indicating an outgoing edge from the Source Node</param>
         /// <returns> A boolean indicating if the specified edge should be included in the graph or not </returns>
-        private bool ValidEdge(PartNode Source, PartNode Target)
+        private bool ValidEdge(PartNode Source, PartEdge Edge)
         {
             string sourceName = Source.GetName();
-            string targetName = Target.GetName();
+            string targetName = Edge.Target.GetName();
             return (RejectionGraph.ContainsKey(sourceName) && RejectionGraph.ContainsKey(targetName));
         }
 
