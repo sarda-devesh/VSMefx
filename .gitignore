@@ -394,3 +394,4 @@ packages/*
 **/obj/*
 *.vs*
 **/*config
+**/*csproj*

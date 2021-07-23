@@ -15,85 +15,81 @@ namespace VSMefx.Commands
 
         }
 
-        /*
-         * <summary>
-         * Method to print basic information associated with all the parts in the catalog
-         * </summary>
-         */
+         /// <summary>
+         /// Method to print basic information associated with all the parts in the catalog
+         /// </summary>
+         
         public void listAllParts()
         {
-            ComposableCatalog catalog = this.Creator.catalog;
-            foreach (ComposablePartDefinition part in catalog.Parts)
+            ComposableCatalog Catalog = this.Creator.Catalog;
+            foreach (ComposablePartDefinition Part in Catalog.Parts)
             {
-                Console.WriteLine(getName(part, "[Part]"));
+                Console.WriteLine(GetName(Part, "[Part]"));
             }
             
         }
 
-        /*
-         * <summary>
-         * Method to present detailed information about the imports/exports of a given part
-         * </summary>
-         */
-        public void getPartInfo(string partName)
+        
+        /// <summary>
+        /// Method to present detailed information about the imports/exports of a given part
+        /// </summary>
+        /// <param name="PartName"> The name of the part we want more information about</param>
+       
+        public void GetPartInfo(string PartName)
         {
-            ComposablePartDefinition definition = this.getPart(partName); 
-            if(definition == null)
+            ComposablePartDefinition Definition = this.getPart(PartName); 
+            if(Definition == null)
             {
-                Console.WriteLine("Couldn't find part with name " + partName);
+                Console.WriteLine("Couldn't find part with name " + PartName);
                 return;
             }
-            Console.WriteLine("Printing out details for part " + partName);
+            Console.WriteLine("Printing out details for part " + PartName);
             //Print details about the exports of the given part
-            foreach(var export in definition.ExportingMembers)
+            foreach(var Export in Definition.ExportingMembers)
             {
-                Console.WriteLine("[Export] " + export.Key.Name);
+                Console.WriteLine("[Export] " + Export.Key.Name);
             }
             //Print details about the parts/type the current part imports
-            foreach(var import in definition.Imports)
+            foreach(var Import in Definition.Imports)
             {
-                Console.WriteLine("[Import] " + import.ImportDefinition.ContractName);
+                Console.WriteLine("[Import] " + Import.ImportDefinition.ContractName);
             }
         }
 
-        //TODO: Preprocess the below commands to find the exporters/importers for parts?
-
-        /*
-         * <summary> 
-         * Method to list all the exporting parts of a given type
-         * </summary>
-         */
-        public void listTypeExporter(string typeName)
+         /// <summary> 
+         /// Method to list all the exporting parts of a given type
+         /// </summary>
+         /// <param name="TypeName"> The type whose exporting parts we want details about </param>
+        public void ListTypeExporter(string TypeName)
         {
-            Console.WriteLine("Exporting parts for " + typeName + ":");
-            foreach (var part in this.Creator.catalog.Parts)
+            Console.WriteLine("Exporting parts for " + TypeName + ":");
+            foreach (var Part in this.Creator.Catalog.Parts)
             { 
-                foreach(var export in part.ExportDefinitions)
+                foreach(var Export in Part.ExportDefinitions)
                 {
-                    if(export.Value.ContractName.Equals(typeName))
+                    if(Export.Value.ContractName.Equals(TypeName))
                     {
-                        Console.WriteLine(getName(part, "[Part]"));
+                        Console.WriteLine(GetName(Part, "[Part]"));
                     }
                 }
             }
         }
 
-        /*
-         * <summary>
-         * Method to detail all the parts that import a given part/type 
-         * </summary>
-         */
+        /// <summary> 
+        /// Method to list all the importing parts of a given type
+        /// </summary>
+        /// <param name="TypeName"> The type whose importing parts we want details about </param>
 
-        public void listTypeImporter(string typeName)
+        public void ListTypeImporter(string TypeName)
         {
-            Console.WriteLine("Importing parts for " + typeName + ":");
-            foreach(var part in this.Creator.catalog.Parts)
+            Console.WriteLine("Importing parts for " + TypeName + ":");
+            foreach(var Part in this.Creator.Catalog.Parts)
             {
-                foreach(var import in part.Imports)
+                foreach(var Import in Part.Imports)
                 {
-                    if(import.ImportDefinition.ContractName.Equals(typeName))
+                    if(Import.ImportDefinition.ContractName.Equals(TypeName))
                     {
-                        Console.WriteLine(getName(part, "[Part]"));
+                        Console.WriteLine(GetName(Part, "[Part]"));
                     }
                 }
             }

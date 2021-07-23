@@ -11,132 +11,130 @@ namespace VSMefx.Commands
 {
     class GraphCreator
     {
-        private Dictionary<string, PartNode> rejectionGraph { set; get; } //The nodes present in the output graph
-        private DirectedGraph DGML { get; set; } //The output graph 
+        private Dictionary<string, PartNode> RejectionGraph { set; get; } //The nodes present in the output graph
+        private DirectedGraph Dgml { get; set; } //The output graph 
 
-        private static readonly string WhiteListProperty = "whitelisted"; 
+        private static readonly string WhiteListProperty = "Whitelisted"; 
 
-        public GraphCreator(Dictionary<string, PartNode> graph)
+        public GraphCreator(Dictionary<string, PartNode> Graph)
         {
-            this.rejectionGraph = graph;
+            this.RejectionGraph = Graph;
             //Tell the DGML creator how to create nodes, categorize them and create edges between 
-            var nodeCreator = new[]
+            var NodeCreator = new[]
             {
-                new NodeBuilder<PartNode>(nodeConverter)
+                new NodeBuilder<PartNode>(NodeConverter)
             };
-            var edgeCreator = new[]
+            var EdgeCreator = new[]
             {
-                new LinksBuilder<PartNode>(edgeGenerator)
+                new LinksBuilder<PartNode>(EdgeGenerator)
             };
-            var categoryCreator = new[]
+            var CategoryCreator = new[]
             {
                 new CategoryBuilder<PartNode>(x => new Category { Id = x.Level.ToString() } )
             };
-            var styleCreator = new[]
+            var StyleCategory = new[]
             {
                 new StyleBuilder<Node>(WhiteListedNode)
             };
             var builder = new DgmlBuilder
             {
-                NodeBuilders = nodeCreator, 
-                LinkBuilders = edgeCreator, 
-                CategoryBuilders = categoryCreator,
-                StyleBuilders = styleCreator
+                NodeBuilders = NodeCreator, 
+                LinkBuilders = EdgeCreator, 
+                CategoryBuilders = CategoryCreator,
+                StyleBuilders = StyleCategory
             };
-            IEnumerable<PartNode> nodes = rejectionGraph.Values;
-            this.DGML = builder.Build(nodes);
+            IEnumerable<PartNode> nodes = RejectionGraph.Values;
+            this.Dgml = builder.Build(nodes);
         }
 
-        public DirectedGraph getGraph()
+        public DirectedGraph GetGraph()
         {
-            return this.DGML;
+            return this.Dgml;
         }
 
-        /*
-         * <summary>
-         * Method to save the generated graph to an output file
-         * </summary>
-         * <param name="outputFileName"> The complete path of the file to which we want to save the DGML graph </param>
-         */
-        public void saveGraph(string outputFileName)
+        /// <summary>
+        /// Method to save the generated graph to an output file
+        /// </summary>
+        /// <param name="OutputFileName"> The complete path of the file to which we want to save the DGML graph </param>
+
+        public void SaveGraph(string OutputFileName)
         {
-            int extensionIndex = outputFileName.LastIndexOf('.');
-            string extension = outputFileName.Substring(extensionIndex + 1);
+            int extensionIndex = OutputFileName.LastIndexOf('.');
+            string extension = OutputFileName.Substring(extensionIndex + 1);
             if(!extension.Equals("dgml"))
             {
-                Console.WriteLine("Can't save graph to ouput file " + outputFileName);
+                Console.WriteLine("Can't save graph to ouput file " + OutputFileName);
                 return;
             } 
-            this.DGML.WriteToFile(outputFileName);
-            Console.WriteLine("Saved rejection graph to " + outputFileName);
+            this.Dgml.WriteToFile(OutputFileName);
+            Console.WriteLine("Saved rejection graph to " + OutputFileName);
         }
 
-        /*
-         * <summary>
-         * Method to convert from custom Node representation to the DGML node representation
-         * <summary>
-         * <param name="current">The PartNode object which we want to convert</param>
-         * <returns> A DGML Node representation of the input PartNode </returns>
-         */
-        private Node nodeConverter(PartNode current)
+        /// <summary>
+        /// Method to convert from custom Node representation to the DGML node representation
+        /// <summary>
+        /// <param name="Current">The PartNode object which we want to convert</param>
+        /// <returns> A DGML Node representation of the input PartNode </returns>
+        
+        private Node NodeConverter(PartNode Current)
         {
-            string property; 
-            if(current.IsWhiteListed)
+            string Property; 
+            if(Current.IsWhiteListed)
             {
-                property = WhiteListProperty;
+                Property = WhiteListProperty;
             } else
             {
-                property = "Error"; 
+                Property = "Error"; 
             }
-            Node converted = new Node
+            Node Convertered = new Node
             {
-                Id = current.getName(),
-                Category = property
+                Id = Current.GetName(),
+                Category = Property
             };
-            converted.Properties.Add("Level", current.Level.ToString());
-            return converted;
+            Convertered.Properties.Add("Level", Current.Level.ToString());
+            return Convertered;
         }
 
-        /*
-         * <summary>
-         * Method to get all the outgoing edges from the current node
-         * </summary>
-         * <param name="current">The PartNode whose outgoing edges we want to find </param>
-         * <returns> A list of Links that represent the outgoing edges for the input node </returns>
-         */
-        private IEnumerable<Link> edgeGenerator(PartNode current)
+        /// <summary>
+        /// Method to get all the outgoing edges from the current node
+        /// </summary>
+        /// <param name="Current">The PartNode whose outgoing edges we want to find </param>
+        /// <returns> A list of Links that represent the outgoing edges for the input node </returns>
+        private IEnumerable<Link> EdgeGenerator(PartNode Current)
         {
-            foreach(var parentNode in current.rejectsCaused)
+            foreach(var parentNode in Current.RejectsCaused)
             {
-                if(validEdge(current, parentNode))
+                if(ValidEdge(Current, parentNode))
                 {
-                    Link edge = new Link
+                    Link Edge = new Link
                     {
-                        Source = current.getName(),
-                        Target = parentNode.getName()
+                        Source = Current.GetName(),
+                        Target = parentNode.GetName()
                     };
-                    yield return edge; 
+                    yield return Edge; 
                 } 
             }
         }
 
-        /*
-         * <summary>
-         * Method to check if a given potential edge is valid or not
-         * </summary>
-         * <param name="Source">The PartNode that would be the source of the potential edge </param>
-         * <param name="Target">The PartNode that would be the destination of the potential edge </param>
-         * <returns> A boolean indicating if the specified edge should be included in the graph or not </returns>
-         */
-
-        private bool validEdge(PartNode source, PartNode target)
+        /// <summary>
+        /// Method to check if a given potential edge is valid or not
+        /// </summary>
+        /// <param name="Source">The PartNode that would be the source of the potential edge </param>
+        /// <param name="Target">The PartNode that would be the destination of the potential edge </param>
+        /// <returns> A boolean indicating if the specified edge should be included in the graph or not </returns>
+        private bool ValidEdge(PartNode Source, PartNode Target)
         {
-            string sourceName = source.getName();
-            string targetName = target.getName();
-            return (rejectionGraph.ContainsKey(sourceName) && rejectionGraph.ContainsKey(targetName));
+            string sourceName = Source.GetName();
+            string targetName = Target.GetName();
+            return (RejectionGraph.ContainsKey(sourceName) && RejectionGraph.ContainsKey(targetName));
         }
 
-        private static Style WhiteListedNode(Node node)
+        /// <summary>
+        /// Returns a Style object that sets the background of whitelisted nodes to white
+        /// </summary>
+        /// <param name="Node"></param>
+        /// <returns>The Style object for a whitelisted node</returns>
+        private static Style WhiteListedNode(Node Node)
         {
             return new Style
             {

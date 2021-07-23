@@ -1,23 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <DirectedGraph xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" DataVirtualized="false" NeighborhoodDistance="0" xmlns="http://schemas.microsoft.com/vs/2009/dgml">
   <Nodes>
-    <Node Id="ExtendedOperations.ImportTest" Category="Error" Level="3" />
-    <Node Id="MefCalculator.AddIn" Category="Error" Level="3" />
-    <Node Id="ExtendedOperations.ChainOne" Category="whitelisted" Level="2" />
-    <Node Id="ExtendedOperations.Modulo" Category="Error" Level="1" />
+    <Node Id="MefCalculator.AddIn" Category="Error" Level="2" />
+    <Node Id="ExtendedOperations.Modulo" Category="Error" Level="2" />
+    <Node Id="ExtendedOperations.ImportTest" Category="Error" Level="2" />
+    <Node Id="ExtendedOperations.ChainOne" Category="Whitelisted" Level="1" />
   </Nodes>
   <Links>
     <Link Source="MefCalculator.AddIn" Target="ExtendedOperations.ChainOne" />
-    <Link Source="ExtendedOperations.ChainOne" Target="ExtendedOperations.Modulo" />
   </Links>
   <Categories>
-    <Category Id="3" />
     <Category Id="2" />
     <Category Id="1" />
   </Categories>
   <Styles>
-    <Style TargetType="Node" GroupLabel="whitelisted">
-      <Condition Expression="HasCategory('whitelisted')" />
+    <Style TargetType="Node" GroupLabel="Whitelisted">
+      <Condition Expression="HasCategory('Whitelisted')" />
       <Setter Property="Background" Value="#FFFFFF" />
     </Style>
   </Styles>

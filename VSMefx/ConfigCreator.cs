@@ -12,199 +12,201 @@ namespace VSMefx
     public class ConfigCreator
     {
         private static string[] ValidExtensions = { "dll", "exe"}; //File extensions that are considered valid 
-
         private List<string> AssemblyPaths { get; set; }  //Complete path of all the files we want to include in our analysis
-        public ComposableCatalog catalog { get; private set; } //Catalog of all the parts we found
-        public CompositionConfiguration config { get; private set; } //Configuration associated with the parts we found
+
+        /// <summary>
+        /// Catalog storing information about the imported parts
+        /// </summary>
+        public ComposableCatalog Catalog { get; private set; } 
+
+        /// <summary>
+        /// Configuration information associated with the imported parts
+        /// </summary>
+        public CompositionConfiguration Config { get; private set; } 
 
         private HashSet<Regex> WhiteListExpressions { get; set; } //If using regex, store the input regular expression
         private HashSet<string> WhiteListParts { get; set; } //If not using regex, store the part names to be excluded
-        private bool usingRegex { get; set; } //A boolean indicating if we are using regex or not 
+        private bool UsingRegex { get; set; } //A boolean indicating if we are using regex or not 
 
         //Constants associated with the Regex's for the expressions specified in the whitelist
-        private static readonly TimeSpan maxRegexTime = new TimeSpan(0, 0, 5);
-        private static readonly RegexOptions options = RegexOptions.IgnoreCase;
+        private static readonly TimeSpan MaxRegexTime = new TimeSpan(0, 0, 5);
+        private static readonly RegexOptions RegexOptions = RegexOptions.IgnoreCase;
 
-        /*
-         * <summary>
-         * Method to add a given file to the list of all the assembly paths. 
-         * A file is added to the list of path if it contains a valid extension and actually exists
-         * </summary>
-         * <returns> A boolean indicating if the file was added to the list of paths </returns>
-         */
-        private bool AddFile(string folderPath, string fileName)
+         /// <summary>
+         /// Method to add a given file to the list of all the assembly paths. 
+         /// A file is added to the list of path if it contains a valid extension and actually exists
+         /// </summary>
+         /// <returns> A boolean indicating if the file was added to the list of paths </returns>
+         
+        private bool AddFile(string FolderPath, string FileName)
         {
-            fileName = fileName.Trim();
-            int extensionIndex = fileName.LastIndexOf('.');
-            bool isSucessful = extensionIndex >= 0;
-            if(isSucessful)
+            FileName = FileName.Trim();
+            int ExtensionIndex = FileName.LastIndexOf('.');
+            bool IsSucessful = ExtensionIndex >= 0;
+            if(IsSucessful)
             {
-                string extension = fileName.Substring(extensionIndex + 1);
+                string extension = FileName.Substring(ExtensionIndex + 1);
                 if (ValidExtensions.Contains(extension))
                 {
-                    string fullPath = Path.Combine(folderPath, fileName);
+                    string fullPath = Path.Combine(FolderPath, FileName);
                     if(File.Exists(fullPath))
                     {
                         this.AssemblyPaths.Add(fullPath);
-                        isSucessful = true;
+                        IsSucessful = true;
                     } else
                     {
-                        isSucessful = false;
+                        IsSucessful = false;
                     }
                 }
                 else
                 {
-                    isSucessful = false;
+                    IsSucessful = false;
                 }
             }
-            return isSucessful;
+            return IsSucessful;
         }
 
-        /*
-         * <summary>
-         * Method to add valid files from the current folder and its subfolders to the list of paths
-         * </summary>
-         * <param name="currentPath>The complete path to the folder we want to add files from</param>
-         */
 
-        private void SearchFolder(string currentPath)
+        /// <summary>
+        /// Method to add valid files from the current folder and its subfolders to the list of paths
+        /// </summary>
+        /// <param name="CurrentPath">The complete path to the folder we want to add files from</param>
+
+        private void SearchFolder(string CurrentPath)
         {
-            DirectoryInfo currentDir = new DirectoryInfo(currentPath);
-            var files = currentDir.EnumerateFiles();
-            foreach (var file in files)
+            DirectoryInfo CurrentDir = new DirectoryInfo(CurrentPath);
+            var Files = CurrentDir.EnumerateFiles();
+            foreach (var File in Files)
             {
-                string name = file.Name;
-                AddFile(currentPath, name);
+                string Name = File.Name;
+                AddFile(CurrentPath, Name);
             }
-            IEnumerable<DirectoryInfo> subFolders = currentDir.EnumerateDirectories();
-            if (subFolders.Count() > 0)
+            IEnumerable<DirectoryInfo> SubFolders = CurrentDir.EnumerateDirectories();
+            if (SubFolders.Count() > 0)
             {
-                foreach (DirectoryInfo subFolder in subFolders)
+                foreach (DirectoryInfo SubFolder in SubFolders)
                 {
-                    SearchFolder(subFolder.FullName);
+                    SearchFolder(SubFolder.FullName);
                 }
             }
         }
 
-        /*
-         * <summary>
-         * Method to process the input files based on whether we are using regex or not. 
-         * Prints any issues encountered while processing the input file back to the user. 
-         * </summary>
-         * <param name = "currentFolder">The complete path to the folder that the file is present in</param>
-         * <param name = "fileName">The relative path to the file from the current folder </param>
-         */
 
-        private void ReadWhiteListFile(string currentFolder, string fileName)
+        /// <summary>
+        /// Method to process the input files based on whether we are using regex or not. 
+        /// Prints any issues encountered while processing the input file back to the user. 
+        /// </summary>
+        /// <param name = "currentFolder">The complete path to the folder that the file is present in</param>
+        /// <param name = "fileName">The relative path to the file from the current folder </param>
+
+        private void ReadWhiteListFile(string CurrentFolder, string FileName)
         {
-            string filePath = Path.Combine(currentFolder, fileName); 
-            if(!File.Exists(filePath))
+            string FilePath = Path.Combine(CurrentFolder, FileName); 
+            if(!File.Exists(FilePath))
             {
-                Console.WriteLine("Couldn't find file " + fileName);
+                Console.WriteLine("Couldn't find file " + FileName);
                 return;
             }
             try
             {
-                string[] lines = File.ReadAllLines(filePath); 
-                foreach(string description in lines)
+                string[] Lines = File.ReadAllLines(FilePath); 
+                foreach(string description in Lines)
                 {
-                    string name = description.Trim();
-                    if(this.usingRegex)
+                    string Name = description.Trim();
+                    if(this.UsingRegex)
                     {
-                        string pattern = @"^" + name + @"$";
-                        this.WhiteListExpressions.Add(new Regex(pattern, options, maxRegexTime));
+                        string pattern = @"^" + Name + @"$";
+                        this.WhiteListExpressions.Add(new Regex(pattern, RegexOptions, MaxRegexTime));
                     } else
                     {
-                        this.WhiteListParts.Add(name);
+                        this.WhiteListParts.Add(Name);
                     }
                 }
-            }catch(Exception e)
+            }catch(Exception Error)
             {
-                Console.WriteLine("Encountered error when trying to process the file: " + e.Message); 
+                Console.WriteLine("Encountered error when trying to process the file: " + Error.Message); 
             }
-        } 
+        }
 
-        /*
-         * <summary>
-         * Method to check if a given part is present in the whitelist or not
-         * </summary>
-         * <param name="partName">The name of the part we want to check</param>
-         * <returns> A boolean indicating if the specified part was included in the whitelist or not</returns>
-         */
-        public bool isWhiteListed(string partName)
+
+        /// <summary>
+        /// Method to check if a given part is present in the whitelist or not
+        /// </summary>
+        /// <param name="PartName">The name of the part we want to check</param>
+        /// <returns> A boolean indicating if the specified part was included in the whitelist or not</returns>
+
+        public bool isWhiteListed(string PartName)
         {
-            if(!this.usingRegex)
+            if(!this.UsingRegex)
             {
-                return this.WhiteListParts.Contains(partName);
+                return this.WhiteListParts.Contains(PartName);
             }
-            foreach(Regex test in this.WhiteListExpressions)
+            foreach(Regex Test in this.WhiteListExpressions)
             {
                 try
                 {
-                    if(test.IsMatch(partName))
+                    if(Test.IsMatch(PartName))
                     {
                         return true;
                     }
-                }catch(Exception e)
+                }catch(Exception Error)
                 {
-                    Console.WriteLine("Encountered " + e.Message + " when testing " + partName + " against " + test.ToString());
+                    Console.WriteLine("Encountered " + Error.Message + " when testing " + PartName + " against " + Test.ToString());
                 }
             }
             return false; 
         }
-
-        /*
-         * <summary>
-         * Method to intialize the catalog and configuration objects from the input files
-         * </summary>
-         */
+        
+         /// <summary>
+         /// Method to intialize the catalog and configuration objects from the input files
+         /// </summary>
 
         public async Task Initialize()
         {
-            PartDiscovery discovery = PartDiscovery.Combine(
+            PartDiscovery Discovery = PartDiscovery.Combine(
                 new AttributedPartDiscovery(Resolver.DefaultInstance),
                 new AttributedPartDiscoveryV1(Resolver.DefaultInstance));
-            this.catalog = ComposableCatalog.Create(Resolver.DefaultInstance)
-                .AddParts(await discovery.CreatePartsAsync(this.AssemblyPaths));
-            this.config = CompositionConfiguration.Create(this.catalog);
+            this.Catalog = ComposableCatalog.Create(Resolver.DefaultInstance)
+                .AddParts(await Discovery.CreatePartsAsync(this.AssemblyPaths));
+            this.Config = CompositionConfiguration.Create(this.Catalog);
         }
 
-        public ConfigCreator(CLIOptions options)
+        public ConfigCreator(CLIOptions Options)
         {
             this.AssemblyPaths = new List<string>();
             //Add all the files in the input argument to the list of paths 
-            string currentFolder = Directory.GetCurrentDirectory();
-            IEnumerable<string> files = options.files; 
-            if (files != null)
+            string CurrentFolder = Directory.GetCurrentDirectory();
+            IEnumerable<string> Files = Options.Files; 
+            if (Files != null)
             {
-                foreach(string file in files)
+                foreach(string File in Files)
                 {
-                    if(!AddFile(currentFolder, file))
+                    if(!AddFile(CurrentFolder, File))
                     {
-                        Console.WriteLine("Couldn't find file " + file);
+                        Console.WriteLine("Couldn't add file " + File);
                     }
                 }
             }
             //Add all the valid files in the input folders to the list of paths
-            IEnumerable<string> folders = options.folders; 
-            if(folders != null)
+            IEnumerable<string> Folders = Options.Folders; 
+            if(Folders != null)
             {
-                foreach(string folder in folders)
+                foreach(string Folder in Folders)
                 {
-                    string folderPath = Path.Combine(currentFolder, folder);
-                    if (Directory.Exists(folderPath))
+                    string FolderPath = Path.Combine(CurrentFolder, Folder);
+                    if (Directory.Exists(FolderPath))
                     {
-                        SearchFolder(folderPath);
+                        SearchFolder(FolderPath);
                     } else
                     {
-                        Console.WriteLine("Couldn't find folder " + folder);
+                        Console.WriteLine("Couldn't add files from folder " + Folder);
                     }
                     
                 }
             }
             //Read and process the whitelist file, if one is present
-            this.usingRegex = options.useRegex;
-            if (this.usingRegex)
+            this.UsingRegex = Options.UseRegex;
+            if (this.UsingRegex)
             {
                 this.WhiteListExpressions = new HashSet<Regex>();
             }
@@ -212,9 +214,9 @@ namespace VSMefx
             {
                 this.WhiteListParts = new HashSet<string>();
             }
-            if (options.whiteListFile.Length > 0)
+            if (Options.WhiteListFile.Length > 0)
             {
-                ReadWhiteListFile(currentFolder, options.whiteListFile); 
+                ReadWhiteListFile(CurrentFolder, Options.WhiteListFile); 
             }
         }
     }

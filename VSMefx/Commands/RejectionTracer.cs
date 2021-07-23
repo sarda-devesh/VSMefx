@@ -10,227 +10,233 @@ namespace VSMefx.Commands
 {
     public class RejectionTracer : Command
     {
-        /*
-         * <summary>
-         * All the nodes in the rejectionGraph, which is a graph representation of 
-         * the error stack provided by the config 
-         * </summary>
-         */
-        private Dictionary<string, PartNode> rejectionGraph { get; set; } 
+        
+         /// <summary>
+         /// All the nodes in the rejectionGraph, which is a graph representation of 
+         /// the error stack provided by the config 
+         /// </summary>
+        private Dictionary<string, PartNode> RejectionGraph { get; set; } 
 
-        /*
-         * <summary>
-         * The number of levels present in the overall graph where the level value
-         * corresponds to the depth of the node/part in the error stack
-         * </summary>
-         */
-        private int maxLevels { get; set; } 
-
-        /*
-         * <summary>
-         * Method to initialize the part nodes and thier "pointers" based on the error
-         * stack from the config
-         * </summary>
-         */
-        private void generateNodeGraph()
+        
+        /// <summary>
+        /// The number of levels present in the overall graph where the level value
+        /// corresponds to the depth of the node/part in the error stack
+        /// </summary>
+        private int MaxLevels { get; set; } 
+        
+        /// <summary>
+        /// Method to initialize the part nodes and thier "pointers" based on the error
+        /// stack from the config
+        /// </summary>
+         
+        private void GenerateNodeGraph()
         {
             //Get the error stack from the composition configuration
-            CompositionConfiguration config = this.Creator.config;
-            var errors = config.CompositionErrors;
-            int levelNumber = errors.Count();
-            this.maxLevels = levelNumber;
-            while (errors.Count() > 0)
+            CompositionConfiguration Config = this.Creator.Config;
+            var Errors = Config.CompositionErrors;
+            int LevelNumber = Errors.Count();
+            this.MaxLevels = LevelNumber;
+            Console.WriteLine("Generating error graph from composition errors"); 
+            while (Errors.Count() > 0)
             {
                 //Process all the parts present in the current level of the stack
-                var currentLevel = errors.Peek();
-                foreach (var element in currentLevel)
+                var CurrentLevel = Errors.Peek();
+                Console.WriteLine("Proccesing elements in level " + LevelNumber); 
+                foreach (var Element in CurrentLevel)
                 {
-                    var parts = element.Parts;
-                    foreach (var part in parts)
+                    var part = Element.Parts.First();
+                    Console.WriteLine("Currently processing part " + part.Definition.Type.FullName);
+                    Console.WriteLine("Element Message is " + Element.Message);
+                    //Create a PartNode object from the definition of the current Part
+                    ComposablePartDefinition Definition = part.Definition;
+                    PartNode CurrentNode = new PartNode(Definition, Element.Message, LevelNumber);
+                    string CurrentName = CurrentNode.GetName();
+                    CurrentNode.SetWhiteListed(this.Creator.isWhiteListed(CurrentName));
+                    //Get the imports for the current part to update the pointers associated with the current node
+                    var Imports = part.Definition.Imports;
+                    foreach (var Import in Imports)
                     {
-                        //Create a PartNode object from the definition of the current Part
-                        ComposablePartDefinition definition = part.Definition;
-                        PartNode currentNode = new PartNode(definition, element.Message, levelNumber);
-                        string currentName = currentNode.getName();
-                        currentNode.setWhiteListed(this.Creator.isWhiteListed(currentName));
-                        //Get the imports for the current part to update the pointers associated with the current node
-                        var imports = part.Definition.Imports;
-                        foreach(var import in imports)
-                        { 
-                            string importName = import.ImportDefinition.ContractName;
-                            /*
-                             * As stated in the documentation for CompositionConfiguration, errors near the top of the stack
-                             * cause errors in elements near the point of the stack. Thus, we check the graph for the import
-                             * since any import that has rejection issues would have already been processed. 
-                             */
-                            if (rejectionGraph.ContainsKey(importName))
-                            {
-                                PartNode childNode = rejectionGraph[importName];
-                                childNode.addParent(currentNode); //Make the current node a "parent" of the import Node
-                                currentNode.addChild(childNode); //Make the import node a "child" of the current Node
-                            } 
-                        }
-                        //If we have already processed the current part before - potential error with the rejection stack
-                        if(rejectionGraph.ContainsKey(currentName))
+                        string ImportName = Import.ImportDefinition.ContractName;
+                        Console.WriteLine("The import name is " + ImportName);
+                        
+                        // As stated in the documentation for CompositionConfiguration, errors near the top of the stack
+                        // cause errors in elements near the point of the stack. Thus, we check the graph for the import
+                        // since any import that has rejection issues would have already been processed. 
+                         
+                        if (RejectionGraph.ContainsKey(ImportName))
                         {
-                            throw new Exception("Node already present in graph, potential issue with duplicates");
+                            PartNode ChildNode = RejectionGraph[ImportName];
+                            ChildNode.AddParent(CurrentNode); //Make the current node a "parent" of the import Node
+                            CurrentNode.AddChild(ChildNode); //Make the import node a "child" of the current Node
                         }
-                        rejectionGraph.Add(currentName, currentNode);
                     }
+                    foreach(var Export in part.Definition.ExportDefinitions)
+                    {
+                        Console.WriteLine("Export is " + Export.Value.ContractName);
+                    }
+                    //If we have already processed the current part before - potential error with the rejection stack
+                    if (RejectionGraph.ContainsKey(CurrentName))
+                    {
+                        throw new Exception("Node already present in graph, potential issue with duplicates");
+                    }
+                    RejectionGraph.Add(CurrentName, CurrentNode);
                 }
                 //Get the next level of the stack
-                errors = errors.Pop();
-                levelNumber -= 1;
+                Errors = Errors.Pop();
+                LevelNumber -= 1;
             }
+            Console.WriteLine();
         }
 
         public RejectionTracer(ConfigCreator DerivedInfo, CLIOptions Arguments) : base(DerivedInfo, Arguments)
         {
-            this.rejectionGraph = new Dictionary<string, PartNode>();
-            this.generateNodeGraph();
+            this.RejectionGraph = new Dictionary<string, PartNode>();
+            this.GenerateNodeGraph();
         }
 
-        /*
-         * <summary>
-         * Method to indicate all the rejection issues present in a given level
-         * </summary>
-         * <param name="currentLevel">An integer representing the level we are intrested in</param>
-         */
-        private void listErrorsinLevel(int currentLevel)
+        
+        /// <summary>
+        /// Method to indicate all the rejection issues present in a given level
+        /// </summary>
+        /// <param name="CurrentLevel">An integer representing the level we are intrested in</param>
+        private void ListErrorsinLevel(int CurrentLevel)
         {
-            Console.WriteLine("Listing errors in level " + currentLevel);
-            foreach(var pair in this.rejectionGraph)
+            Console.WriteLine("Listing errors in level " + CurrentLevel);
+            foreach(var Pair in this.RejectionGraph)
             {
-                PartNode node = pair.Value;
-                if(node.Level.Equals(currentLevel))
+                PartNode CurrentNode = Pair.Value;
+                if(CurrentNode.Level.Equals(CurrentLevel))
                 {
-                    writeNodeDetail(node);
+                    WriteNodeDetail(CurrentNode);
                     
                 }
             }
             Console.WriteLine();
         }
 
-        /*
-         * <summary>
-         * Method to display all the rejections present in the input files.
-         * Based on how the levels are assigned, the root causes for the errors in the 
-         * application can easily be accessed by looking at the rejection issues present at
-         * the highest level. 
-         * If the graph argument was passed in the input arguments, a DGML graph representing
-         * all the rejection issues is saved in a file called all.dgml
-         * </summary>
-         */
-        public void listAllRejections ()
+        /// <summary>
+        /// Method to display all the rejections present in the input files.
+        /// If the graph argument was passed in the input arguments, a DGML graph representing
+        /// all the rejection issues is saved in a file called All.dgml
+        /// </summary>
+        /// <remarks>
+        /// Based on how the levels are assigned, the root causes for the errors in the 
+        /// application can easily be accessed by looking at the rejection issues present at
+        /// the highest level. 
+        /// </remarks>
+
+        public void ListAllRejections ()
         {
-            for(int level = maxLevels; level > 0; level--)
+            for(int Level = MaxLevels; Level > 0; Level--)
             {
-                listErrorsinLevel(level);
+                ListErrorsinLevel(Level);
             }
-            if(Options.saveGraph)
+            if(Options.SaveGraph)
             {
-                GraphCreator creater = new GraphCreator(rejectionGraph);
-                creater.saveGraph("all.dgml");
+                GraphCreator creater = new GraphCreator(RejectionGraph);
+                creater.SaveGraph("All.dgml");
             }
         }
 
-        /* 
-         * <summary>
-         * Method to the get the information about the rejection information that caused a
-         * particular import failure, rather than for the entire system.
-         * Once again, the root causes can easily be accessed by looking at the rejection
-         * issues at the highest levels of the output. 
-         * If graph was specified in the input arguments then a DGML graph tracing the rejection
-         * chain assocaited with the current path alone is saved to a file called [partName].dgml
-         * <param name = "partName"> The name of the part which we want to analyze</param>
-         * </summary>
-        */
-        public void listReject(string partName)
+        
+        /// <summary>
+        /// Method to the get the information about the rejection information that caused a
+        /// particular import failure, rather than for the entire system.
+        /// If graph was specified in the input arguments then a DGML graph tracing the rejection
+        /// chain assocaited with the current path alone is saved to a file called [partName].dgml
+        /// </summary>
+        /// <param name = "PartName"> The name of the part which we want to analyze</param>
+        /// <remarks>
+        /// Once again, the root causes can easily be accessed by looking at the rejection
+        /// issues at the highest levels of the output. 
+        /// </remarks>
+        
+        public void ListReject(string PartName)
         {
             //Deal with the case that there are no rejection issues with the given part
-            if (!rejectionGraph.ContainsKey(partName))
+            if (!RejectionGraph.ContainsKey(PartName))
             {
-                Console.WriteLine("No Rejection Issues associated with " + partName + "\n");
+                Console.WriteLine("No Rejection Issues associated with " + PartName + "\n");
                 return;
             }
-            Console.WriteLine("Printing Rejection Graph Info for " + partName + "\n");
+            Console.WriteLine("Printing Rejection Graph Info for " + PartName + "\n");
             //Store just the nodes that are involved in the current rejection chain to use when generating the graph
-            Dictionary<string, PartNode> relevantNodes = null; 
-            if (Options.saveGraph)
+            Dictionary<string, PartNode> RelevantNodes = null; 
+            if (Options.SaveGraph)
             {
-                relevantNodes = new Dictionary<string, PartNode>();
+                RelevantNodes = new Dictionary<string, PartNode>();
             }
-            /*
-             * Perform Breadth First Search (BFS) with the node associated with partName as the root. 
-             * When performing BFS, only the child nodes are considered since we want to the root to be
-             * the end point of the rejection chain(s). 
-             * BFS was chosen over DFS because of the fact that we process level by level when performing
-             * the travesal and thus easier to communicate the causes and pathway to the end user
-             */
-            Queue<PartNode> currentLevelNodes = new Queue<PartNode>();
-            currentLevelNodes.Enqueue(rejectionGraph[partName]);
-            int currentLevel = 1; 
-            while(currentLevelNodes.Count() > 0)
+            
+            // Perform Breadth First Search (BFS) with the node associated with partName as the root. 
+            // When performing BFS, only the child nodes are considered since we want to the root to be
+            // the end point of the rejection chain(s). 
+            // BFS was chosen over DFS because of the fact that we process level by level when performing
+            // the travesal and thus easier to communicate the causes and pathway to the end user
+
+            Queue<PartNode> CurrentLevelNodes = new Queue<PartNode>();
+            CurrentLevelNodes.Enqueue(RejectionGraph[PartName]);
+            int CurrentLevel = 1; 
+            while(CurrentLevelNodes.Count() > 0)
             {
-                Console.WriteLine("Errors in Level " + currentLevel);
+                Console.WriteLine("Errors in Level " + CurrentLevel);
                 //Iterate through all the nodes in the current level
-                int numNodes = currentLevelNodes.Count();
-                for (int i = 0; i < numNodes; i++)
+                int NumNodes = CurrentLevelNodes.Count();
+                for (int Index = 0; Index < NumNodes; Index++)
                 {
                     //Process the current node by displaying its import issue and adding it to the graph
-                    PartNode current = currentLevelNodes.Dequeue();
-                    if(Options.saveGraph)
+                    PartNode Current = CurrentLevelNodes.Dequeue();
+                    if(Options.SaveGraph)
                     {
-                        relevantNodes.Add(current.getName(), current);
+                        RelevantNodes.Add(Current.GetName(), Current);
                     }
-                    writeNodeDetail(current);
+                    WriteNodeDetail(Current);
                     //Add the non whitelised "children" of the current node to the queue for future processing
-                    if (current.importRejects.Count() > 0)
+                    if (Current.ImportRejects.Count() > 0)
                     {
-                        foreach(var node in current.importRejects)
+                        foreach(var ChildNode in Current.ImportRejects)
                         {
-                            currentLevelNodes.Enqueue(node);
+                            CurrentLevelNodes.Enqueue(ChildNode);
                         }
                     }
                 }
-                currentLevel += 1;
+                CurrentLevel += 1;
                 Console.WriteLine();
             }
             //Save the output graph if the user request it
-            if(Options.saveGraph)
+            if(Options.SaveGraph)
             {
-                GraphCreator creater = new GraphCreator(relevantNodes);
+                GraphCreator Creater = new GraphCreator(RelevantNodes);
                 //Replacing '.' with '_' in the fileName to ensure that the '.' is associated with the file extension
-                string fileName = partName.Replace(".", "_") + ".dgml";
-                creater.saveGraph(fileName);
+                string FileName = PartName.Replace(".", "_") + ".dgml";
+                Creater.SaveGraph(FileName);
                 Console.WriteLine();
             }
         }
 
-        /*
-         * <summary>
-         * Method to display information about a particular node to the user 
-         * </summary>
-         */
-        private void writeNodeDetail(PartNode current)
+        /// <summary>
+        /// Method to display information about a particular node to the user 
+        /// </summary>
+        /// <param name="Current">The Node whose information we want to display</param>
+         
+        private void WriteNodeDetail(PartNode Current)
         {
-            string message; 
-            if(current.IsWhiteListed)
+            string Message; 
+            if(Current.IsWhiteListed)
             {
-                message = "[Whitelisted] "; 
+                Message = "[Whitelisted] "; 
             } else
             {
-                message = "";
+                Message = "";
             }
-            if (Options.verbose)
+            if (Options.Verbose)
             {
-                message += current.verboseMessage;
+                Message += Current.VerboseMessage;
             }
             else
             {
-                message += getName(current.part, "[Part]");
+                Message += GetName(Current.Part, "[Part]");
             }
-            Console.WriteLine(message);
+            Console.WriteLine(Message);
         }
 
     }

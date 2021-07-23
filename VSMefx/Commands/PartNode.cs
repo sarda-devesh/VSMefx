@@ -9,8 +9,8 @@ namespace VSMefx.Commands
 {
     public class PartNode
     {
-        public ComposablePartDefinition part { get; set; } //Represents the part associated with the current node
-        public string verboseMessage { get; set; } //Rejection Message(s) associated with the current part
+        public ComposablePartDefinition Part { get; set; } //Represents the part associated with the current node
+        public string VerboseMessage { get; set; } //Rejection Message(s) associated with the current part
 
         /*
          * <summary>
@@ -18,7 +18,7 @@ namespace VSMefx.Commands
          * node imports that have import issues themselves
          * </summary>
          */
-        public HashSet<PartNode> importRejects;
+        public HashSet<PartNode> ImportRejects;
 
         /*
          * <summary>
@@ -27,50 +27,50 @@ namespace VSMefx.Commands
          * </summary>
          */
 
-        public HashSet<PartNode> rejectsCaused; 
+        public HashSet<PartNode> RejectsCaused; 
         public int Level { get; private set; } //An indicator of its depth in the rejection stack 
 
         public bool IsWhiteListed { get; private set;  } //A boolean if this part was specified in the whitelist file
 
-        public PartNode(ComposablePartDefinition definition, string message, int currLevel)
+        public PartNode(ComposablePartDefinition Definition, string Message, int CurrLevel)
         {
-            this.part = definition;
-            this.verboseMessage = message;
-            importRejects = new HashSet<PartNode>();
-            rejectsCaused = new HashSet<PartNode>();
-            this.Level = currLevel;
+            this.Part = Definition;
+            this.VerboseMessage = Message;
+            ImportRejects = new HashSet<PartNode>();
+            RejectsCaused = new HashSet<PartNode>();
+            this.Level = CurrLevel;
             this.IsWhiteListed = false; 
         }
 
-        public string getName()
+        public string GetName()
         {
-            return part.Type.FullName;
+            return Part.Type.FullName;
         }
 
-        /*
-         * <summary>
-         * Method to check if the given node imports any parts with import issues
-         * </summary>
-         * <returns> A boolean indicating it the given node is a leaf node</return>
-         */
-        public bool isLeafNode()
+        
+        /// <summary>
+        /// Method to check if the given node imports any parts with import issues
+        /// </summary>
+        /// <returns> A boolean indicating it the given node is a leaf node</return>
+        
+        public bool IsLeafNode()
         {
-            return importRejects.Count() == 0;
+            return ImportRejects.Count() == 0;
         }
 
-        public void addChild(PartNode node)
+        public void AddChild(PartNode Node)
         {
-            importRejects.Add(node);
+            ImportRejects.Add(Node);
         }
 
-        public void addParent(PartNode node)
+        public void AddParent(PartNode Node)
         {
-            rejectsCaused.Add(node);
+            RejectsCaused.Add(Node);
         }
 
-        public void setWhiteListed(bool value)
+        public void SetWhiteListed(bool Value)
         {
-            this.IsWhiteListed = value; 
+            this.IsWhiteListed = Value; 
         }
 
     }

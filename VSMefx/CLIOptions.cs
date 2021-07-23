@@ -17,36 +17,36 @@ namespace VSMefx
     {
 
         [Option('v', "verbose", Default = false)]
-        public bool verbose { get; set; }
+        public bool Verbose { get; set; }
 
         [Option('f', "files")]
-        public IEnumerable<string> files { get; set; }
+        public IEnumerable<string> Files { get; set; }
 
         [Option('d', "directories")]
-        public IEnumerable<string> folders { get; set; }
+        public IEnumerable<string> Folders { get; set; }
 
         [Option('p', "parts")]
-        public bool listParts { get; set; }
+        public bool ListParts { get; set; }
 
         [Option('t', "type")]
-        public IEnumerable<string> partDetails { get; set; }
+        public IEnumerable<string> PartDetails { get; set; }
 
         [Option('i', "importers")]
-        public IEnumerable<string> importDetails { get; set; }
+        public IEnumerable<string> ImportDetails { get; set; }
 
         [Option('e', "exporters")]
-        public IEnumerable<string> exportDetails { get; set; }
+        public IEnumerable<string> ExportDetails { get; set; }
 
         [Option('r', "rejected")]
-        public IEnumerable<string> rejectedDetails { get; set; }
+        public IEnumerable<string> RejectedDetails { get; set; }
 
         [Option('g', "graph", Default = false)]
-        public bool saveGraph { get; set; }
+        public bool SaveGraph { get; set; }
 
         [Option('w', "whitelist", Default =  "" )]
-        public string whiteListFile { get; set; }
+        public string WhiteListFile { get; set; }
 
         [Option('x', "regex", Default = false)]
-        public bool useRegex { get; set;  }
+        public bool UseRegex { get; set;  }
     }
 }

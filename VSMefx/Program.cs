@@ -15,22 +15,22 @@ namespace VSMefx
     class Program
     {
 
-        private static readonly string testFolder = "Basic"; //Name of the test folder to navigate to
+        private static readonly string TestFolder = "Basic"; //Name of the test folder to navigate to
 
         /*
          *  <summary>
          *  Configure the working directory of the current application for testing purposes based on the testFolder string. 
          *  </summary> 
          */ 
-        private static void setWorkingDirectory()
+        private static void SetWorkingDirectory()
         {
             string currentFile = Assembly.GetExecutingAssembly().Location;
             string currentFolder = Path.GetDirectoryName(currentFile);
             string rootFolder = Path.GetFullPath(Path.Combine(currentFolder, "..\\..\\.."));
             string testLocation = Path.Combine(rootFolder, "Tests");
-            if(testFolder.Length > 0)
+            if(TestFolder.Length > 0)
             {
-                testLocation = Path.Combine(testLocation, testFolder); 
+                testLocation = Path.Combine(testLocation, TestFolder); 
             }
             if (Directory.Exists(testLocation))
             {
@@ -40,7 +40,7 @@ namespace VSMefx
 
         static void Main(string[] args)
         {
-            setWorkingDirectory(); //TODO: Remove this call in the main application since this for the current repo's file structure
+            SetWorkingDirectory(); //TODO: Remove this call in the main application since this for the current repo's file structure
             CommandLine.Parser.Default.ParseArguments<CLIOptions>(args)
             .WithParsed(async options =>
             {
@@ -56,58 +56,57 @@ namespace VSMefx
          * Performs the operations and commands specified in the input arguments 
          * <summary>
          */
-        
         static async Task RunOptions(CLIOptions options)
         {
-            ConfigCreator creator = new ConfigCreator(options);
-            await creator.Initialize();
-            PartInfo infoGetter = new PartInfo(creator, options);
+            ConfigCreator Creator = new ConfigCreator(options);
+            await Creator.Initialize();
+            PartInfo InfoGetter = new PartInfo(Creator, options);
             //Listing all the parts present in the input files/folders
-            if (options.listParts)
+            if (options.ListParts)
             {
                 Console.WriteLine("Parts in Catalog are ");
-                infoGetter.listAllParts();
+                InfoGetter.listAllParts();
                 Console.WriteLine();
             }
             //Get more detailed information about a specific part 
-            if (options.partDetails.Count() > 0)
+            if (options.PartDetails.Count() > 0)
             {
-                foreach (string partName in options.partDetails)
+                foreach (string PartName in options.PartDetails)
                 {
-                    infoGetter.getPartInfo(partName);
+                    InfoGetter.GetPartInfo(PartName);
                     Console.WriteLine();
                 }
             }
             //Get parts that export a given type
-            if(options.exportDetails.Count() > 0)
+            if(options.ExportDetails.Count() > 0)
             {
-                foreach(string exportType in options.exportDetails)
+                foreach(string ExportType in options.ExportDetails)
                 {
-                    infoGetter.listTypeExporter(exportType);
+                    InfoGetter.ListTypeExporter(ExportType);
                     Console.WriteLine();
                 }
             }
             //Get parts that import a given part or type
-            if(options.importDetails.Count() > 0)
+            if(options.ImportDetails.Count() > 0)
             {
-                foreach(string importType in options.importDetails)
+                foreach(string ImportType in options.ImportDetails)
                 {
-                    infoGetter.listTypeImporter(importType);
+                    InfoGetter.ListTypeImporter(ImportType);
                     Console.WriteLine();
                 }
             }
             //Perform rejection tracing as well as visualization if specified
-            if(options.rejectedDetails.Count() > 0)
+            if(options.RejectedDetails.Count() > 0)
             {
-                RejectionTracer tracer = new RejectionTracer(creator, options);
-                if(options.rejectedDetails.Contains("all"))
+                RejectionTracer Tracer = new RejectionTracer(Creator, options);
+                if(options.RejectedDetails.Contains("all"))
                 {
-                    tracer.listAllRejections();
+                    Tracer.ListAllRejections();
                 }  else
                 {
-                    foreach(string rejectPart in options.rejectedDetails)
+                    foreach(string RejectPart in options.RejectedDetails)
                     {
-                        tracer.listReject(rejectPart);
+                        Tracer.ListReject(RejectPart);
                     }
                 }
             }
@@ -126,5 +125,6 @@ namespace VSMefx
                 Console.WriteLine(error);
             }
         }
+
     }
 }
