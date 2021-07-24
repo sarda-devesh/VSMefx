@@ -7,8 +7,8 @@
     <Node Id="ExtendedOperations.Modulo" Category="Error" Level="1" />
   </Nodes>
   <Links>
-    <Link Source="MefCalculator.AddIn" Target="ExtendedOperations.ChainOne" Label="Adder" />
-    <Link Source="ExtendedOperations.ChainOne" Target="ExtendedOperations.Modulo" Label="addInput" />
+    <Link Source="MefCalculator.AddIn" Target="ExtendedOperations.ChainOne" Category="Edge" Label="Adder" />
+    <Link Source="ExtendedOperations.ChainOne" Target="ExtendedOperations.Modulo" Category="Edge" Label="addInput" />
   </Links>
   <Categories>
     <Category Id="3" />
@@ -16,6 +16,11 @@
     <Category Id="1" />
   </Categories>
   <Styles>
+    <Style TargetType="Link" GroupLabel="Edge">
+      <Condition Expression="HasCategory('Edge')" />
+      <Setter Property="Background" Value="#00FFFF" />
+      <Setter Property="StrokeThickness" Value="3" />
+    </Style>
     <Style TargetType="Node" GroupLabel="Whitelisted">
       <Condition Expression="HasCategory('Whitelisted')" />
       <Setter Property="Background" Value="#FFFFFF" />

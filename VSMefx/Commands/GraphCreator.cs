@@ -14,7 +14,11 @@ namespace VSMefx.Commands
         private Dictionary<string, PartNode> RejectionGraph { set; get; } //The nodes present in the output graph
         private DirectedGraph Dgml { get; set; } //The output graph 
 
-        private static readonly string WhiteListProperty = "Whitelisted"; 
+        private static readonly string WhiteListLabel = "Whitelisted";
+        private static readonly string EdgeLabel = "Edge";
+        private static readonly string NodeBackgroundHex = "#FFFFFF";
+        private static readonly string EdgeColor = "#00FFFF";
+        private static readonly string EdgeThickness = "3";
 
         public GraphCreator(Dictionary<string, PartNode> Graph)
         {
@@ -32,16 +36,16 @@ namespace VSMefx.Commands
             {
                 new CategoryBuilder<PartNode>(x => new Category { Id = x.Level.ToString() } )
             };
-            var StyleCategory = new[]
-            {
-                new StyleBuilder<Node>(WhiteListedNode)
+            StyleBuilder[] StyleCreator =  {
+                new StyleBuilder<Node>(WhiteListedNode),
+                new StyleBuilder<Link>(EdgeStyle)
             };
             var builder = new DgmlBuilder
             {
                 NodeBuilders = NodeCreator, 
                 LinkBuilders = EdgeCreator, 
                 CategoryBuilders = CategoryCreator,
-                StyleBuilders = StyleCategory
+                StyleBuilders = StyleCreator
             };
             IEnumerable<PartNode> nodes = RejectionGraph.Values;
             this.Dgml = builder.Build(nodes);
@@ -81,7 +85,7 @@ namespace VSMefx.Commands
             string Property; 
             if(Current.IsWhiteListed)
             {
-                Property = WhiteListProperty;
+                Property = WhiteListLabel;
             } else
             {
                 Property = "Error"; 
@@ -110,7 +114,8 @@ namespace VSMefx.Commands
                     {
                         Source = Current.GetName(),
                         Target = OutgoingEdge.Target.GetName(),
-                        Label = OutgoingEdge.Label
+                        Label = OutgoingEdge.Label,
+                        Category = EdgeLabel
                     };
                     yield return Edge; 
                 } 
@@ -139,10 +144,23 @@ namespace VSMefx.Commands
         {
             return new Style
             {
-                GroupLabel = WhiteListProperty,
+                GroupLabel = WhiteListLabel,
                 Setter = new List<Setter>
                 {
-                    new Setter {Property = "Background", Value = "#FFFFFF" }
+                    new Setter {Property = "Background", Value = NodeBackgroundHex }
+                }
+            };
+        }
+
+        private static Style EdgeStyle(Link Edge)
+        {
+            return new Style
+            {
+                GroupLabel = EdgeLabel,
+                Setter = new List<Setter>
+                {
+                    new Setter { Property = "Background", Value = EdgeColor },
+                    new Setter {Property = "StrokeThickness", Value = EdgeThickness}
                 }
             };
         }
