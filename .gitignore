@@ -388,7 +388,6 @@ FodyWeavers.xsd
 *.sln.iml
 
 #Custom Stuff
-Tests/**/*.json
 packages/*
 **/bin/*
 **/obj/*

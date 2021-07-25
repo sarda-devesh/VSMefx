@@ -24,17 +24,17 @@ namespace VSMefx
          */ 
         private static void SetWorkingDirectory()
         {
-            string currentFile = Assembly.GetExecutingAssembly().Location;
-            string currentFolder = Path.GetDirectoryName(currentFile);
-            string rootFolder = Path.GetFullPath(Path.Combine(currentFolder, "..\\..\\.."));
-            string testLocation = Path.Combine(rootFolder, "Tests");
+            string CurrentFile = Assembly.GetExecutingAssembly().Location;
+            string CurrentFolder = Path.GetDirectoryName(CurrentFile);
+            string RootFolder = Path.GetFullPath(Path.Combine(CurrentFolder, "..\\..\\.."));
+            string TestLocation = Path.Combine(RootFolder, "Tests");
             if(TestFolder.Length > 0)
             {
-                testLocation = Path.Combine(testLocation, TestFolder); 
+                TestLocation = Path.Combine(TestLocation, TestFolder); 
             }
-            if (Directory.Exists(testLocation))
+            if (Directory.Exists(TestLocation))
             {
-                Directory.SetCurrentDirectory(testLocation);
+                Directory.SetCurrentDirectory(TestLocation);
             }
         }
 
@@ -56,59 +56,60 @@ namespace VSMefx
          * Performs the operations and commands specified in the input arguments 
          * <summary>
          */
-        static async Task RunOptions(CLIOptions options)
+        static async Task RunOptions(CLIOptions Options)
         {
-            ConfigCreator Creator = new ConfigCreator(options);
+            ConfigCreator Creator = new ConfigCreator(Options);
             await Creator.Initialize();
-            PartInfo InfoGetter = new PartInfo(Creator, options);
+            PartInfo InfoGetter = new PartInfo(Creator, Options);
             //Listing all the parts present in the input files/folders
-            if (options.ListParts)
+            if (Options.ListParts)
             {
                 Console.WriteLine("Parts in Catalog are ");
                 InfoGetter.listAllParts();
                 Console.WriteLine();
             }
             //Get more detailed information about a specific part 
-            if (options.PartDetails.Count() > 0)
+            if (Options.PartDetails.Count() > 0)
             {
-                foreach (string PartName in options.PartDetails)
+                foreach (string PartName in Options.PartDetails)
                 {
                     InfoGetter.GetPartInfo(PartName);
                     Console.WriteLine();
                 }
             }
             //Get parts that export a given type
-            if(options.ExportDetails.Count() > 0)
+            if(Options.ExportDetails.Count() > 0)
             {
-                foreach(string ExportType in options.ExportDetails)
+                foreach(string ExportType in Options.ExportDetails)
                 {
                     InfoGetter.ListTypeExporter(ExportType);
                     Console.WriteLine();
                 }
             }
             //Get parts that import a given part or type
-            if(options.ImportDetails.Count() > 0)
+            if(Options.ImportDetails.Count() > 0)
             {
-                foreach(string ImportType in options.ImportDetails)
+                foreach(string ImportType in Options.ImportDetails)
                 {
                     InfoGetter.ListTypeImporter(ImportType);
                     Console.WriteLine();
                 }
             }
             //Perform rejection tracing as well as visualization if specified
-            if(options.RejectedDetails.Count() > 0)
+            if(Options.RejectedDetails.Count() > 0)
             {
-                RejectionTracer Tracer = new RejectionTracer(Creator, options);
-                if(options.RejectedDetails.Contains("all"))
+                RejectionTracer Tracer = new RejectionTracer(Creator, Options);
+                if(Options.RejectedDetails.Contains("all"))
                 {
                     Tracer.ListAllRejections();
                 }  else
                 {
-                    foreach(string RejectPart in options.RejectedDetails)
+                    foreach(string RejectPart in Options.RejectedDetails)
                     {
                         Tracer.ListReject(RejectPart);
                     }
                 }
+                
             }
         }
 

@@ -40,10 +40,8 @@ namespace VSMefx.Commands
             {
                 //Process all the parts present in the current level of the stack
                 var CurrentLevel = Errors.Peek();
-                Console.WriteLine("Processing errors at level " + LevelNumber); 
                 foreach (var Element in CurrentLevel)
                 {
-                    Console.WriteLine("Error message of " + Element.Message); 
                     var Part = Element.Parts.First();
                     //Create a PartNode object from the definition of the current Part
                     ComposablePartDefinition Definition = Part.Definition;
@@ -55,13 +53,11 @@ namespace VSMefx.Commands
                     }
                     PartNode CurrentNode = new PartNode(Definition, Element.Message, LevelNumber);
                     CurrentNode.SetWhiteListed(this.Creator.isWhiteListed(CurrentName));
-                    Console.WriteLine("Created Node with name of " + CurrentName); 
                     //Get the imports for the current part to update the pointers associated with the current node
                     foreach(var Import in Definition.Imports)
                     {
                         string ImportName = Import.ImportingSiteType.FullName;
                         string ImportLabel = Import.ImportingMember.Name;
-                        Console.WriteLine("Import name of " + ImportName + " and label of " + ImportLabel); 
                         if(RejectionGraph.ContainsKey(ImportName))
                         {
                             PartNode ChildNode = RejectionGraph[ImportName];
@@ -188,7 +184,10 @@ namespace VSMefx.Commands
                     }
                 }
                 CurrentLevel += 1;
-                Console.WriteLine();
+                if(!Options.Verbose)
+                {
+                    Console.WriteLine();
+                }
             }
             //Save the output graph if the user request it
             if(Options.SaveGraph)
@@ -222,14 +221,16 @@ namespace VSMefx.Commands
                 foreach(string ErrorMessage in Current.VerboseMessages)
                 {
                     string Message = StartMessage + ErrorMessage;
-                    Console.WriteLine(Message); 
+                    Console.WriteLine(Message);
+                    Console.WriteLine(); 
                 }
-            }else
+                
+            }
+            else
             {
                 string Message = StartMessage + GetName(Current.Part, "[Part]");
                 Console.WriteLine(Message);
             }
-            Console.WriteLine(); 
         }
 
     }
