@@ -10,7 +10,7 @@ namespace VSMefx.Commands
     class PartNode
     {
         public ComposablePartDefinition Part { get; set; } //Represents the part associated with the current node
-        public string VerboseMessage { get; set; } //Rejection Message(s) associated with the current part
+        public List<string> VerboseMessages { get; set; } //Rejection Message(s) associated with the current part
 
         /*
          * <summary>
@@ -35,7 +35,8 @@ namespace VSMefx.Commands
         public PartNode(ComposablePartDefinition Definition, string Message, int CurrLevel)
         {
             this.Part = Definition;
-            this.VerboseMessage = Message;
+            this.VerboseMessages = new List<string>();
+            this.VerboseMessages.Add(Message); 
             ImportRejects = new HashSet<PartEdge>();
             RejectsCaused = new HashSet<PartEdge>();
             this.Level = CurrLevel;
@@ -71,6 +72,11 @@ namespace VSMefx.Commands
         public void SetWhiteListed(bool Value)
         {
             this.IsWhiteListed = Value; 
+        }
+
+        public void AddErrorMessage(string Message)
+        {
+            this.VerboseMessages.Add(Message); 
         }
 
     }

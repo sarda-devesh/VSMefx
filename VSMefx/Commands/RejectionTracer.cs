@@ -40,19 +40,28 @@ namespace VSMefx.Commands
             {
                 //Process all the parts present in the current level of the stack
                 var CurrentLevel = Errors.Peek();
+                Console.WriteLine("Processing errors at level " + LevelNumber); 
                 foreach (var Element in CurrentLevel)
                 {
+                    Console.WriteLine("Error message of " + Element.Message); 
                     var Part = Element.Parts.First();
                     //Create a PartNode object from the definition of the current Part
                     ComposablePartDefinition Definition = Part.Definition;
-                    PartNode CurrentNode = new PartNode(Definition, Element.Message, LevelNumber);
-                    string CurrentName = CurrentNode.GetName();
-                    CurrentNode.SetWhiteListed(this.Creator.isWhiteListed(CurrentName));
-                    //Get the imports for the current part to update the pointers associated with the current node
-                    foreach(var Import in Part.Definition.Imports)
+                    string CurrentName = Definition.Type.FullName;
+                    if(RejectionGraph.ContainsKey(CurrentName))
                     {
-                        string ImportName = Import.ImportDefinition.ContractName;
+                        RejectionGraph[CurrentName].AddErrorMessage(Element.Message); 
+                        continue;
+                    }
+                    PartNode CurrentNode = new PartNode(Definition, Element.Message, LevelNumber);
+                    CurrentNode.SetWhiteListed(this.Creator.isWhiteListed(CurrentName));
+                    Console.WriteLine("Created Node with name of " + CurrentName); 
+                    //Get the imports for the current part to update the pointers associated with the current node
+                    foreach(var Import in Definition.Imports)
+                    {
+                        string ImportName = Import.ImportingSiteType.FullName;
                         string ImportLabel = Import.ImportingMember.Name;
+                        Console.WriteLine("Import name of " + ImportName + " and label of " + ImportLabel); 
                         if(RejectionGraph.ContainsKey(ImportName))
                         {
                             PartNode ChildNode = RejectionGraph[ImportName];
@@ -91,7 +100,6 @@ namespace VSMefx.Commands
                     
                 }
             }
-            Console.WriteLine();
         }
 
         /// <summary>
@@ -200,23 +208,28 @@ namespace VSMefx.Commands
          
         private void WriteNodeDetail(PartNode Current)
         {
-            string Message; 
-            if(Current.IsWhiteListed)
+            string StartMessage;
+            if (Current.IsWhiteListed)
             {
-                Message = "[Whitelisted] "; 
-            } else
-            {
-                Message = "";
-            }
-            if (Options.Verbose)
-            {
-                Message += Current.VerboseMessage;
+                StartMessage = "[Whitelisted] ";
             }
             else
             {
-                Message += GetName(Current.Part, "[Part]");
+                StartMessage = "";
             }
-            Console.WriteLine(Message);
+            if (Options.Verbose)
+            {
+                foreach(string ErrorMessage in Current.VerboseMessages)
+                {
+                    string Message = StartMessage + ErrorMessage;
+                    Console.WriteLine(Message); 
+                }
+            }else
+            {
+                string Message = StartMessage + GetName(Current.Part, "[Part]");
+                Console.WriteLine(Message);
+            }
+            Console.WriteLine(); 
         }
 
     }

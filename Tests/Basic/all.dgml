@@ -3,7 +3,7 @@
   <Nodes>
     <Node Id="ExtendedOperations.ImportTest" Category="Error" Level="3" />
     <Node Id="MefCalculator.AddIn" Category="Error" Level="3" />
-    <Node Id="ExtendedOperations.ChainOne" Category="Whitelisted" Level="2" />
+    <Node Id="ExtendedOperations.ChainOne" Category="Error" Level="2" />
     <Node Id="ExtendedOperations.Modulo" Category="Error" Level="1" />
   </Nodes>
   <Links>
@@ -18,7 +18,6 @@
   <Styles>
     <Style TargetType="Link" GroupLabel="Edge">
       <Condition Expression="HasCategory('Edge')" />
-      <Setter Property="Background" Value="#00FFFF" />
       <Setter Property="StrokeThickness" Value="3" />
     </Style>
     <Style TargetType="Node" GroupLabel="Whitelisted">

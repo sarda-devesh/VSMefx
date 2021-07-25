@@ -17,7 +17,6 @@ namespace VSMefx.Commands
         private static readonly string WhiteListLabel = "Whitelisted";
         private static readonly string EdgeLabel = "Edge";
         private static readonly string NodeBackgroundHex = "#FFFFFF";
-        private static readonly string EdgeColor = "#00FFFF";
         private static readonly string EdgeThickness = "3";
 
         public GraphCreator(Dictionary<string, PartNode> Graph)
@@ -138,7 +137,6 @@ namespace VSMefx.Commands
         /// <summary>
         /// Returns a Style object that sets the background of whitelisted nodes to white
         /// </summary>
-        /// <param name="Node"></param>
         /// <returns>The Style object for a whitelisted node</returns>
         private static Style WhiteListedNode(Node Node)
         {
@@ -152,6 +150,10 @@ namespace VSMefx.Commands
             };
         }
 
+        /// <summary>
+        /// Method to generate the Style properties for the edges 
+        /// </summary>
+        /// <returns>A style object to use when styling edges</returns>
         private static Style EdgeStyle(Link Edge)
         {
             return new Style
@@ -159,7 +161,6 @@ namespace VSMefx.Commands
                 GroupLabel = EdgeLabel,
                 Setter = new List<Setter>
                 {
-                    new Setter { Property = "Background", Value = EdgeColor },
                     new Setter {Property = "StrokeThickness", Value = EdgeThickness}
                 }
             };
