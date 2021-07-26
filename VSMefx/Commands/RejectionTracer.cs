@@ -95,7 +95,10 @@ namespace VSMefx.Commands
                     WriteNodeDetail(CurrentNode);
                 }
             }
-            Console.WriteLine(); 
+            if(!Options.Verbose)
+            {
+                Console.WriteLine();
+            }
         }
 
         /// <summary>

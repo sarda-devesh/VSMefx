@@ -11,8 +11,11 @@ namespace VSMefx
 {
     class ConfigCreator
     {
-        private static string[] ValidExtensions = { "dll", "exe"}; //File extensions that are considered valid 
+        //Ensure that the cache extension is the last one since it needs to be processed seperately
+        private static string[] ValidExtensions = { "dll", "exe", "cache"}; //File extensions that are considered valid 
         private List<string> AssemblyPaths { get; set; }  //Complete path of all the files we want to include in our analysis
+
+        private List<string> CachePaths { get; set; } //Paths to all the cache files we want to process
 
         /// <summary>
         /// Catalog storing information about the imported parts
@@ -42,25 +45,25 @@ namespace VSMefx
         {
             FileName = FileName.Trim();
             int ExtensionIndex = FileName.LastIndexOf('.');
-            bool IsSucessful = ExtensionIndex >= 0;
-            if(IsSucessful)
+            bool IsSucessful = false;
+            if(ExtensionIndex >= 0)
             {
-                string extension = FileName.Substring(ExtensionIndex + 1);
-                if (ValidExtensions.Contains(extension))
+                string Extension = FileName.Substring(ExtensionIndex + 1);
+                if (ValidExtensions.Contains(Extension))
                 {
-                    string fullPath = Path.Combine(FolderPath, FileName);
-                    if(File.Exists(fullPath))
+                    string FullPath = Path.Combine(FolderPath, FileName);
+                    if(File.Exists(FullPath))
                     {
-                        this.AssemblyPaths.Add(fullPath);
+                        bool IsCacheFile = Extension.Equals(ValidExtensions[ValidExtensions.Length - 1]);
+                        if (IsCacheFile)
+                        {
+                            this.CachePaths.Add(FullPath);
+                        } else
+                        {
+                            this.AssemblyPaths.Add(FullPath);
+                        }
                         IsSucessful = true;
-                    } else
-                    {
-                        IsSucessful = false;
-                    }
-                }
-                else
-                {
-                    IsSucessful = false;
+                    } 
                 }
             }
             return IsSucessful;
@@ -124,7 +127,7 @@ namespace VSMefx
                 }
             }catch(Exception Error)
             {
-                Console.WriteLine("Encountered error when trying to process the file: " + Error.Message); 
+                throw new Exception("Encountered error when trying to process the file: " + Error.Message); 
             }
         }
 
@@ -151,10 +154,36 @@ namespace VSMefx
                     }
                 }catch(Exception Error)
                 {
-                    Console.WriteLine("Encountered " + Error.Message + " when testing " + PartName + " against " + Test.ToString());
+                    throw new Exception("Encountered " + Error.Message + " when testing " + PartName + " against " + Test.ToString());
                 }
             }
             return false; 
+        }
+
+        /// <summary>
+        /// Method to read the input parts stored in cache files and add them to the existing Catalog
+        /// </summary>
+
+        private async Task ReadCacheFiles()
+        {
+            if(this.Catalog == null)
+            {
+                return;
+            }
+            foreach(string FilePath in this.CachePaths)
+            {
+                try
+                {
+                    FileStream InputStream = File.OpenRead(FilePath);
+                    CachedCatalog CatalogReader = new CachedCatalog();
+                    ComposableCatalog CurrentCatalog = await CatalogReader.LoadAsync(InputStream, Resolver.DefaultInstance);
+                    this.Catalog.AddCatalog(CurrentCatalog);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("Encountered error when trying to read cache file: " + e.Message);
+                }
+            }
         }
         
          /// <summary>
@@ -168,6 +197,10 @@ namespace VSMefx
                 new AttributedPartDiscoveryV1(Resolver.DefaultInstance));
             this.Catalog = ComposableCatalog.Create(Resolver.DefaultInstance)
                 .AddParts(await Discovery.CreatePartsAsync(this.AssemblyPaths));
+            if(this.CachePaths.Count() > 0)
+            {
+                await this.ReadCacheFiles(); 
+            }
             this.Config = CompositionConfiguration.Create(this.Catalog);
         }
 
