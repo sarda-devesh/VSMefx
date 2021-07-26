@@ -77,6 +77,8 @@ The saved DGML file has the parts that have import issues as the nodes and has d
 The DGML diagram that is saved when we run the above command looks like 
 ![DGML Graph for all the rejections](Images/All_Graph.jpg)
 
+To help the users, quickly diagonse import errors, the edges in the DGML diagram are labeled with the field name in the importing part that has the import issue, the head of the directed edge. For example, we can quickly derive from the above diagram that the import issue with ExtendedOperations.ChainOne in ExtendedOperations.Modulo is associated with the field addInput in Modulo.   
+
 ### Specific Rejection Information 
 
 When working with large projects and libraries with tons of .dll and .exe files, it will get painful to list/visualize a graph for all the import issues when we care about a single or only a couple of parts. Thus, Mefx allows users to indicate which part(s) they want to trace the rejection information about through commands such as: 

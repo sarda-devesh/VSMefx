@@ -93,9 +93,9 @@ namespace VSMefx.Commands
                 if(CurrentNode.Level.Equals(CurrentLevel))
                 {
                     WriteNodeDetail(CurrentNode);
-                    
                 }
             }
+            Console.WriteLine(); 
         }
 
         /// <summary>
