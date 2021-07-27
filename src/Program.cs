@@ -55,7 +55,7 @@ namespace VSMefx
             List<string> Exporter = null,
             List<string> Rejected = null, 
             bool Graph = false, 
-            string Whitelist = null, 
+            string Whitelist = "", 
             bool Regex = false)
         {
             try

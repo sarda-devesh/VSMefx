@@ -99,8 +99,8 @@ namespace VSMefx
         /// Method to process the input files based on whether we are using regex or not. 
         /// Prints any issues encountered while processing the input file back to the user. 
         /// </summary>
-        /// <param name = "currentFolder">The complete path to the folder that the file is present in</param>
-        /// <param name = "fileName">The relative path to the file from the current folder </param>
+        /// <param name = "CurrentFolder">The complete path to the folder that the file is present in</param>
+        /// <param name = "FileName">The relative path to the file from the current folder </param>
 
         private void ReadWhiteListFile(string CurrentFolder, string FileName)
         {
@@ -166,10 +166,6 @@ namespace VSMefx
 
         private async Task ReadCacheFiles()
         {
-            if(this.Catalog == null)
-            {
-                return;
-            }
             foreach(string FilePath in this.CachePaths)
             {
                 try
