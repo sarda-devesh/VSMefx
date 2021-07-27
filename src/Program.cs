@@ -4,8 +4,8 @@ using System.IO;
 using System.Reflection;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.Composition;
 using VSMefx.Commands;
-using System.CommandLine.DragonFruit;
 
 namespace VSMefx
 {
