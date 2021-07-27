@@ -118,3 +118,45 @@ Saved rejection graph to ExtendedOperations_Modulo.dgml
 Comparing this output to the previous output, we see that more rejected parts overall but Mefx automatically filtered out the rejections to only include those that affect the ExtendedOperations.Modulo part. Since the verbose option was chosen, Mefx prints out detailed information about the cause of the issue which can be used to quickly pinpoint and resolve the issue. We can see this filtering take place in the output DGML file as well as the output DGML file produced by the above command looks like: 
 
 ![DGML Graph for all the rejections](Images/Modulo_Trace.jpg)
+
+### Whitelisting
+
+The whitelist options allows you to a specify a text file that lists parts that are expected to be rejected. For example, let us say that we have a file named expected.txt which contains the text "ExtendedOperations.ChainOne" and we run the command from above with this as the whitelist: 
+
+```
+--verbose --graph --rejected ExtendedOperations.Modulo  --file MefCalculator.dll --directory Extensions --whitelist expected.txt
+```
+
+Currently, all Mefx does with the whitelist file is indicated to the user which parts have been whitelisted in both the textual and visual outputs. Rather than automatically
+removing parts which may introduce additional confusion, Mefx instead tries to make it to clear the user which parts have been whitelisted and let them decide how to best go
+about fixing this error with the above information in mind. 
+
+Thus, the output of the above command is: 
+```
+Printing Rejection Graph Info for ExtendedOperations.Modulo
+
+Errors in Level 1
+ExtendedOperations.Modulo.addInput: expected exactly 1 export matching constraints:
+    Contract name: CustomContractName
+    TypeIdentityName: ExtendedOperations.ChainOne
+but found 0.
+
+Errors in Level 2
+[Whitelisted] ExtendedOperations.ChainOne.Adder: expected exactly 1 export matching constraints:
+    Contract name: MefCalculator.AddIn
+    TypeIdentityName: MefCalculator.AddIn
+but found 0.
+
+Errors in Level 3
+MefCalculator.AddIn.fieldTwo: expected exactly 1 export matching constraints:
+    Contract name: ChainTwo
+    TypeIdentityName: System.String
+but found 0.
+
+Saved rejection graph to ExtendedOperations_Modulo.dgml
+```
+
+Additionally, Mefx also allows the user to treat the lines in the whitelist files as regular expression through the `--regex` option. For example, if we wanted to whitelist all the parts from the ExtendedOperations project, we could modify the line in expected.txt to contain the line "ExtendedOperations\\..*" and include the `--regex` option in our command.
+
+In the DGML file, Mefx indicates which parts have been whitelisted by changing the color of the nodes associated with the whitelisted parts to white which easily allows users to distinigiush between whitelisted parts and non whitelisted parts. Thus, the DGML file produced by the above command looks like:
+![DGML Graph for all the rejections](Images/WhitelistExample.jpg)
