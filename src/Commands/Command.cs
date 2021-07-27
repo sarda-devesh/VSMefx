@@ -37,7 +37,7 @@ namespace VSMefx.Commands
          /// <returns>ComposablePartDefinition associated with the given part if it is present in the catalog
          ///          Null if the given part is not present in the catalog </returns>
 
-        protected ComposablePartDefinition getPart(string PartName)
+        protected ComposablePartDefinition GetPart(string PartName)
         {
             if(!this.PartInformation.ContainsKey(PartName))
             {

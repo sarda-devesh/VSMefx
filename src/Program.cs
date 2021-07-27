@@ -45,6 +45,7 @@ namespace VSMefx
         /// <param name="Graph">Save a DGML graph to visualize the rejection chain</param>
         /// <param name="Whitelist">A file which lists the parts we expect to be rejected</param>
         /// <param name="Regex">A boolean to toggle if we want to treat the text in the whitelist file as regular expressions</param>
+        /// <param name="Cache">Specify the name of the output file if we want to store the input files in a cache</param>
         /// <returns></returns>
         static async Task Main(bool Verbose = false, 
             List<string> File = null, 
@@ -56,7 +57,8 @@ namespace VSMefx
             List<string> Rejected = null, 
             bool Graph = false, 
             string Whitelist = "", 
-            bool Regex = false)
+            bool Regex = false,
+            string Cache = "")
         {
             try
             {
@@ -64,7 +66,8 @@ namespace VSMefx
                 CLIOptions Options = new CLIOptions();
                 Options.Verbose = Verbose; Options.Files = File; Options.Folders = Directory; Options.ListParts = Parts;
                 Options.PartDetails = Type; Options.ImportDetails = Importer; Options.ExportDetails = Exporter;
-                Options.RejectedDetails = Rejected; Options.SaveGraph = Graph; Options.WhiteListFile = Whitelist; Options.UseRegex = Regex;
+                Options.RejectedDetails = Rejected; Options.SaveGraph = Graph; Options.WhiteListFile = Whitelist; 
+                Options.UseRegex = Regex; Options.CacheFile = Cache;
                 await RunOptions(Options);
                 Console.WriteLine("Finished Running Command");
             } catch(Exception e)
@@ -81,12 +84,16 @@ namespace VSMefx
         {
             ConfigCreator Creator = new ConfigCreator(Options);
             await Creator.Initialize();
+            if(Options.CacheFile.Length > 0)
+            {
+                await Creator.SaveToCache(Options.CacheFile);
+            }
             PartInfo InfoGetter = new PartInfo(Creator, Options);
             //Listing all the parts present in the input files/folders
             if (Options.ListParts)
             {
                 Console.WriteLine("Parts in Catalog are ");
-                InfoGetter.listAllParts();
+                InfoGetter.ListAllParts();
                 Console.WriteLine();
             }
             //Get more detailed information about a specific part 

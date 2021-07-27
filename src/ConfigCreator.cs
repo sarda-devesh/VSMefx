@@ -138,7 +138,7 @@ namespace VSMefx
         /// <param name="PartName">The name of the part we want to check</param>
         /// <returns> A boolean indicating if the specified part was included in the whitelist or not</returns>
 
-        public bool isWhiteListed(string PartName)
+        public bool IsWhiteListed(string PartName)
         {
             if(!this.UsingRegex)
             {
@@ -187,6 +187,34 @@ namespace VSMefx
                     throw new Exception("Encountered error when trying to read cache file: " + e.Message);
                 }
             }
+        }
+
+        /// <summary>
+        /// Method to store the parts read from the input files into a cache for future use
+        /// </summary>
+        /// <param name="FileName">The name of the cache file in which we want to store this data</param>
+
+        public async Task SaveToCache(string FileName)
+        {
+            if(this.Catalog == null)
+            {
+                Console.WriteLine("Can't save non initialized catalog to a cache file");
+            }
+            FileName = FileName.Trim();
+            int ExtensionIndex = FileName.LastIndexOf('.');
+            if(ExtensionIndex >= 0 && FileName.Substring(ExtensionIndex + 1).Equals(ValidExtensions[ValidExtensions.Length - 1]))
+            {
+                string FilePath = Path.Combine(Directory.GetCurrentDirectory(), FileName);
+                CachedCatalog CacheWriter = new CachedCatalog();
+                var FileWriter = File.Create(FilePath);
+                await CacheWriter.SaveAsync(this.Catalog, FileWriter);
+                Console.WriteLine("Saved catalog to file " + FileName);
+            }
+            else
+            {
+                Console.WriteLine("Couldn't save catalog to file " + FileName);
+            }
+            Console.WriteLine();
         }
         
          /// <summary>

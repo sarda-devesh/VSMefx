@@ -52,7 +52,7 @@ namespace VSMefx.Commands
                         continue;
                     }
                     PartNode CurrentNode = new PartNode(Definition, Element.Message, LevelNumber);
-                    CurrentNode.SetWhiteListed(this.Creator.isWhiteListed(CurrentName));
+                    CurrentNode.SetWhiteListed(this.Creator.IsWhiteListed(CurrentName));
                     //Get the imports for the current part to update the pointers associated with the current node
                     foreach(var Import in Definition.Imports)
                     {

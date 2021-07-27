@@ -19,7 +19,7 @@ namespace VSMefx.Commands
          /// Method to print basic information associated with all the parts in the catalog
          /// </summary>
          
-        public void listAllParts()
+        public void ListAllParts()
         {
             ComposableCatalog Catalog = this.Creator.Catalog;
             foreach (ComposablePartDefinition Part in Catalog.Parts)
@@ -37,7 +37,7 @@ namespace VSMefx.Commands
        
         public void GetPartInfo(string PartName)
         {
-            ComposablePartDefinition Definition = this.getPart(PartName); 
+            ComposablePartDefinition Definition = this.GetPart(PartName); 
             if(Definition == null)
             {
                 Console.WriteLine("Couldn't find part with name " + PartName);

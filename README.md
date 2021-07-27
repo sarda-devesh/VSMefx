@@ -13,11 +13,13 @@ The following command illustrates the basic functionality to get information abo
 ```
 
 This command performs a variety of different operations and thus we will break down the command by those operations to understand
-its functionality. We specify that we want to perform analysis on the MefCalculator.dll file as well as the Extensions folder through ` --files MefCalculator.dll  -d Extensions `. When a folder is specified, Mefx automatically finds all .dll and .exe files present in the folder itself along with its subfolders. 
+its functionality. We specify that we want to perform analysis on the MefCalculator.dll file as well as the Extensions folder through ` --files MefCalculator.dll --directory Extensions `. When a folder is specified, Mefx automatically finds all valid files present in the folder itself along with its subfolders. 
 
-The `-p` argument of the commands tells Mefx to list all the parts present in the input files and folders. The `-t` argument allows us to get more information on a particular part like `-t MefCalculator.ExportTest` prints out the imports and exports for the MefCalculator.ExportTest class. 
+Currently, Mefx considers any file with the extensions .dll, .exe, or .cache as valid files. Please note that the .cache file must have been created using the SaveAsync of the Cached Catalog in the main MEF library for Mefx to be able to properly process the file. Mefx allows users to store the catalog created from the files specified in the input argument by specifiying the output file name in the `--cache` option and thus can be called by including something like `--cache Combined.cache` in the command.
 
-The `-e` command can be used to find the exporters of a given type like `-e MefCalculator.MefCalculatorInterfaces+IOperation` find all the parts/type that export as an IOperation. Finally, the `-i` can be used to find the classes that import a given type like `-i MinorRevision` finds all the parts that import MinorRevision. 
+The `--parts` argument of the commands tells Mefx to list all the parts present in the input files and folders. The `--type` argument allows us to get more information on a particular part like `--type MefCalculator.ExportTest` prints out the imports and exports for the MefCalculator.ExportTest class. 
+
+The `--exporter` command can be used to find the exporters of a given type like `--exporter MefCalculator.MefCalculatorInterfaces+IOperation` find all the parts/type that export as an IOperation. Finally, the `--importer` can be used to find the classes that import a given type like `--importer MajorRevision` finds all the parts that import MinorRevision. 
 
 The above commands gives us the following output which shows the workings of all the features above: 
 ```
@@ -51,7 +53,7 @@ The following command showcases the ability of Mefx to share rejection informati
 --graph --rejected all  --file MefCalculator.dll --directory Extensions
 ```
 
-The main things that we want to focus on in this section are the `-g` and the `-r all` sections of the command. The `-r all` tells Mefx that we want information about all the rejections, and in the next example we will see how we can get rejection information about particular parts. The `-g` command tells Mefx to generate a [DGML file](https://docs.microsoft.com/en-us/visualstudio/modeling/directed-graph-markup-language-dgml-reference?view=vs-2019) to visualize the rejection graph and see which imports and parts are causing issues. 
+The main things that we want to focus on in this section are the `--graph` and the `--rejected all` sections of the command. The `-r all` tells Mefx that we want information about all the rejections, and in the next example we will see how we can get rejection information about particular parts. The `--graph` command tells Mefx to generate a [DGML file](https://docs.microsoft.com/en-us/visualstudio/modeling/directed-graph-markup-language-dgml-reference?view=vs-2019) to visualize the rejection graph and see which imports and parts are causing issues. 
 
 The output of running the above command looks like: 
 ```
@@ -86,7 +88,7 @@ When working with large projects and libraries with tons of .dll and .exe files,
 --verbose --graph --rejected ExtendedOperations.Modulo  --file MefCalculator.dll --directory Extensions
 ```
 
-When a user specifies a part to get rejection information about, Mefx automatically finds parts whose import issues impact the specified part, which in this case is ExtendedOperations.Modulo. Thus, when displaying information or generating a graph, Mefx only presents reject issues that impact the specified part and ignores all others. The `-v` command stands for verbose and that can be used to print out additional information about the issues and the parts involved. 
+When a user specifies a part to get rejection information about, Mefx automatically finds parts whose import issues impact the specified part, which in this case is ExtendedOperations.Modulo. Thus, when displaying information or generating a graph, Mefx only presents reject issues that impact the specified part and ignores all others. The `--verbose` command stands for verbose and that can be used to print out additional information about the issues and the parts involved. 
 
 The output of the above command is: 
 ```

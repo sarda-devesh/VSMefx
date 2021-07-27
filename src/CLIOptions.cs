@@ -36,5 +36,7 @@ namespace VSMefx
         public string WhiteListFile { get; set; }
 
         public bool UseRegex { get; set;  }
+
+        public string CacheFile { get; set; }
     }
 }
