@@ -177,7 +177,14 @@ namespace VSMefx
                     FileStream InputStream = File.OpenRead(FilePath);
                     CachedCatalog CatalogReader = new CachedCatalog();
                     ComposableCatalog CurrentCatalog = await CatalogReader.LoadAsync(InputStream, Resolver.DefaultInstance);
-                    this.Catalog.AddCatalog(CurrentCatalog);
+                    if(this.Catalog == null)
+                    {
+                        this.Catalog = CurrentCatalog;
+                    } else
+                    {
+                        this.Catalog = this.Catalog.AddCatalog(CurrentCatalog);
+                    }
+                    
                 }
                 catch (Exception e)
                 {
@@ -195,18 +202,25 @@ namespace VSMefx
             PartDiscovery Discovery = PartDiscovery.Combine(
                 new AttributedPartDiscovery(Resolver.DefaultInstance),
                 new AttributedPartDiscoveryV1(Resolver.DefaultInstance));
-            this.Catalog = ComposableCatalog.Create(Resolver.DefaultInstance)
+            if(this.AssemblyPaths.Count() > 0)
+            {
+                this.Catalog = ComposableCatalog.Create(Resolver.DefaultInstance)
                 .AddParts(await Discovery.CreatePartsAsync(this.AssemblyPaths));
+            }
             if(this.CachePaths.Count() > 0)
             {
                 await this.ReadCacheFiles(); 
             }
-            this.Config = CompositionConfiguration.Create(this.Catalog);
+            if(this.Catalog != null)
+            {
+                this.Config = CompositionConfiguration.Create(this.Catalog);
+            }
         }
 
         public ConfigCreator(CLIOptions Options)
         {
             this.AssemblyPaths = new List<string>();
+            this.CachePaths = new List<string>();
             //Add all the files in the input argument to the list of paths 
             string CurrentFolder = Directory.GetCurrentDirectory();
             IEnumerable<string> Files = Options.Files; 
@@ -217,7 +231,7 @@ namespace VSMefx
                     if(!AddFile(CurrentFolder, File))
                     {
                         Console.WriteLine("Couldn't add file " + File);
-                    }
+                    } 
                 }
             }
             //Add all the valid files in the input folders to the list of paths
@@ -247,7 +261,7 @@ namespace VSMefx
             {
                 this.WhiteListParts = new HashSet<string>();
             }
-            if (Options.WhiteListFile.Length > 0)
+            if (Options.WhiteListFile != null && Options.WhiteListFile.Length > 0)
             {
                 ReadWhiteListFile(CurrentFolder, Options.WhiteListFile); 
             }

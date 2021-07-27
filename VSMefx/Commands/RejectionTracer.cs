@@ -227,7 +227,6 @@ namespace VSMefx.Commands
                     Console.WriteLine(Message);
                     Console.WriteLine(); 
                 }
-                
             }
             else
             {

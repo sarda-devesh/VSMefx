@@ -9,7 +9,7 @@ The application currently sets the working directory based on the testFolder fie
 
 The following command illustrates the basic functionality to get information about parts and thier types: 
 ```
--p -t MefCalculator.ExportTest -e MefCalculator.MefCalculatorInterfaces+IOperation -i MajorRevision --files MefCalculator.dll  -d Extensions
+--parts --type MefCalculator.ExportTest --exporter MefCalculator.MefCalculatorInterfaces+IOperation --importer MajorRevision  --file MefCalculator.dll --directory Extensions
 ```
 
 This command performs a variety of different operations and thus we will break down the command by those operations to understand
@@ -48,7 +48,7 @@ MefCalculator.MefCalculatorInterfaces+Subtract
 The following command showcases the ability of Mefx to share rejection information for all the input files and folders: 
 
 ```
--g -r all --files MefCalculator.dll -d Extensions
+--graph --rejected all  --file MefCalculator.dll --directory Extensions
 ```
 
 The main things that we want to focus on in this section are the `-g` and the `-r all` sections of the command. The `-r all` tells Mefx that we want information about all the rejections, and in the next example we will see how we can get rejection information about particular parts. The `-g` command tells Mefx to generate a [DGML file](https://docs.microsoft.com/en-us/visualstudio/modeling/directed-graph-markup-language-dgml-reference?view=vs-2019) to visualize the rejection graph and see which imports and parts are causing issues. 
@@ -83,7 +83,7 @@ To help the users, quickly diagonse import errors, the edges in the DGML diagram
 
 When working with large projects and libraries with tons of .dll and .exe files, it will get painful to list/visualize a graph for all the import issues when we care about a single or only a couple of parts. Thus, Mefx allows users to indicate which part(s) they want to trace the rejection information about through commands such as: 
 ```
--gv -r ExtendedOperations.Modulo --files MefCalculator.dll -d Extensions
+--verbose --graph --rejected ExtendedOperations.Modulo  --file MefCalculator.dll --directory Extensions
 ```
 
 When a user specifies a part to get rejection information about, Mefx automatically finds parts whose import issues impact the specified part, which in this case is ExtendedOperations.Modulo. Thus, when displaying information or generating a graph, Mefx only presents reject issues that impact the specified part and ignores all others. The `-v` command stands for verbose and that can be used to print out additional information about the issues and the parts involved. 

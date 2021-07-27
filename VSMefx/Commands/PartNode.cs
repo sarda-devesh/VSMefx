@@ -12,21 +12,18 @@ namespace VSMefx.Commands
         public ComposablePartDefinition Part { get; set; } //Represents the part associated with the current node
         public List<string> VerboseMessages { get; set; } //Rejection Message(s) associated with the current part
 
-        /*
-         * <summary>
-         * Stores the "children" of the current node, which represents parts that the current
-         * node imports that have import issues themselves
-         * </summary>
-         */
+        
+         /// <summary>
+         /// Stores the "children" of the current node, which represents parts that the current
+         /// node imports that have import issues themselves
+         /// </summary>
         public HashSet<PartEdge> ImportRejects;
 
-        /*
-         * <summary>
-         * Stores the "parent" of the current node, which represents parts that the current
-         * node caused import issues in due to its failure 
-         * </summary>
-         */
-
+        
+        /// <summary>
+        /// Stores the "parent" of the current node, which represents parts that the current
+        /// node caused import issues in due to its failure 
+        /// </summary>
         public HashSet<PartEdge> RejectsCaused; 
         public int Level { get; private set; } //An indicator of its depth in the rejection stack 
 
