@@ -1,6 +1,10 @@
 # VSMefx
 A Composition Analysis Tool for VS-MEF
 
+## Command Options Summary
+
+![A image of all the command Options](Images/Options.jpg)
+
 ## Example Commands 
 
 The application currently sets the working directory based on the testFolder field in the Program.cs file. If the testFolder is a subFolder in the Tests directory then the program sets the currently working directory to the specified testFolder. If the testFolder is a empty string then the currently working directory will be set to Tests. File and folder paths needed to be specified relative to the currently working directory for the application to be able to process them. When running the application through Visual Studio, the input command can be specified by navigating to the following section: Solution Properties (Right Click the VSMefx Solution in vs) -> Debug -> Start Options. 

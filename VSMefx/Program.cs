@@ -4,7 +4,6 @@ using System.IO;
 using System.Reflection;
 using System.Linq;
 using System.Threading.Tasks;
-using System.CommandLine.DragonFruit;
 using VSMefx.Commands;
 
 namespace VSMefx
@@ -38,8 +37,8 @@ namespace VSMefx
         /// A command line application to diagonse composition failures in MEF applications
         /// </summary>
         /// <param name="verbose">An boolean option to toggle the detail level of the text output</param>
-        /// <param name="file">Specify files whose parts we want to consider</param>
-        /// <param name="directory">Specify folders in which we want to look for parts</param>
+        /// <param name="file">Specify files from which we want to load parts from</param>
+        /// <param name="directory">Specify folders from which we want to load parts from</param>
         /// <param name="parts">An boolean to toggle if we want to print out all the parts</param>
         /// <param name="detail">Specify the parts we want to get more information about</param>
         /// <param name="importer">List the parts who import the specified contract name(s)</param>
@@ -48,7 +47,7 @@ namespace VSMefx
         /// <param name="graph">Save a DGML graph to visualize the rejection chain</param>
         /// <param name="whitelist">A file which lists the parts we expect to be rejected</param>
         /// <param name="regex">A boolean to toggle if we want to treat the text in the whitelist file as regular expressions</param>
-        /// <param name="cache">Specify the name of the output file if we want to store the input files in a cache</param>
+        /// <param name="cache">Specify the name of the output file to store the loaded parts</param>
         static async Task Main(bool verbose = false, 
             List<string> file = null, 
             List<string> directory = null,
