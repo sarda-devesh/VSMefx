@@ -50,6 +50,7 @@ namespace VSMefx.Commands
          /// Method to get the name of the given its definition
          /// </summary>
          /// <param name="Part"> The defintion of the part whose name we want </param>
+         /// <param name="VerboseLabel"> Label to add before the verbose description of the part</param>
          /// <returns> A string representing either the simple or verbose name of the part based
          ///          on if verbose was specified as an input argument </returns>
 

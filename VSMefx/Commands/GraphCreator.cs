@@ -75,7 +75,7 @@ namespace VSMefx.Commands
 
         /// <summary>
         /// Method to convert from custom Node representation to the DGML node representation
-        /// <summary>
+        /// </summary>
         /// <param name="Current">The PartNode object which we want to convert</param>
         /// <returns> A DGML Node representation of the input PartNode </returns>
         

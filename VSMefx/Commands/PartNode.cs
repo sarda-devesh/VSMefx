@@ -32,8 +32,7 @@ namespace VSMefx.Commands
         public PartNode(ComposablePartDefinition Definition, string Message, int CurrLevel)
         {
             this.Part = Definition;
-            this.VerboseMessages = new List<string>();
-            this.VerboseMessages.Add(Message); 
+            this.VerboseMessages = new List<string> { Message };
             ImportRejects = new HashSet<PartEdge>();
             RejectsCaused = new HashSet<PartEdge>();
             this.Level = CurrLevel;
@@ -49,7 +48,7 @@ namespace VSMefx.Commands
         /// <summary>
         /// Method to check if the given node imports any parts with import issues
         /// </summary>
-        /// <returns> A boolean indicating it the given node is a leaf node</return>
+        /// <returns> A boolean indicating it the given node is a leaf node</returns>
         
         public bool IsLeafNode()
         {

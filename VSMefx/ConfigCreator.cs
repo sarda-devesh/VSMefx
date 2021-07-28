@@ -12,7 +12,7 @@ namespace VSMefx
     class ConfigCreator
     {
         //Ensure that the cache extension is the last one since it needs to be processed seperately
-        private static string[] ValidExtensions = { "dll", "exe", "cache"}; //File extensions that are considered valid 
+        private static readonly string[] ValidExtensions = { "dll", "exe", "cache"}; //File extensions that are considered valid 
         private List<string> AssemblyPaths { get; set; }  //Complete path of all the files we want to include in our analysis
 
         private List<string> CachePaths { get; set; } //Paths to all the cache files we want to process
