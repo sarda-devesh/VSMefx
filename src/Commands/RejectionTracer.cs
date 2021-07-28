@@ -57,7 +57,11 @@ namespace VSMefx.Commands
                     foreach(var Import in Definition.Imports)
                     {
                         string ImportName = Import.ImportingSiteType.FullName;
-                        string ImportLabel = Import.ImportingMember.Name;
+                        string ImportLabel = "Constructor";
+                        if(Import.ImportingMember != null)
+                        {
+                            ImportLabel = Import.ImportingMember.Name;
+                        }
                         if(RejectionGraph.ContainsKey(ImportName))
                         {
                             PartNode ChildNode = RejectionGraph[ImportName];

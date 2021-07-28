@@ -9,7 +9,7 @@ The application currently sets the working directory based on the testFolder fie
 
 The following command illustrates the basic functionality to get information about parts and thier types: 
 ```
---parts --type MefCalculator.ExportTest --exporter MefCalculator.MefCalculatorInterfaces+IOperation --importer MajorRevision  --file MefCalculator.dll --directory Extensions
+--parts --detail MefCalculator.ImportTest --exporter MefCalculator.MefCalculatorInterfaces+IOperation --importer MajorRevision  --file MefCalculator.dll --directory Extensions
 ```
 
 This command performs a variety of different operations and thus we will break down the command by those operations to understand
@@ -17,24 +17,27 @@ its functionality. We specify that we want to perform analysis on the MefCalcula
 
 Currently, Mefx considers any file with the extensions .dll, .exe, or .cache as valid files. Please note that the .cache file must have been created using the SaveAsync of the Cached Catalog in the main MEF library for Mefx to be able to properly process the file. Mefx allows users to store the catalog created from the files specified in the input argument by specifiying the output file name in the `--cache` option and thus can be called by including something like `--cache Combined.cache` in the command.
 
-The `--parts` argument of the commands tells Mefx to list all the parts present in the input files and folders. The `--type` argument allows us to get more information on a particular part like `--type MefCalculator.ExportTest` prints out the imports and exports for the MefCalculator.ExportTest class. 
+The `--parts` argument of the commands tells Mefx to list all the parts present in the input files and folders. The `--detail` argument allows us to get more information on a particular part by printing out all the imports and exports associated with the specified part name. 
 
-The `--exporter` command can be used to find the exporters of a given type like `--exporter MefCalculator.MefCalculatorInterfaces+IOperation` find all the parts/type that export as an IOperation. Finally, the `--importer` can be used to find the classes that import a given type like `--importer MajorRevision` finds all the parts that import MinorRevision. 
+The `--exporter` command can be used to find the exporters of a given contract name like `--exporter MefCalculator.MefCalculatorInterfaces+IOperation` finds all exports with the contract name of IOperation. Finally, the `--importer` can be used to find the parts that contains imports with a given contract name like `--importer MajorRevision`
+finds all the parts that contain a import with the contract name of MajorRevision. 
 
 The above commands gives us the following output which shows the workings of all the features above: 
 ```
 Parts in Catalog are
 MefCalculator.AddIn
 MefCalculator.ExportTest
+MefCalculator.ImportTest
 MefCalculator.MefCalculatorInterfaces+Add
 MefCalculator.MefCalculatorInterfaces+Subtract
 ExtendedOperations.ChainOne
-ExtendedOperations.ImportTest
 ExtendedOperations.Modulo
 
-Printing out details for part MefCalculator.ExportTest
-[Export] MajorRevision
-[Export] MinorRevision
+Printing out details for part MefCalculator.ImportTest
+[Export] MefCalculator.ImportTest
+[Import] Field: Operations, Contract Name: MefCalculator.MefCalculatorInterfaces+IOperation
+[Import] Field: failingField, Contract Name: MissingField
+[Import] Field: OtherError, Contract Name: MissingFieldTwo
 
 Exporting parts for MefCalculator.MefCalculatorInterfaces+IOperation:
 MefCalculator.MefCalculatorInterfaces+Add

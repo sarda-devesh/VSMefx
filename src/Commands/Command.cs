@@ -58,7 +58,12 @@ namespace VSMefx.Commands
             Type PartType = Part.Type;
             if (this.Options.Verbose)
             {
-                return VerboseLabel + " " + PartType.AssemblyQualifiedName;
+                string Divider = " "; 
+                if(VerboseLabel.Length == 0)
+                {
+                    Divider = "";
+                }
+                return VerboseLabel + Divider + PartType.AssemblyQualifiedName;
             }
             else
             {

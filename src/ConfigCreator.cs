@@ -202,7 +202,8 @@ namespace VSMefx
             }
             FileName = FileName.Trim();
             int ExtensionIndex = FileName.LastIndexOf('.');
-            if(ExtensionIndex >= 0 && FileName.Substring(ExtensionIndex + 1).Equals(ValidExtensions[ValidExtensions.Length - 1]))
+            string CacheExtension = ValidExtensions[ValidExtensions.Length - 1];
+            if (ExtensionIndex >= 0 && FileName.Substring(ExtensionIndex + 1).Equals(CacheExtension))
             {
                 string FilePath = Path.Combine(Directory.GetCurrentDirectory(), FileName);
                 CachedCatalog CacheWriter = new CachedCatalog();

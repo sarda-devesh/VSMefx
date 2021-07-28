@@ -45,14 +45,21 @@ namespace VSMefx.Commands
             }
             Console.WriteLine("Printing out details for part " + PartName);
             //Print details about the exports of the given part
-            foreach(var Export in Definition.ExportingMembers)
+            foreach(var ExportPair in Definition.ExportDefinitions)
             {
-                Console.WriteLine("[Export] " + Export.Key.Name);
+                string ExportName = ExportPair.Value.ContractName;
+                Console.WriteLine("[Export] " + ExportName);
             }
             //Print details about the parts/type the current part imports
             foreach(var Import in Definition.Imports)
             {
-                Console.WriteLine("[Import] " + Import.ImportDefinition.ContractName);
+                string ImportName = Import.ImportDefinition.ContractName;
+                string ImportField = "Constructor";
+                if (Import.ImportingMember != null)
+                {
+                    ImportField = Import.ImportingMember.Name;
+                }
+                Console.WriteLine("[Import] Field: " + ImportField +", Contract Name: " + ImportName);
             }
         }
 

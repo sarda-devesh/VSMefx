@@ -34,40 +34,40 @@ namespace VSMefx
             }
         }
 
-        /// <param name="Verbose">An boolean option to toggle the detail level of the text output</param>
-        /// <param name="File">Specify files whose parts we want to consider</param>
-        /// <param name="Directory">Specify folders in which we want to look for parts</param>
-        /// <param name="Parts">An boolean to toggle if we want to print out all the parts</param>
-        /// <param name="Type">Specify the parts we want to get more information about</param>
-        /// <param name="Importer">List the parts who import the specified contract name(s)</param>
-        /// <param name="Exporter">List the parts who export the specified contract name(s)</param>
-        /// <param name="Rejected">List the rejection causes for a given part (use all if you want all the rejection errors)</param>
-        /// <param name="Graph">Save a DGML graph to visualize the rejection chain</param>
-        /// <param name="Whitelist">A file which lists the parts we expect to be rejected</param>
-        /// <param name="Regex">A boolean to toggle if we want to treat the text in the whitelist file as regular expressions</param>
-        /// <param name="Cache">Specify the name of the output file if we want to store the input files in a cache</param>
+        /// <param name="verbose">An boolean option to toggle the detail level of the text output</param>
+        /// <param name="file">Specify files whose parts we want to consider</param>
+        /// <param name="directory">Specify folders in which we want to look for parts</param>
+        /// <param name="parts">An boolean to toggle if we want to print out all the parts</param>
+        /// <param name="detail">Specify the parts we want to get more information about</param>
+        /// <param name="importer">List the parts who import the specified contract name(s)</param>
+        /// <param name="exporter">List the parts who export the specified contract name(s)</param>
+        /// <param name="rejected">List the rejection causes for a given part (use all if you want all the rejection errors)</param>
+        /// <param name="graph">Save a DGML graph to visualize the rejection chain</param>
+        /// <param name="whitelist">A file which lists the parts we expect to be rejected</param>
+        /// <param name="regex">A boolean to toggle if we want to treat the text in the whitelist file as regular expressions</param>
+        /// <param name="cache">Specify the name of the output file if we want to store the input files in a cache</param>
         /// <returns></returns>
-        static async Task Main(bool Verbose = false, 
-            List<string> File = null, 
-            List<string> Directory = null,
-            bool Parts = false,
-            List<string> Type = null,
-            List<string> Importer = null,
-            List<string> Exporter = null,
-            List<string> Rejected = null, 
-            bool Graph = false, 
-            string Whitelist = "", 
-            bool Regex = false,
-            string Cache = "")
+        static async Task Main(bool verbose = false, 
+            List<string> file = null, 
+            List<string> directory = null,
+            bool parts = false,
+            List<string> detail = null,
+            List<string> importer = null,
+            List<string> exporter = null,
+            List<string> rejected = null, 
+            bool graph = false, 
+            string whitelist = "", 
+            bool regex = false,
+            string cache = "")
         {
             try
             {
                 SetWorkingDirectory(); //TODO: Remove this call in the main application since this for the current repo's file structure
                 CLIOptions Options = new CLIOptions();
-                Options.Verbose = Verbose; Options.Files = File; Options.Folders = Directory; Options.ListParts = Parts;
-                Options.PartDetails = Type; Options.ImportDetails = Importer; Options.ExportDetails = Exporter;
-                Options.RejectedDetails = Rejected; Options.SaveGraph = Graph; Options.WhiteListFile = Whitelist; 
-                Options.UseRegex = Regex; Options.CacheFile = Cache;
+                Options.Verbose = verbose; Options.Files = file; Options.Folders = directory; Options.ListParts = parts;
+                Options.PartDetails = detail; Options.ImportDetails = importer; Options.ExportDetails = exporter;
+                Options.RejectedDetails = rejected; Options.SaveGraph = graph; Options.WhiteListFile = whitelist; 
+                Options.UseRegex = regex; Options.CacheFile = cache;
                 await RunOptions(Options);
                 Console.WriteLine("Finished Running Command");
             } catch(Exception e)
