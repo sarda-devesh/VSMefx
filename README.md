@@ -64,15 +64,15 @@ The main things that we want to focus on in this section are the `--graph` and t
 
 The output of running the above command looks like: 
 ```
-Listing errors in level 1
-ExtendedOperations.Modulo
+Listing errors in level 3
+MefCalculator.AddIn
+MefCalculator.ImportTest
 
 Listing errors in level 2
 ExtendedOperations.ChainOne
 
-Listing errors in level 3
-MefCalculator.AddIn
-ExtendedOperations.ImportTest
+Listing errors in level 1
+ExtendedOperations.Modulo
 
 Saved rejection graph to all.dgml
 ```
