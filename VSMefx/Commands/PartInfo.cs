@@ -101,30 +101,43 @@ namespace VSMefx.Commands
             }
         }
 
+        /// <summary>
+        /// Method to get a basic description of a given constraint for output
+        /// </summary>
+        /// <param name="Constraint">The Constraint which we want information about</param>
+        /// <returns>A string providing some details about the given constraint</returns>
         private string GetConstraintString(IImportSatisfiabilityConstraint Constraint)
         {
+            //Try to treat the constraint as an indentity constraint
             try
             {
                 var IdentityConstraint = (ExportTypeIdentityConstraint) Constraint;
-                return "[Type Identity: " + IdentityConstraint.TypeIdentityName + "]";
+                return "[Type: " + IdentityConstraint.TypeIdentityName + "]";
             } catch(Exception Error) { }
+            //Try to treat the constraint as an metadata constraint
             try
             {
                 var MetadataConstraint = (ExportMetadataValueImportConstraint) Constraint;
-                return "[Export Metadata: " + MetadataConstraint.Name + "]";
+                return "[Metadata: " + MetadataConstraint.Name + "]";
             }catch(Exception Error) { }
+            //If it is neither just return the constraint type
             return Constraint.ToString();
         }
 
+        /// <summary>
+        /// Method to check if a export satifies the import requirements and print that result to the user
+        /// </summary>
+        /// <param name="Import">The ImportDefinition that we want to check against</param>
+        /// <param name="Export">The ExportDefinition we want to compare with</param>
         private void CheckDefinitionMatch(ImportDefinition Import, ExportDefinition Export)
         {
             bool SucessfulMatch = true;
+            //Import = Import.AddExportConstraint(new ExportMetadataValueImportConstraint("Bound to fail", "32"));
             foreach (var Constraint in Import.ExportConstraints)
             {
-                var CastedConstraint = (ExportTypeIdentityConstraint) Constraint;
-                string ConstraintDetail = GetConstraintString(Constraint);
                 if (!Constraint.IsSatisfiedBy(Export))
                 {
+                    string ConstraintDetail = GetConstraintString(Constraint);
                     Console.WriteLine("Export fails to sastify constraint of " + ConstraintDetail);
                     SucessfulMatch = false;
                 }
@@ -135,36 +148,51 @@ namespace VSMefx.Commands
             }   
         }
 
+        /// <summary>
+        ///  Method to check if there is a relationship between two given parts
+        ///  and print information regarding that match to the user
+        /// </summary>
+        /// <param name="ExportPartName">The name of the part whose exports we want to consider</param>
+        /// <param name="ImportPartName">The name of the part whose imports we want to consider</param>
         public void CheckMatch(string ExportPartName, string ImportPartName)
         {
+            //Deal with the case that one of the parts doesn't exist 
             ComposablePartDefinition ExportPart = GetPart(ExportPartName);
-            if(ExportPart == null)
+            if (ExportPart == null)
             {
                 Console.WriteLine("Couldn't find part with name " + ExportPartName);
                 return;
             }
             ComposablePartDefinition ImportPart = GetPart(ImportPartName);
-            if(ImportPart == null)
+            if (ImportPart == null)
             {
                 Console.WriteLine("Couldn't find part with name " + ImportPartName);
             }
             Console.WriteLine("Finding matches between " + ExportPartName + " and " + ImportPartName);
-            Dictionary<string, ExportDefinition> AllExportDefinitions = new Dictionary<string, ExportDefinition>(); 
-            foreach(var Export in ExportPart.ExportDefinitions)
+            //Get all the exports of the exporting part, indexed by the export contract name
+            Dictionary<string, ExportDefinition> AllExportDefinitions = new Dictionary<string, ExportDefinition>();
+            foreach (var Export in ExportPart.ExportDefinitions)
             {
                 ExportDefinition ExportDetails = Export.Value;
                 AllExportDefinitions.Add(ExportDetails.ContractName, ExportDetails);
             }
-            foreach(var Import in ImportPart.Imports)
+            bool FoundMatch = false;
+            //Find imports that have the same contract name as one of the exports and check if they match
+            foreach (var Import in ImportPart.Imports)
             {
                 var CurrentImportDefintion = Import.ImportDefinition;
                 string CurrentContractName = CurrentImportDefintion.ContractName;
-                if(AllExportDefinitions.ContainsKey(CurrentContractName))
+                if (AllExportDefinitions.ContainsKey(CurrentContractName))
                 {
-                    Console.WriteLine("Found matching contract name of " + CurrentContractName);
+                    Console.WriteLine("Potential match with contract name " + CurrentContractName);
                     var PotentialMatch = AllExportDefinitions[CurrentContractName];
                     CheckDefinitionMatch(CurrentImportDefintion, PotentialMatch);
+                    FoundMatch = true;
                 }
+            }
+            if (!FoundMatch)
+            {
+                Console.WriteLine("Couldn't find any potential matches between the two given parts");
             }
             Console.WriteLine();
         }
