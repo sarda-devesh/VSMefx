@@ -29,6 +29,8 @@ namespace VSMefx
 
         public IEnumerable<string> ExportDetails { get; set; }
 
+        public IEnumerable<string> MatchParts { get; set; }
+
         public IEnumerable<string> RejectedDetails { get; set; }
 
         public bool SaveGraph { get; set; }
@@ -38,5 +40,6 @@ namespace VSMefx
         public bool UseRegex { get; set;  }
 
         public string CacheFile { get; set; }
+
     }
 }

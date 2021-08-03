@@ -59,7 +59,7 @@ namespace VSMefx.Commands
                 {
                     ImportField = Import.ImportingMember.Name;
                 }
-                Console.WriteLine("[Import] Field: " + ImportField +", Contract Name: " + ImportName);
+                Console.WriteLine("[Import] Field: " + ImportField + ", Contract Name: " + ImportName);
             }
         }
 
@@ -99,6 +99,74 @@ namespace VSMefx.Commands
                     }
                 }
             }
+        }
+
+        private string GetConstraintString(IImportSatisfiabilityConstraint Constraint)
+        {
+            try
+            {
+                var IdentityConstraint = (ExportTypeIdentityConstraint) Constraint;
+                return "[Type Identity: " + IdentityConstraint.TypeIdentityName + "]";
+            } catch(Exception Error) { }
+            try
+            {
+                var MetadataConstraint = (ExportMetadataValueImportConstraint) Constraint;
+                return "[Export Metadata: " + MetadataConstraint.Name + "]";
+            }catch(Exception Error) { }
+            return Constraint.ToString();
+        }
+
+        private void CheckDefinitionMatch(ImportDefinition Import, ExportDefinition Export)
+        {
+            bool SucessfulMatch = true;
+            foreach (var Constraint in Import.ExportConstraints)
+            {
+                var CastedConstraint = (ExportTypeIdentityConstraint) Constraint;
+                string ConstraintDetail = GetConstraintString(Constraint);
+                if (!Constraint.IsSatisfiedBy(Export))
+                {
+                    Console.WriteLine("Export fails to sastify constraint of " + ConstraintDetail);
+                    SucessfulMatch = false;
+                }
+            }
+            if (SucessfulMatch)
+            {
+                Console.WriteLine("Export matches all import contstraints");
+            }   
+        }
+
+        public void CheckMatch(string ExportPartName, string ImportPartName)
+        {
+            ComposablePartDefinition ExportPart = GetPart(ExportPartName);
+            if(ExportPart == null)
+            {
+                Console.WriteLine("Couldn't find part with name " + ExportPartName);
+                return;
+            }
+            ComposablePartDefinition ImportPart = GetPart(ImportPartName);
+            if(ImportPart == null)
+            {
+                Console.WriteLine("Couldn't find part with name " + ImportPartName);
+            }
+            Console.WriteLine("Finding matches between " + ExportPartName + " and " + ImportPartName);
+            Dictionary<string, ExportDefinition> AllExportDefinitions = new Dictionary<string, ExportDefinition>(); 
+            foreach(var Export in ExportPart.ExportDefinitions)
+            {
+                ExportDefinition ExportDetails = Export.Value;
+                AllExportDefinitions.Add(ExportDetails.ContractName, ExportDetails);
+            }
+            foreach(var Import in ImportPart.Imports)
+            {
+                var CurrentImportDefintion = Import.ImportDefinition;
+                string CurrentContractName = CurrentImportDefintion.ContractName;
+                if(AllExportDefinitions.ContainsKey(CurrentContractName))
+                {
+                    Console.WriteLine("Found matching contract name of " + CurrentContractName);
+                    var PotentialMatch = AllExportDefinitions[CurrentContractName];
+                    CheckDefinitionMatch(CurrentImportDefintion, PotentialMatch);
+                }
+            }
+            Console.WriteLine();
         }
 
        

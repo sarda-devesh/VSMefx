@@ -24,10 +24,14 @@ namespace VSMefx.Commands
             this.Creator = DerivedInfo;
             this.Options = Arguments;
             this.PartInformation = new Dictionary<string, ComposablePartDefinition>();
-            foreach (ComposablePartDefinition part in Creator.Catalog.Parts)
+            if(Creator.Catalog.Parts != null)
             {
-                this.PartInformation.Add(part.Type.FullName, part); 
+                foreach (ComposablePartDefinition part in Creator.Catalog.Parts)
+                {
+                    this.PartInformation.Add(part.Type.FullName, part);
+                }
             }
+            
         }
 
          /// <summary>

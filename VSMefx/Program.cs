@@ -43,6 +43,7 @@ namespace VSMefx
         /// <param name="detail">Specify the parts we want to get more information about</param>
         /// <param name="importer">List the parts who import the specified contract name(s)</param>
         /// <param name="exporter">List the parts who export the specified contract name(s)</param>
+        /// <param name="match">Check cause of failure between given part pairs, list pairs in the following order: ExportingPart ImportingPart</param>
         /// <param name="rejected">List the rejection causes for a given part (use all to list every rejection error)</param>
         /// <param name="graph">Save a DGML graph to visualize the rejection chain</param>
         /// <param name="whitelist">A file which lists the parts we expect to be rejected</param>
@@ -55,6 +56,7 @@ namespace VSMefx
             List<string> detail = null,
             List<string> importer = null,
             List<string> exporter = null,
+            List<string> match = null,
             List<string> rejected = null, 
             bool graph = false, 
             string whitelist = "", 
@@ -73,6 +75,7 @@ namespace VSMefx
                     PartDetails = detail,
                     ImportDetails = importer,
                     ExportDetails = exporter,
+                    MatchParts = match,
                     RejectedDetails = rejected,
                     SaveGraph = graph,
                     WhiteListFile = whitelist,
@@ -132,6 +135,22 @@ namespace VSMefx
                 {
                     InfoGetter.ListTypeImporter(ImportType);
                     Console.WriteLine();
+                }
+            }
+            if(Options.MatchParts != null)
+            {
+                if(Options.MatchParts.Count() % 2 == 0)
+                {
+                    IEnumerable<string> ConsideringParts = Options.MatchParts; 
+                    for(int Index = 0; Index < ConsideringParts.Count(); Index += 2)
+                    {
+                        string ExportPart = ConsideringParts.ElementAt(Index);
+                        string ImportPart = ConsideringParts.ElementAt(Index + 1);
+                        InfoGetter.CheckMatch(ExportPart, ImportPart);
+                    }
+                } else
+                {
+                    Console.WriteLine("Didn't provide an even number of part names\n");
                 }
             }
             //Perform rejection tracing as well as visualization if specified

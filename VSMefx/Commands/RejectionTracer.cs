@@ -118,7 +118,7 @@ namespace VSMefx.Commands
 
         public void ListAllRejections ()
         {
-            for(int Level = MaxLevels; Level > 0; Level--)
+            for(int Level = 1; Level <= MaxLevels; Level++)
             {
                 ListErrorsinLevel(Level);
             }
