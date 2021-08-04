@@ -15,9 +15,13 @@ namespace VSMefx.Commands
         private DirectedGraph Dgml { get; set; } //The output graph 
 
         private static readonly string WhiteListLabel = "Whitelisted";
+        private static readonly string NormalNodeLabel = "Error";
         private static readonly string EdgeLabel = "Edge";
-        private static readonly string NodeBackgroundHex = "#FFFFFF";
+        private static readonly string NodeColor = "#00FFFF";
         private static readonly string EdgeThickness = "3";
+        private static readonly string ContainerString = "Expanded";
+        private static readonly string ContainerLabel = "Contains";
+        private static readonly string ContainerStart = "Container: ";
 
         public GraphCreator(Dictionary<string, PartNode> Graph)
         {
@@ -73,6 +77,17 @@ namespace VSMefx.Commands
             Console.WriteLine("Saved rejection graph to " + OutputFileName);
         }
 
+        private string GetNodeName(PartNode Current)
+        {
+            if(Current.HasExports())
+            {
+                return ContainerStart + Current.GetName();
+            } else
+            {
+                return Current.GetName();
+            }
+        }
+
         /// <summary>
         /// Method to convert from custom Node representation to the DGML node representation
         /// </summary>
@@ -81,18 +96,12 @@ namespace VSMefx.Commands
         
         private Node NodeConverter(PartNode Current)
         {
-            string Property; 
-            if(Current.IsWhiteListed)
-            {
-                Property = WhiteListLabel;
-            } else
-            {
-                Property = "Error"; 
-            }
+            string NodeName = GetNodeName(Current);
             Node Convertered = new Node
             {
-                Id = Current.GetName(),
-                Category = Property
+                Id = NodeName,
+                Category = Current.IsWhiteListed ? WhiteListLabel : NormalNodeLabel,
+                Group = Current.HasExports() ? ContainerString : null
             };
             Convertered.Properties.Add("Level", Current.Level.ToString());
             return Convertered;
@@ -105,19 +114,39 @@ namespace VSMefx.Commands
         /// <returns> A list of Links that represent the outgoing edges for the input node </returns>
         private IEnumerable<Link> EdgeGenerator(PartNode Current)
         {
-            foreach(var OutgoingEdge in Current.RejectsCaused)
+            //Add edges for import/exports between parts
+            if(Current.RejectsCaused != null)
             {
-                if(ValidEdge(Current, OutgoingEdge))
+                foreach (var OutgoingEdge in Current.RejectsCaused)
                 {
-                    Link Edge = new Link
+                    if (ValidEdge(Current, OutgoingEdge))
                     {
-                        Source = Current.GetName(),
-                        Target = OutgoingEdge.Target.GetName(),
-                        Label = OutgoingEdge.Label,
-                        Category = EdgeLabel
+                        string SourceName = GetNodeName(Current);
+                        string TargetName = GetNodeName(OutgoingEdge.Target);
+                        Link Edge = new Link
+                        {
+                            Source = SourceName,
+                            Target = TargetName,
+                            Label = OutgoingEdge.Label,
+                            Category = EdgeLabel
+                        };
+                        yield return Edge;
+                    }
+                }
+            } 
+            //Create containers for the parts that have exports for the current part
+            if(Current.HasExports())
+            {
+                string SourceName = ContainerStart + Current.GetName();
+                foreach(var ExportName in Current.ExportingContracts)
+                {
+                    yield return new Link
+                    {
+                        Source = SourceName,
+                        Target = ExportName,
+                        Category = ContainerLabel
                     };
-                    yield return Edge; 
-                } 
+                }
             }
         }
 
@@ -145,7 +174,7 @@ namespace VSMefx.Commands
                 GroupLabel = WhiteListLabel,
                 Setter = new List<Setter>
                 {
-                    new Setter {Property = "Background", Value = NodeBackgroundHex }
+                    new Setter {Property = "Background", Value = NodeColor }
                 }
             };
         }

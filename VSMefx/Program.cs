@@ -43,7 +43,7 @@ namespace VSMefx
         /// <param name="detail">Specify the parts we want to get more information about</param>
         /// <param name="importer">List the parts who import the specified contract name(s)</param>
         /// <param name="exporter">List the parts who export the specified contract name(s)</param>
-        /// <param name="match">Check cause of failure between given part pairs, list pairs in the following order: ExportingPart ImportingPart</param>
+        /// <param name="match">Check relationship between given part pairs, list pairs in the following order: ExportingPart ImportingPart</param>
         /// <param name="rejected">List the rejection causes for a given part (use all to list every rejection error)</param>
         /// <param name="graph">Save a DGML graph to visualize the rejection chain</param>
         /// <param name="whitelist">A file which lists the parts we expect to be rejected</param>

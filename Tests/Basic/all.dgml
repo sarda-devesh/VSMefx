@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <DirectedGraph xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" DataVirtualized="false" NeighborhoodDistance="0" xmlns="http://schemas.microsoft.com/vs/2009/dgml">
   <Nodes>
-    <Node Id="MefCalculator.AddIn" Category="Error" Level="3" />
     <Node Id="MefCalculator.ImportTest" Category="Error" Level="3" />
-    <Node Id="ExtendedOperations.ChainOne" Category="Error" Level="2" />
-    <Node Id="ExtendedOperations.Modulo" Category="Error" Level="1" />
+    <Node Id="MefCalculator.AddIn" Category="Error" Level="3" />
+    <Node Id="Container: MefCalculator.ExportTest" Category="Error" Group="Expanded" Level="3" />
+    <Node Id="ExtendedOperations.ChainOne" Category="Whitelisted" Level="2" />
+    <Node Id="Container: ExtendedOperations.Modulo" Category="Error" Group="Expanded" Level="1" />
   </Nodes>
   <Links>
     <Link Source="MefCalculator.AddIn" Target="ExtendedOperations.ChainOne" Category="Edge" Label="Adder" />
-    <Link Source="ExtendedOperations.ChainOne" Target="ExtendedOperations.Modulo" Category="Edge" Label="addInput" />
+    <Link Source="Container: MefCalculator.ExportTest" Target="MajorRevision" Category="Contains" />
+    <Link Source="Container: MefCalculator.ExportTest" Target="MinorRevision" Category="Contains" />
+    <Link Source="ExtendedOperations.ChainOne" Target="Container: ExtendedOperations.Modulo" Category="Edge" Label="addInput" />
+    <Link Source="Container: ExtendedOperations.Modulo" Target="MefCalculator.MefCalculatorInterfaces+IOperation" Category="Contains" />
   </Links>
   <Categories>
     <Category Id="3" />
@@ -20,9 +24,9 @@
       <Condition Expression="HasCategory('Edge')" />
       <Setter Property="StrokeThickness" Value="3" />
     </Style>
-    <Style TargetType="Node" GroupLabel="Whitelisted">
-      <Condition Expression="HasCategory('Whitelisted')" />
-      <Setter Property="Background" Value="#FFFFFF" />
+    <Style TargetType="Node" GroupLabel="Error">
+      <Condition Expression="HasCategory('Error')" />
+      <Setter Property="Background" Value="#00FFFF" />
     </Style>
   </Styles>
   <Properties />

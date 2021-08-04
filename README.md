@@ -83,6 +83,8 @@ Another way of saying the above statement is that rejections in lower levels ten
 
 The saved DGML file has the parts that have import issues as the nodes and has directed edges between parts to indicate the flow of part imports. Since we only store the nodes that have rejection issues, any incoming edges into a graph can be interpreted as parts that are causing it to be rejected and any outgoing edges can be thought of as parts that it is causing to be rejected. 
 
+If a part has exports other than itself, then Mefx visualizes that part as a container and stores the other exports inside the given container. Currently, 
+
 The DGML diagram that is saved when we run the above command looks like 
 ![DGML Graph for all the rejections](Images/All_Graph.jpg)
 
@@ -124,7 +126,7 @@ Saved rejection graph to ExtendedOperations_Modulo.dgml
 
 Comparing this output to the previous output, we see that more rejected parts overall but Mefx automatically filtered out the rejections to only include those that affect the ExtendedOperations.Modulo part. Since the verbose option was chosen, Mefx prints out detailed information about the cause of the issue which can be used to quickly pinpoint and resolve the issue. We can see this filtering take place in the output DGML file as well as the output DGML file produced by the above command looks like: 
 
-![DGML Graph for all the rejections](Images/Modulo_Trace.jpg)
+![DGML Graph for specific rejection](Images/Modulo_Trace.jpg)
 
 ### Whitelisting
 
@@ -168,4 +170,4 @@ Additionally, Mefx also allows the user to treat the lines in the whitelist file
 In the DGML file, Mefx indicates which parts have been whitelisted by changing the color of the nodes associated with the whitelisted parts to white which easily allows users to distinigiush between whitelisted parts and non whitelisted parts. Thus, the DGML file produced by the above command looks like:
 
 
-![DGML Graph for all the rejections](Images/WhitelistExample.jpg)
+![DGML Graph with whitelisting](Images/WhitelistExample.jpg)

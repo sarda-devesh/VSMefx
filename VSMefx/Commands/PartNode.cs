@@ -11,7 +11,6 @@ namespace VSMefx.Commands
     {
         public ComposablePartDefinition Part { get; set; } //Represents the part associated with the current node
         public List<string> VerboseMessages { get; set; } //Rejection Message(s) associated with the current part
-
         
          /// <summary>
          /// Stores the "children" of the current node, which represents parts that the current
@@ -19,7 +18,6 @@ namespace VSMefx.Commands
          /// </summary>
         public HashSet<PartEdge> ImportRejects;
 
-        
         /// <summary>
         /// Stores the "parent" of the current node, which represents parts that the current
         /// node caused import issues in due to its failure 
@@ -29,6 +27,8 @@ namespace VSMefx.Commands
 
         public bool IsWhiteListed { get; private set;  } //A boolean if this part was specified in the whitelist file
 
+        public List<string> ExportingContracts { get; private set; }
+
         public PartNode(ComposablePartDefinition Definition, string Message, int CurrLevel)
         {
             this.Part = Definition;
@@ -36,20 +36,29 @@ namespace VSMefx.Commands
             ImportRejects = new HashSet<PartEdge>();
             RejectsCaused = new HashSet<PartEdge>();
             this.Level = CurrLevel;
-            this.IsWhiteListed = false; 
+            this.IsWhiteListed = false;
+
+            this.ExportingContracts = new List<string>();
+            var NodeName = this.GetName();
+            foreach (var Export in Part.ExportDefinitions)
+            {
+                var ContractName = Export.Value.ContractName;
+                if(!ContractName.Equals(NodeName))
+                {
+                    ExportingContracts.Add(ContractName);
+                }
+            }
         }
 
         public string GetName()
         {
-            return Part.Type.FullName;
+            return this.Part.Type.FullName;
         }
-
         
         /// <summary>
         /// Method to check if the given node imports any parts with import issues
         /// </summary>
         /// <returns> A boolean indicating it the given node is a leaf node</returns>
-        
         public bool IsLeafNode()
         {
             return ImportRejects.Count() == 0;
@@ -73,6 +82,11 @@ namespace VSMefx.Commands
         public void AddErrorMessage(string Message)
         {
             this.VerboseMessages.Add(Message); 
+        }
+
+        public bool HasExports()
+        {
+            return this.ExportingContracts.Count() > 0;
         }
 
     }

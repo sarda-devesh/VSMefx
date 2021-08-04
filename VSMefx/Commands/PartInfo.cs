@@ -62,42 +62,76 @@ namespace VSMefx.Commands
                 Console.WriteLine("[Import] Field: " + ImportField + ", Contract Name: " + ImportName);
             }
         }
-
-         /// <summary> 
-         /// Method to list all the exporting parts of a given type
-         /// </summary>
-         /// <param name="TypeName"> The type whose exporting parts we want details about </param>
-        public void ListTypeExporter(string TypeName)
+        
+        /// <summary>
+        /// Method to get a list of all the parts that contain a export with the given contract name
+        /// </summary>
+        /// <param name="ContractName">The contract name whose exporting parts we want</param>
+        /// <returns>A list of all the parts that export the given contract name</returns>
+        public List<ComposablePartDefinition> GetContractExporters(string ContractName)
         {
-            Console.WriteLine("Exporting parts for " + TypeName + ":");
-            foreach (var Part in this.Creator.Catalog.Parts)
-            { 
-                foreach(var Export in Part.ExportDefinitions)
+            List<ComposablePartDefinition> ExportingParts = new List<ComposablePartDefinition>();
+            foreach(var Part in this.Creator.Catalog.Parts)
+            {
+                foreach (var Export in Part.ExportDefinitions)
                 {
-                    if(Export.Value.ContractName.Equals(TypeName))
+                    if (Export.Value.ContractName.Equals(ContractName))
                     {
-                        Console.WriteLine(GetName(Part, "[Part]"));
+                        ExportingParts.Add(Part);
+                        break;
                     }
                 }
             }
+            return ExportingParts;
         }
 
         /// <summary> 
-        /// Method to list all the importing parts of a given type
+        /// Method to output all the exporting parts of a given contract name
         /// </summary>
-        /// <param name="TypeName"> The type whose importing parts we want details about </param>
-        public void ListTypeImporter(string TypeName)
+        /// <param name="ContractName">The contract name whose exporters we want</param>
+        public void ListTypeExporter(string ContractName)
         {
-            Console.WriteLine("Importing parts for " + TypeName + ":");
-            foreach(var Part in this.Creator.Catalog.Parts)
+            Console.WriteLine("Exporting parts for " + ContractName + ":");
+            var ExportingParts = GetContractExporters(ContractName);
+            foreach(var Part in ExportingParts)
             {
-                foreach(var Import in Part.Imports)
+                Console.WriteLine(GetName(Part, "[Part]"));
+            }
+        }
+
+        /// <summary>
+        /// Method to get a list of all the parts that contain a import with the given contract name
+        /// </summary>
+        /// <param name="ContractName">The contract name whose importing parts we want</param>
+        /// <returns>A list of all the parts that import the given contract name</returns>
+        public List<ComposablePartDefinition> GetContractImporters(string ContractName)
+        {
+            List<ComposablePartDefinition> ImportingParts = new List<ComposablePartDefinition>();
+            foreach (var Part in this.Creator.Catalog.Parts)
+            {
+                foreach (var Import in Part.Imports)
                 {
-                    if(Import.ImportDefinition.ContractName.Equals(TypeName))
+                    if (Import.ImportDefinition.ContractName.Equals(ContractName))
                     {
-                        Console.WriteLine(GetName(Part, "[Part]"));
+                        ImportingParts.Add(Part);
+                        break;
                     }
                 }
+            }
+            return ImportingParts;
+        }
+
+        /// <summary> 
+        /// Method to output all the importing parts of a given contract name
+        /// </summary>
+        /// <param name="ContractName"> The contract name we want to analyze</param>
+        public void ListTypeImporter(string ContractName)
+        {
+            Console.WriteLine("Importing parts for " + ContractName + ":");
+            var ImportingParts = GetContractImporters(ContractName);
+            foreach (var Part in ImportingParts)
+            {
+                Console.WriteLine(GetName(Part, "[Part]"));
             }
         }
 
