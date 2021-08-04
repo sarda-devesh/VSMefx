@@ -143,17 +143,17 @@ namespace VSMefx.Commands
         private string GetConstraintString(IImportSatisfiabilityConstraint Constraint)
         {
             //Try to treat the constraint as an indentity constraint
-            try
+            if(Constraint is ExportTypeIdentityConstraint)
             {
                 var IdentityConstraint = (ExportTypeIdentityConstraint) Constraint;
                 return "[Type: " + IdentityConstraint.TypeIdentityName + "]";
-            } catch(Exception Error) { }
+            }
             //Try to treat the constraint as an metadata constraint
-            try
+            if (Constraint is ExportMetadataValueImportConstraint)
             {
                 var MetadataConstraint = (ExportMetadataValueImportConstraint) Constraint;
                 return "[Metadata: " + MetadataConstraint.Name + "]";
-            }catch(Exception Error) { }
+            }
             //If it is neither just return the constraint type
             return Constraint.ToString();
         }
@@ -166,7 +166,7 @@ namespace VSMefx.Commands
         private void CheckDefinitionMatch(ImportDefinition Import, ExportDefinition Export)
         {
             bool SucessfulMatch = true;
-            //Import = Import.AddExportConstraint(new ExportMetadataValueImportConstraint("Bound to fail", "32"));
+            Import = Import.AddExportConstraint(new ExportMetadataValueImportConstraint("Bound to fail", "32"));
             foreach (var Constraint in Import.ExportConstraints)
             {
                 if (!Constraint.IsSatisfiedBy(Export))
@@ -209,6 +209,7 @@ namespace VSMefx.Commands
             {
                 ExportDefinition ExportDetails = Export.Value;
                 AllExportDefinitions.Add(ExportDetails.ContractName, ExportDetails);
+                
             }
             bool FoundMatch = false;
             //Find imports that have the same contract name as one of the exports and check if they match
