@@ -21,7 +21,7 @@ namespace VSMefx.Commands
         private static readonly string EdgeThickness = "3";
         private static readonly string ContainerString = "Expanded";
         private static readonly string ContainerLabel = "Contains";
-        private static readonly string ContainerStart = "Container: ";
+        private static readonly string ContainerStart = "";
 
         public GraphCreator(Dictionary<string, PartNode> Graph)
         {

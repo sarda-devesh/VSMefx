@@ -13,7 +13,7 @@ The application currently sets the working directory based on the testFolder fie
 
 The following command illustrates the basic functionality to get information about parts and thier types: 
 ```
---parts --detail MefCalculator.ImportTest --exporter MefCalculator.MefCalculatorInterfaces+IOperation --importer MajorRevision  --file MefCalculator.dll --directory Extensions
+--parts --detail MefCalculator.ImportTest --exporter MefCalculator.MefCalculatorInterfaces+IOperation --importer ExtendedOperations.ChainOne  --file MefCalculator.dll --directory Extensions
 ```
 
 This command performs a variety of different operations and thus we will break down the command by those operations to understand
@@ -41,15 +41,14 @@ Printing out details for part MefCalculator.ImportTest
 [Export] MefCalculator.ImportTest
 [Import] Field: Operations, Contract Name: MefCalculator.MefCalculatorInterfaces+IOperation
 [Import] Field: failingField, Contract Name: MissingField
-[Import] Field: OtherError, Contract Name: MissingFieldTwo
 
 Exporting parts for MefCalculator.MefCalculatorInterfaces+IOperation:
 MefCalculator.MefCalculatorInterfaces+Add
 MefCalculator.MefCalculatorInterfaces+Subtract
 ExtendedOperations.Modulo
 
-Importing parts for MajorRevision:
-MefCalculator.MefCalculatorInterfaces+Subtract
+Importing parts for ExtendedOperations.ChainOne:
+ExtendedOperations.Modulo
 ```
 
 ### General Rejection Information
@@ -83,7 +82,7 @@ Another way of saying the above statement is that rejections in lower levels ten
 
 The saved DGML file has the parts that have import issues as the nodes and has directed edges between parts to indicate the flow of part imports. Since we only store the nodes that have rejection issues, any incoming edges into a graph can be interpreted as parts that are causing it to be rejected and any outgoing edges can be thought of as parts that it is causing to be rejected. 
 
-If a part has exports other than itself, then Mefx visualizes that part as a container and stores the other exports inside the given container. Currently, 
+If a part has exports other than itself, then Mefx visualizes that part as a container and stores the other exports inside the given container. 
 
 The DGML diagram that is saved when we run the above command looks like 
 ![DGML Graph for all the rejections](Images/All_Graph.jpg)
@@ -116,8 +115,8 @@ ExtendedOperations.ChainOne.Adder: expected exactly 1 export matching constraint
 but found 0.
 
 Errors in Level 3
-MefCalculator.AddIn.fieldTwo: expected exactly 1 export matching constraints:
-    Contract name: ChainTwo
+MefCalculator.AddIn.fieldOne: expected exactly 1 export matching constraints:
+    Contract name: ChainOne
     TypeIdentityName: System.String
 but found 0.
 
@@ -146,7 +145,7 @@ Printing Rejection Graph Info for ExtendedOperations.Modulo
 
 Errors in Level 1
 ExtendedOperations.Modulo.addInput: expected exactly 1 export matching constraints:
-    Contract name: CustomContractName
+    Contract name: ExtendedOperations.ChainOne
     TypeIdentityName: ExtendedOperations.ChainOne
 but found 0.
 
@@ -157,8 +156,8 @@ Errors in Level 2
 but found 0.
 
 Errors in Level 3
-MefCalculator.AddIn.fieldTwo: expected exactly 1 export matching constraints:
-    Contract name: ChainTwo
+MefCalculator.AddIn.fieldOne: expected exactly 1 export matching constraints:
+    Contract name: ChainOne
     TypeIdentityName: System.String
 but found 0.
 
