@@ -30,6 +30,7 @@ The above commands gives us the following output which shows the workings of all
 ```
 Parts in Catalog are
 MefCalculator.AddIn
+MefCalculator.ExportMeta
 MefCalculator.ExportTest
 MefCalculator.ImportTest
 MefCalculator.MefCalculatorInterfaces+Add
@@ -41,6 +42,7 @@ Printing out details for part MefCalculator.ImportTest
 [Export] MefCalculator.ImportTest
 [Import] Field: Operations, Contract Name: MefCalculator.MefCalculatorInterfaces+IOperation
 [Import] Field: failingField, Contract Name: MissingField
+[Import] Field: IntInput, Contract Name: MetadataTest
 
 Exporting parts for MefCalculator.MefCalculatorInterfaces+IOperation:
 MefCalculator.MefCalculatorInterfaces+Add
@@ -63,17 +65,18 @@ The main things that we want to focus on in this section are the `--graph` and t
 
 The output of running the above command looks like: 
 ```
-Listing errors in level 3
-MefCalculator.AddIn
-MefCalculator.ImportTest
+Listing errors in level 1
+ExtendedOperations.Modulo
 
 Listing errors in level 2
 ExtendedOperations.ChainOne
 
-Listing errors in level 1
-ExtendedOperations.Modulo
+Listing errors in level 3
+MefCalculator.ExportTest
+MefCalculator.AddIn
+MefCalculator.ImportTest
 
-Saved rejection graph to all.dgml
+Saved rejection graph to All.dgml
 ```
 
 Mefx classify parts that have import issues into different levels based on the cause of thier import issues. Parts on lower levels, parts with smaller level numbers, generally tend to have rejection issues because of the fact that they are importing a part that has failed imports itself, which means that the part they are trying to import will have a higher level number. 
