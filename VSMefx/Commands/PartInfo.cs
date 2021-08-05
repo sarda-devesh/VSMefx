@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Composition;
+using Newtonsoft.Json;
 
 namespace VSMefx.Commands
 {
@@ -24,6 +25,7 @@ namespace VSMefx.Commands
             ComposableCatalog Catalog = this.Creator.Catalog;
             foreach (ComposablePartDefinition Part in Catalog.Parts)
             {
+               
                 Console.WriteLine(GetName(Part, "[Part]"));
             }
             
@@ -163,23 +165,61 @@ namespace VSMefx.Commands
         /// </summary>
         /// <param name="Import">The ImportDefinition that we want to check against</param>
         /// <param name="Export">The ExportDefinition we want to compare with</param>
-        private void CheckDefinitionMatch(ImportDefinition Import, ExportDefinition Export)
+        /// <returns> 
+        /// A Tuple whose first field is a boolean indicating if the export satifies the import
+        /// and whose second field is a list of messages to output to the user about the match
+        /// </returns>
+        private Tuple<bool, List<string>> CheckDefinitionMatch(ImportDefinition Import, ExportDefinition Export)
         {
             bool SucessfulMatch = true;
-            Import = Import.AddExportConstraint(new ExportMetadataValueImportConstraint("Bound to fail", "32"));
+            List<string> OutputMessages = new List<string>();
+            //Import = Import.AddExportConstraint(new ExportMetadataValueImportConstraint("Bound to fail", "32"));
             foreach (var Constraint in Import.ExportConstraints)
             {
                 if (!Constraint.IsSatisfiedBy(Export))
                 {
                     string ConstraintDetail = GetConstraintString(Constraint);
-                    Console.WriteLine("Export fails to sastify constraint of " + ConstraintDetail);
+                    OutputMessages.Add("Export fails to sastify constraint of " + ConstraintDetail);
                     SucessfulMatch = false;
                 }
             }
             if (SucessfulMatch)
             {
-                Console.WriteLine("Export matches all import contstraints");
-            }   
+                OutputMessages.Add("Export matches all import constraints");
+            }
+            return new Tuple<bool, List<string>>(SucessfulMatch, OutputMessages);
+        }
+
+        /// <summary>
+        /// Method to output to the user if the given exports satisfy the import requirements
+        /// </summary>
+        /// <param name="Import">The ImportDefintion we want to match against</param>
+        /// <param name="MatchingExports">A list of ExportDefinitions that we want to match against the import</param>
+        private void PerformDefintionChecking(ImportDefinition Import, List<ExportDefinition> MatchingExports)
+        {
+            bool PrintExportDetails = MatchingExports.Count() > 1; 
+            int Total = 0; 
+            foreach(var Export in MatchingExports)
+            {
+                if(PrintExportDetails)
+                {
+                    Console.WriteLine("Considering export with metadata " + JsonConvert.SerializeObject(Export.Metadata));
+                }
+                var Result = CheckDefinitionMatch(Import, Export);
+                if(Result.Item1)
+                {
+                    Total += 1; 
+                }
+                foreach(var Message in Result.Item2)
+                {
+                    Console.WriteLine(Message);
+                }
+            }
+            bool PrintMatchSummary = PrintExportDetails; 
+            if(PrintMatchSummary)
+            {
+                Console.WriteLine(Total + "/" + MatchingExports.Count() + " export(s) satisfy the import constraints");
+            }
         }
 
         /// <summary>
@@ -201,14 +241,20 @@ namespace VSMefx.Commands
             if (ImportPart == null)
             {
                 Console.WriteLine("Couldn't find part with name " + ImportPartName);
+                return; 
             }
             Console.WriteLine("Finding matches between " + ExportPartName + " and " + ImportPartName);
             //Get all the exports of the exporting part, indexed by the export contract name
-            Dictionary<string, ExportDefinition> AllExportDefinitions = new Dictionary<string, ExportDefinition>();
+            Dictionary<string, List<ExportDefinition>> AllExportDefinitions = new Dictionary<string, List<ExportDefinition>>();
             foreach (var Export in ExportPart.ExportDefinitions)
             {
                 ExportDefinition ExportDetails = Export.Value;
-                AllExportDefinitions.Add(ExportDetails.ContractName, ExportDetails);
+                string ExportName = ExportDetails.ContractName; 
+                if(!AllExportDefinitions.ContainsKey(ExportName))
+                {
+                    AllExportDefinitions.Add(ExportName, new List<ExportDefinition>());
+                }
+                AllExportDefinitions[ExportName].Add(ExportDetails);
                 
             }
             bool FoundMatch = false;
@@ -219,10 +265,15 @@ namespace VSMefx.Commands
                 string CurrentContractName = CurrentImportDefintion.ContractName;
                 if (AllExportDefinitions.ContainsKey(CurrentContractName))
                 {
-                    Console.WriteLine("Potential match with contract name " + CurrentContractName);
-                    var PotentialMatch = AllExportDefinitions[CurrentContractName];
-                    CheckDefinitionMatch(CurrentImportDefintion, PotentialMatch);
+                    string FieldName = "Part Constructor"; 
+                    if(Import.ImportingMember != null)
+                    {
+                        FieldName = Import.ImportingMember.Name;
+                    }
+                    var PotentialMatches = AllExportDefinitions[CurrentContractName];
+                    Console.WriteLine("\nFound " + PotentialMatches.Count() + " potential match(es) for importing field " + FieldName);
                     FoundMatch = true;
+                    PerformDefintionChecking(CurrentImportDefintion, PotentialMatches);
                 }
             }
             if (!FoundMatch)
