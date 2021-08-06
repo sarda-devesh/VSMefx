@@ -173,3 +173,37 @@ In the DGML file, Mefx indicates which parts have been whitelisted by changing t
 
 
 ![DGML Graph with whitelisting](Images/WhitelistExample.jpg)
+
+### Matching
+
+The match option provides users an option to easily check the import/export relationship between two given parts and analyze causes of import failures between two given
+parts. This feature is especially useful when paired with the rejection options as it provides specific information about how the import and export of the specified parts
+relate and why the exports fail to satisfy the import requirements. For example, the following command indicates how to properly use the match feature:
+
+```
+--match MefCalculator.AddIn ExtendedOperations.ChainOne MefCalculator.ExportMeta MefCalculator.ImportTest --file MefCalculator.dll --directory Extensions
+```
+
+Mefx accepts you list multiple pairs of parts in the match option but make sure you list the part who exports you want to consider before the part who exports you want to consider. Mefx analyzes the pairs from left to right and thus it interprets the above command as try to match the expors of MefCalculator.AddIn with the imports of ExtendedOperations.ChainOne as well as try to match the exports of MefCalculator.ExportMeta with the imports of MefCalculator.ImportTest. In general specify parts to the match command in the following order: `ExportPart1 ImportPart1 ExportPart2 ImportPart2 ...`
+
+The output of the above command is:
+
+```
+Finding matches from MefCalculator.AddIn to ExtendedOperations.ChainOne
+
+Found 1 potential match(es) for importing field Adder
+Export matches all import constraints
+
+Finding matches from MefCalculator.ExportMeta to MefCalculator.ImportTest
+
+Found 2 potential match(es) for importing field IntInput
+Considering exporting field ExportOne
+Export matches all import constraints
+Considering exporting field ExportTwo
+Export fails to sastify constraint of [Type: System.Int32]
+1/2 export(s) satisfy the import constraints
+```
+
+Let us analyze this output to understand how the match functionality works. For this first match pair, we found one export in MefCalculator.AddIn that satisfies the import constraints specified by the importing field Adder. This represents the ideal case where there is one export that satifies the import constraints without any composition failures.  
+
+Now lets us process the second output in detail as it showcases how Mefx deals with the non normal cases. If there is more than one export in the specified part that matches the importing contract name, then Mefx matches all of them against the import requirements individually. In the example above, exporting fields ExportOne and ExportTwo match the contract name for the importing field IntInput and thus the program considers both of them seperately. It then reports back to the user either that the export meets the import requirements or the reason why the export failed to meet the import requirements. Going back to the example, we see that the exporting field ExportOne meets all the import requirements but ExportTwo failes to meet the requirement that the exporting type be of System.Int32. 

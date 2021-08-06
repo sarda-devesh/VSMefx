@@ -50,7 +50,14 @@ namespace VSMefx.Commands
             foreach(var ExportPair in Definition.ExportDefinitions)
             {
                 string ExportName = ExportPair.Value.ContractName;
-                Console.WriteLine("[Export] " + ExportName);
+                if(ExportPair.Key == null)
+                {
+                    Console.WriteLine("[Export] " + ExportName);
+                } else
+                {
+                    string ExportField = ExportPair.Key.Name;
+                    Console.WriteLine("[Export] Field: " + ExportField + ", Contract Name: " + ExportName);
+                }
             }
             //Print details about the parts/type the current part imports
             foreach(var Import in Definition.Imports)
@@ -195,7 +202,7 @@ namespace VSMefx.Commands
         /// </summary>
         /// <param name="Import">The ImportDefintion we want to match against</param>
         /// <param name="MatchingExports">A list of ExportDefinitions that we want to match against the import</param>
-        private void PerformDefintionChecking(ImportDefinition Import, List<ExportDefinition> MatchingExports)
+        private void PerformDefintionChecking(ImportDefinition Import, List<Tuple<ExportDefinition, string>> MatchingExports)
         {
             bool PrintExportDetails = MatchingExports.Count() > 1; 
             int Total = 0; 
@@ -203,9 +210,9 @@ namespace VSMefx.Commands
             {
                 if(PrintExportDetails)
                 {
-                    Console.WriteLine("Considering export with metadata " + JsonConvert.SerializeObject(Export.Metadata));
+                    Console.WriteLine("Considering exporting field " + Export.Item2);
                 }
-                var Result = CheckDefinitionMatch(Import, Export);
+                var Result = CheckDefinitionMatch(Import, Export.Item1);
                 if(Result.Item1)
                 {
                     Total += 1; 
@@ -243,18 +250,24 @@ namespace VSMefx.Commands
                 Console.WriteLine("Couldn't find part with name " + ImportPartName);
                 return; 
             }
-            Console.WriteLine("Finding matches between " + ExportPartName + " and " + ImportPartName);
+            Console.WriteLine("Finding matches from " + ExportPartName + " to " + ImportPartName);
             //Get all the exports of the exporting part, indexed by the export contract name
-            Dictionary<string, List<ExportDefinition>> AllExportDefinitions = new Dictionary<string, List<ExportDefinition>>();
+            Dictionary<string, List<Tuple<ExportDefinition, string>>> AllExportDefinitions;
+            AllExportDefinitions = new Dictionary<string, List<Tuple<ExportDefinition, string>>>();
             foreach (var Export in ExportPart.ExportDefinitions)
             {
-                ExportDefinition ExportDetails = Export.Value;
+                var ExportDetails = Export.Value;
                 string ExportName = ExportDetails.ContractName; 
                 if(!AllExportDefinitions.ContainsKey(ExportName))
                 {
-                    AllExportDefinitions.Add(ExportName, new List<ExportDefinition>());
+                    AllExportDefinitions.Add(ExportName, new List<Tuple<ExportDefinition, string>>());
                 }
-                AllExportDefinitions[ExportName].Add(ExportDetails);
+                string ExportLabel = "Entire Part";
+                if(Export.Key != null)
+                {
+                    ExportLabel = Export.Key.Name;
+                }
+                AllExportDefinitions[ExportName].Add(Tuple.Create(ExportDetails, ExportLabel));
                 
             }
             bool FoundMatch = false;

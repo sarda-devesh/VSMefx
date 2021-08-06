@@ -11,7 +11,6 @@ namespace VSMefx.Commands
     /// <summary>
     /// A general command class which serves a parent class for all the commands that can be run by application 
     /// </summary>
-
     class Command
     {
         protected ConfigCreator Creator { get; private set; } //Stores the catalog and config information for the input files 
