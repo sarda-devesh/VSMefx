@@ -98,76 +98,23 @@ namespace VSMefx
         {
             ConfigCreator Creator = new ConfigCreator(Options);
             await Creator.Initialize();
-            if(Options.CacheFile.Length > 0)
+            if(Creator.Catalog == null)
             {
-                await Creator.SaveToCache(Options.CacheFile);
+                Console.WriteLine("Couldn't find any parts in the input files and folders");
+                return;
             }
             PartInfo InfoGetter = new PartInfo(Creator, Options);
-            //Listing all the parts present in the input files/folders
-            if (Options.ListParts)
+            InfoGetter.PrintRequestedInfo();
+            if (Options.MatchParts != null)
             {
-                Console.WriteLine("Parts in Catalog are ");
-                InfoGetter.ListAllParts();
-                Console.WriteLine();
-            }
-            //Get more detailed information about a specific part 
-            if (Options.PartDetails != null && Options.PartDetails.Count() > 0)
-            {
-                foreach (string PartName in Options.PartDetails)
-                {
-                    InfoGetter.GetPartInfo(PartName);
-                    Console.WriteLine();
-                }
-            }
-            //Get parts that export a given type
-            if(Options.ExportDetails != null && Options.ExportDetails.Count() > 0)
-            {
-                foreach(string ExportType in Options.ExportDetails)
-                {
-                    InfoGetter.ListTypeExporter(ExportType);
-                    Console.WriteLine();
-                }
-            }
-            //Get parts that import a given part or type
-            if(Options.ImportDetails != null && Options.ImportDetails.Count() > 0)
-            {
-                foreach(string ImportType in Options.ImportDetails)
-                {
-                    InfoGetter.ListTypeImporter(ImportType);
-                    Console.WriteLine();
-                }
-            }
-            if(Options.MatchParts != null)
-            {
-                if(Options.MatchParts.Count() % 2 == 0)
-                {
-                    IEnumerable<string> ConsideringParts = Options.MatchParts; 
-                    for(int Index = 0; Index < ConsideringParts.Count(); Index += 2)
-                    {
-                        string ExportPart = ConsideringParts.ElementAt(Index);
-                        string ImportPart = ConsideringParts.ElementAt(Index + 1);
-                        InfoGetter.CheckMatch(ExportPart, ImportPart);
-                    }
-                } else
-                {
-                    Console.WriteLine("Didn't provide an even number of part names\n");
-                }
+                MatchChecker Checker = new MatchChecker(Creator, Options);
+                Checker.PerformMatching();
             }
             //Perform rejection tracing as well as visualization if specified
-            if(Options.RejectedDetails != null && Options.RejectedDetails.Count() > 0)
+            if (Options.RejectedDetails != null && Options.RejectedDetails.Count() > 0)
             {
                 RejectionTracer Tracer = new RejectionTracer(Creator, Options);
-                if(Options.RejectedDetails.Contains("all"))
-                {
-                    Tracer.ListAllRejections();
-                }  else
-                {
-                    foreach(string RejectPart in Options.RejectedDetails)
-                    {
-                        Tracer.ListReject(RejectPart);
-                    }
-                }
-                
+                Tracer.PerformRejectionTracing();
             }
         }
 

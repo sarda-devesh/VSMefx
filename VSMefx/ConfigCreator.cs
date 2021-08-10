@@ -14,6 +14,8 @@ namespace VSMefx
         //Ensure that the cache extension is the last one since it needs to be processed seperately
         private static readonly string[] ValidExtensions = { "dll", "exe", "cache"}; //File extensions that are considered valid 
         private List<string> AssemblyPaths { get; set; }  //Complete path of all the files we want to include in our analysis
+        
+        private string OutputCacheFile { get; set; } //Path to the output file in which to store the catalog as a cache
 
         private List<string> CachePaths { get; set; } //Paths to all the cache files we want to process
 
@@ -40,7 +42,6 @@ namespace VSMefx
          /// A file is added to the list of path if it contains a valid extension and actually exists
          /// </summary>
          /// <returns> A boolean indicating if the file was added to the list of paths </returns>
-         
         private bool AddFile(string FolderPath, string FileName)
         {
             FileName = FileName.Trim();
@@ -192,15 +193,9 @@ namespace VSMefx
         /// <summary>
         /// Method to store the parts read from the input files into a cache for future use
         /// </summary>
-        /// <param name="FileName">The name of the cache file in which we want to store this data</param>
-
-        public async Task SaveToCache(string FileName)
+        private async Task SaveToCache()
         {
-            if(this.Catalog == null)
-            {
-                Console.WriteLine("Can't save non initialized catalog to a cache file");
-            }
-            FileName = FileName.Trim();
+            string FileName = OutputCacheFile.Trim();
             int ExtensionIndex = FileName.LastIndexOf('.');
             string CacheExtension = ValidExtensions[ValidExtensions.Length - 1];
             if (ExtensionIndex >= 0 && FileName.Substring(ExtensionIndex + 1).Equals(CacheExtension))
@@ -239,6 +234,10 @@ namespace VSMefx
             if(this.Catalog != null)
             {
                 this.Config = CompositionConfiguration.Create(this.Catalog);
+                if (OutputCacheFile.Length > 0)
+                {
+                    await this.SaveToCache();
+                }
             }
         }
 
@@ -290,6 +289,7 @@ namespace VSMefx
             {
                 ReadWhiteListFile(CurrentFolder, Options.WhiteListFile); 
             }
+            this.OutputCacheFile = Options.CacheFile;
         }
     }
 }

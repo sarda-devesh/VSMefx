@@ -20,7 +20,7 @@ namespace VSMefx.Commands
          /// Method to print basic information associated with all the parts in the catalog
          /// </summary>
          
-        public void ListAllParts()
+        private void ListAllParts()
         {
             ComposableCatalog Catalog = this.Creator.Catalog;
             foreach (ComposablePartDefinition Part in Catalog.Parts)
@@ -37,7 +37,7 @@ namespace VSMefx.Commands
         /// </summary>
         /// <param name="PartName"> The name of the part we want more information about</param>
        
-        public void GetPartInfo(string PartName)
+        private void GetPartInfo(string PartName)
         {
             ComposablePartDefinition Definition = this.GetPart(PartName); 
             if(Definition == null)
@@ -77,7 +77,7 @@ namespace VSMefx.Commands
         /// </summary>
         /// <param name="ContractName">The contract name whose exporting parts we want</param>
         /// <returns>A list of all the parts that export the given contract name</returns>
-        public List<ComposablePartDefinition> GetContractExporters(string ContractName)
+        private List<ComposablePartDefinition> GetContractExporters(string ContractName)
         {
             List<ComposablePartDefinition> ExportingParts = new List<ComposablePartDefinition>();
             foreach(var Part in this.Creator.Catalog.Parts)
@@ -98,7 +98,7 @@ namespace VSMefx.Commands
         /// Method to output all the exporting parts of a given contract name
         /// </summary>
         /// <param name="ContractName">The contract name whose exporters we want</param>
-        public void ListTypeExporter(string ContractName)
+        private void ListTypeExporter(string ContractName)
         {
             Console.WriteLine("Exporting parts for " + ContractName + ":");
             var ExportingParts = GetContractExporters(ContractName);
@@ -113,7 +113,7 @@ namespace VSMefx.Commands
         /// </summary>
         /// <param name="ContractName">The contract name whose importing parts we want</param>
         /// <returns>A list of all the parts that import the given contract name</returns>
-        public List<ComposablePartDefinition> GetContractImporters(string ContractName)
+        private List<ComposablePartDefinition> GetContractImporters(string ContractName)
         {
             List<ComposablePartDefinition> ImportingParts = new List<ComposablePartDefinition>();
             foreach (var Part in this.Creator.Catalog.Parts)
@@ -134,7 +134,7 @@ namespace VSMefx.Commands
         /// Method to output all the importing parts of a given contract name
         /// </summary>
         /// <param name="ContractName"> The contract name we want to analyze</param>
-        public void ListTypeImporter(string ContractName)
+        private void ListTypeImporter(string ContractName)
         {
             Console.WriteLine("Importing parts for " + ContractName + ":");
             var ImportingParts = GetContractImporters(ContractName);
@@ -145,157 +145,46 @@ namespace VSMefx.Commands
         }
 
         /// <summary>
-        /// Method to get a basic description of a given constraint for output
+        /// Method to the read the arguments to the input options and output the requested info
+        /// to the user
         /// </summary>
-        /// <param name="Constraint">The Constraint which we want information about</param>
-        /// <returns>A string providing some details about the given constraint</returns>
-        private string GetConstraintString(IImportSatisfiabilityConstraint Constraint)
+        public void PrintRequestedInfo()
         {
-            //Try to treat the constraint as an indentity constraint
-            if(Constraint is ExportTypeIdentityConstraint)
+            //Listing all the parts present in the input files/folders
+            if (Options.ListParts)
             {
-                var IdentityConstraint = (ExportTypeIdentityConstraint) Constraint;
-                return "[Type: " + IdentityConstraint.TypeIdentityName + "]";
+                Console.WriteLine("Parts in Catalog are ");
+                this.ListAllParts();
+                Console.WriteLine();
             }
-            //Try to treat the constraint as an metadata constraint
-            if (Constraint is ExportMetadataValueImportConstraint)
+            //Get more detailed information about a specific part 
+            if (Options.PartDetails != null && Options.PartDetails.Count() > 0)
             {
-                var MetadataConstraint = (ExportMetadataValueImportConstraint) Constraint;
-                return "[Metadata: " + MetadataConstraint.Name + "]";
-            }
-            //If it is neither just return the constraint type
-            return Constraint.ToString();
-        }
-
-        /// <summary>
-        /// Method to check if a export satifies the import requirements and print that result to the user
-        /// </summary>
-        /// <param name="Import">The ImportDefinition that we want to check against</param>
-        /// <param name="Export">The ExportDefinition we want to compare with</param>
-        /// <returns> 
-        /// A Tuple whose first field is a boolean indicating if the export satifies the import
-        /// and whose second field is a list of messages to output to the user about the match
-        /// </returns>
-        private Tuple<bool, List<string>> CheckDefinitionMatch(ImportDefinition Import, ExportDefinition Export)
-        {
-            bool SucessfulMatch = true;
-            List<string> OutputMessages = new List<string>();
-            //Import = Import.AddExportConstraint(new ExportMetadataValueImportConstraint("Bound to fail", "32"));
-            foreach (var Constraint in Import.ExportConstraints)
-            {
-                if (!Constraint.IsSatisfiedBy(Export))
+                foreach (string PartName in Options.PartDetails)
                 {
-                    string ConstraintDetail = GetConstraintString(Constraint);
-                    OutputMessages.Add("Export fails to sastify constraint of " + ConstraintDetail);
-                    SucessfulMatch = false;
+                    this.GetPartInfo(PartName);
+                    Console.WriteLine();
                 }
             }
-            if (SucessfulMatch)
+            //Get parts that export a given type
+            if (Options.ExportDetails != null && Options.ExportDetails.Count() > 0)
             {
-                OutputMessages.Add("Export matches all import constraints");
-            }
-            return new Tuple<bool, List<string>>(SucessfulMatch, OutputMessages);
-        }
-
-        /// <summary>
-        /// Method to output to the user if the given exports satisfy the import requirements
-        /// </summary>
-        /// <param name="Import">The ImportDefintion we want to match against</param>
-        /// <param name="MatchingExports">A list of ExportDefinitions that we want to match against the import</param>
-        private void PerformDefintionChecking(ImportDefinition Import, List<Tuple<ExportDefinition, string>> MatchingExports)
-        {
-            bool PrintExportDetails = MatchingExports.Count() > 1; 
-            int Total = 0; 
-            foreach(var Export in MatchingExports)
-            {
-                if(PrintExportDetails)
+                foreach (string ExportType in Options.ExportDetails)
                 {
-                    Console.WriteLine("Considering exporting field " + Export.Item2);
-                }
-                var Result = CheckDefinitionMatch(Import, Export.Item1);
-                if(Result.Item1)
-                {
-                    Total += 1; 
-                }
-                foreach(var Message in Result.Item2)
-                {
-                    Console.WriteLine(Message);
+                    this.ListTypeExporter(ExportType);
+                    Console.WriteLine();
                 }
             }
-            bool PrintMatchSummary = PrintExportDetails; 
-            if(PrintMatchSummary)
+            //Get parts that import a given part or type
+            if (Options.ImportDetails != null && Options.ImportDetails.Count() > 0)
             {
-                Console.WriteLine(Total + "/" + MatchingExports.Count() + " export(s) satisfy the import constraints");
+                foreach (string ImportType in Options.ImportDetails)
+                {
+                    this.ListTypeImporter(ImportType);
+                    Console.WriteLine();
+                }
             }
         }
-
-        /// <summary>
-        ///  Method to check if there is a relationship between two given parts
-        ///  and print information regarding that match to the user
-        /// </summary>
-        /// <param name="ExportPartName">The name of the part whose exports we want to consider</param>
-        /// <param name="ImportPartName">The name of the part whose imports we want to consider</param>
-        public void CheckMatch(string ExportPartName, string ImportPartName)
-        {
-            //Deal with the case that one of the parts doesn't exist 
-            ComposablePartDefinition ExportPart = GetPart(ExportPartName);
-            if (ExportPart == null)
-            {
-                Console.WriteLine("Couldn't find part with name " + ExportPartName);
-                return;
-            }
-            ComposablePartDefinition ImportPart = GetPart(ImportPartName);
-            if (ImportPart == null)
-            {
-                Console.WriteLine("Couldn't find part with name " + ImportPartName);
-                return; 
-            }
-            Console.WriteLine("Finding matches from " + ExportPartName + " to " + ImportPartName);
-            //Get all the exports of the exporting part, indexed by the export contract name
-            Dictionary<string, List<Tuple<ExportDefinition, string>>> AllExportDefinitions;
-            AllExportDefinitions = new Dictionary<string, List<Tuple<ExportDefinition, string>>>();
-            foreach (var Export in ExportPart.ExportDefinitions)
-            {
-                var ExportDetails = Export.Value;
-                string ExportName = ExportDetails.ContractName; 
-                if(!AllExportDefinitions.ContainsKey(ExportName))
-                {
-                    AllExportDefinitions.Add(ExportName, new List<Tuple<ExportDefinition, string>>());
-                }
-                string ExportLabel = "Entire Part";
-                if(Export.Key != null)
-                {
-                    ExportLabel = Export.Key.Name;
-                }
-                AllExportDefinitions[ExportName].Add(Tuple.Create(ExportDetails, ExportLabel));
-                
-            }
-            bool FoundMatch = false;
-            //Find imports that have the same contract name as one of the exports and check if they match
-            foreach (var Import in ImportPart.Imports)
-            {
-                var CurrentImportDefintion = Import.ImportDefinition;
-                string CurrentContractName = CurrentImportDefintion.ContractName;
-                if (AllExportDefinitions.ContainsKey(CurrentContractName))
-                {
-                    string FieldName = "Part Constructor"; 
-                    if(Import.ImportingMember != null)
-                    {
-                        FieldName = Import.ImportingMember.Name;
-                    }
-                    var PotentialMatches = AllExportDefinitions[CurrentContractName];
-                    Console.WriteLine("\nFound " + PotentialMatches.Count() + " potential match(es) for importing field " + FieldName);
-                    FoundMatch = true;
-                    PerformDefintionChecking(CurrentImportDefintion, PotentialMatches);
-                }
-            }
-            if (!FoundMatch)
-            {
-                Console.WriteLine("Couldn't find any potential matches between the two given parts");
-            }
-            Console.WriteLine();
-        }
-
        
     }
 }
