@@ -21,7 +21,7 @@ namespace VSMefx.Commands
         private static readonly string EdgeThickness = "3";
         private static readonly string ContainerString = "Expanded";
         private static readonly string ContainerLabel = "Contains";
-        private static readonly string ContainerStart = "";
+        private static readonly string ContainerStart = "Part: ";
 
         public GraphCreator(Dictionary<string, PartNode> Graph)
         {
@@ -137,7 +137,7 @@ namespace VSMefx.Commands
             //Create containers for the parts that have exports for the current part
             if(Current.HasExports())
             {
-                string SourceName = ContainerStart + Current.GetName();
+                string SourceName = GetNodeName(Current);
                 foreach(var ExportName in Current.ExportingContracts)
                 {
                     yield return new Link

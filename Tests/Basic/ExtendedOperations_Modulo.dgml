@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <DirectedGraph xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" DataVirtualized="false" NeighborhoodDistance="0" xmlns="http://schemas.microsoft.com/vs/2009/dgml">
   <Nodes>
-    <Node Id="ExtendedOperations.Modulo" Category="Error" Group="Expanded" Level="1" />
-    <Node Id="ExtendedOperations.ChainOne" Category="Error" Level="2" />
+    <Node Id="Part: ExtendedOperations.Modulo" Category="Error" Group="Expanded" Level="1" />
+    <Node Id="ExtendedOperations.ChainOne" Category="Whitelisted" Level="2" />
     <Node Id="MefCalculator.AddIn" Category="Error" Level="3" />
   </Nodes>
   <Links>
-    <Link Source="ExtendedOperations.Modulo" Target="MefCalculator.MefCalculatorInterfaces+IOperation" Category="Contains" />
-    <Link Source="ExtendedOperations.ChainOne" Target="ExtendedOperations.Modulo" Category="Edge" Label="addInput" />
+    <Link Source="Part: ExtendedOperations.Modulo" Target="MefCalculator.MefCalculatorInterfaces+IOperation" Category="Contains" />
+    <Link Source="ExtendedOperations.ChainOne" Target="Part: ExtendedOperations.Modulo" Category="Edge" Label="addInput" />
     <Link Source="MefCalculator.AddIn" Target="ExtendedOperations.ChainOne" Category="Edge" Label="Adder" />
   </Links>
   <Categories>

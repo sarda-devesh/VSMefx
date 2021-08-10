@@ -105,7 +105,7 @@ namespace VSMefx
 
         private void ReadWhiteListFile(string CurrentFolder, string FileName)
         {
-            string FilePath = Path.Combine(CurrentFolder, FileName); 
+            string FilePath = Path.Combine(CurrentFolder, FileName.Trim()); 
             if(!File.Exists(FilePath))
             {
                 Console.WriteLine("Couldn't find file " + FileName);
@@ -113,22 +113,24 @@ namespace VSMefx
             }
             try
             {
-                string[] Lines = File.ReadAllLines(FilePath); 
-                foreach(string description in Lines)
+                string[] Lines = File.ReadAllLines(FilePath);
+                foreach (string description in Lines)
                 {
                     string Name = description.Trim();
-                    if(this.UsingRegex)
+                    if (this.UsingRegex)
                     {
                         string pattern = @"^" + Name + @"$";
                         this.WhiteListExpressions.Add(new Regex(pattern, RegexOptions, MaxRegexTime));
-                    } else
+                    }
+                    else
                     {
                         this.WhiteListParts.Add(Name);
                     }
                 }
-            }catch(Exception Error)
+            }
+            catch(Exception Error)
             {
-                throw new Exception("Encountered error when trying to process the file: " + Error.Message); 
+                throw new Exception("Encountered error when trying to process the whitelisted file: " + Error.Message); 
             }
         }
 
@@ -147,15 +149,9 @@ namespace VSMefx
             }
             foreach(Regex Test in this.WhiteListExpressions)
             {
-                try
+                if (Test.IsMatch(PartName))
                 {
-                    if(Test.IsMatch(PartName))
-                    {
-                        return true;
-                    }
-                }catch(Exception Error)
-                {
-                    throw new Exception("Encountered " + Error.Message + " when testing " + PartName + " against " + Test.ToString());
+                    return true;
                 }
             }
             return false; 
@@ -174,18 +170,18 @@ namespace VSMefx
                     FileStream InputStream = File.OpenRead(FilePath);
                     CachedCatalog CatalogReader = new CachedCatalog();
                     ComposableCatalog CurrentCatalog = await CatalogReader.LoadAsync(InputStream, Resolver.DefaultInstance);
-                    if(this.Catalog == null)
+                    if (this.Catalog == null)
                     {
                         this.Catalog = CurrentCatalog;
-                    } else
+                    }
+                    else
                     {
                         this.Catalog = this.Catalog.AddCatalog(CurrentCatalog);
                     }
-                    
-                }
-                catch (Exception e)
+                } catch(Exception Error)
                 {
-                    throw new Exception("Encountered error when trying to read cache file: " + e.Message);
+                    Console.WriteLine("Encountered the following error: " + Error.Message + " when trying to read " +
+                        " file " + FilePath);
                 }
             }
         }
@@ -204,19 +200,35 @@ namespace VSMefx
                 CachedCatalog CacheWriter = new CachedCatalog();
                 var FileWriter = File.Create(FilePath);
                 await CacheWriter.SaveAsync(this.Catalog, FileWriter);
-                Console.WriteLine("Saved catalog to file " + FileName);
+                Console.WriteLine("Saved catalog to file " + FileName + "\n");
             }
             else
             {
-                Console.WriteLine("Couldn't save catalog to file " + FileName);
+                Console.WriteLine("Couldn't save catalog to file " + FileName + "\n");
             }
             Console.WriteLine();
+        }
+
+        /// <summary>
+        /// Method to print any discovery errors encountered during catalog creation
+        /// </summary>
+        private void PrintDiscoveryErrors()
+        {
+            var DiscoveryErrors = this.Catalog.DiscoveredParts.DiscoveryErrors;
+            if (DiscoveryErrors.Count() > 0)
+            {
+                Console.WriteLine("Encountered the following errors when trying to parse input files: ");
+                foreach(var Error in DiscoveryErrors)
+                {
+                    Console.WriteLine("Encountered error of " + Error.Message + " with assembly " + Error.AssemblyPath);
+                }
+                Console.WriteLine();
+            }
         }
         
          /// <summary>
          /// Method to intialize the catalog and configuration objects from the input files
          /// </summary>
-
         public async Task Initialize()
         {
             PartDiscovery Discovery = PartDiscovery.Combine(
@@ -233,6 +245,7 @@ namespace VSMefx
             }
             if(this.Catalog != null)
             {
+                this.PrintDiscoveryErrors();
                 this.Config = CompositionConfiguration.Create(this.Catalog);
                 if (OutputCacheFile.Length > 0)
                 {
@@ -254,7 +267,7 @@ namespace VSMefx
                 {
                     if(!AddFile(CurrentFolder, File))
                     {
-                        Console.WriteLine("Couldn't add file " + File);
+                        Console.WriteLine("Couldn't add file " + File + "\n");
                     } 
                 }
             }
@@ -270,7 +283,7 @@ namespace VSMefx
                         SearchFolder(FolderPath);
                     } else
                     {
-                        Console.WriteLine("Couldn't add files from folder " + Folder);
+                        Console.WriteLine("Couldn't add files from folder " + Folder + "\n");
                     }
                     
                 }
