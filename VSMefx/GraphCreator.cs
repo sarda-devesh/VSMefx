@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using OpenSoftware.DgmlTools;
 using OpenSoftware.DgmlTools.Builders;
 using OpenSoftware.DgmlTools.Model;
+using VSMefx.Commands;
 
-namespace VSMefx.Commands
+namespace VSMefx
 {
     class GraphCreator
     {

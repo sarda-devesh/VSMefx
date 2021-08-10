@@ -33,21 +33,6 @@ namespace VSMefx.Commands
             
         }
 
-         /// <summary>
-         /// Method to get the details about a part, i.e. the part Definition, given its name.
-         /// </summary>
-         /// <param name="PartName"> The name of the part we want to get details about </param>
-         /// <returns>ComposablePartDefinition associated with the given part if it is present in the catalog
-         ///          Null if the given part is not present in the catalog </returns>
-
-        protected ComposablePartDefinition GetPart(string PartName)
-        {
-            if(!this.PartInformation.ContainsKey(PartName))
-            {
-                return null;
-            }
-            return this.PartInformation[PartName]; 
-        }
         
          /// <summary>
          /// Method to get the name of the given its definition
@@ -59,6 +44,10 @@ namespace VSMefx.Commands
 
         protected string GetName(ComposablePartDefinition Part, string VerboseLabel = "")
         {
+            if(Part == null)
+            {
+                throw new ArgumentException("Request name of a null part");
+            }
             Type PartType = Part.Type;
             if (this.Options.Verbose)
             {

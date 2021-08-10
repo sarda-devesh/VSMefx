@@ -22,7 +22,12 @@ namespace VSMefx
         /// <summary>
         /// Catalog storing information about the imported parts
         /// </summary>
-        public ComposableCatalog Catalog { get; private set; } 
+        public ComposableCatalog Catalog { get; private set; }
+
+        /// <summary>
+        /// Dictionary storing parts indexed by thier parts name for easy lookup
+        /// </summary>
+        private Dictionary<string, ComposablePartDefinition> PartInformation { get; set; }
 
         /// <summary>
         /// Configuration information associated with the imported parts
@@ -108,7 +113,7 @@ namespace VSMefx
             string FilePath = Path.Combine(CurrentFolder, FileName.Trim()); 
             if(!File.Exists(FilePath))
             {
-                Console.WriteLine("Couldn't find file " + FileName);
+                Console.WriteLine("Couldn't find whitelist file " + FileName);
                 return;
             }
             try
@@ -251,7 +256,28 @@ namespace VSMefx
                 {
                     await this.SaveToCache();
                 }
+                //Add all the parts to the dictionary for lookup
+                this.PartInformation = new Dictionary<string, ComposablePartDefinition>();
+                foreach (ComposablePartDefinition part in this.Catalog.Parts)
+                {
+                    this.PartInformation.Add(part.Type.FullName, part);
+                }
             }
+        }
+
+        /// <summary>
+        /// Method to get the details about a part, i.e. the part Definition, given its name.
+        /// </summary>
+        /// <param name="PartName"> The name of the part we want to get details about </param>
+        /// <returns>ComposablePartDefinition associated with the given part if it is present in the catalog
+        ///          Null if the given part is not present in the catalog </returns>
+        public ComposablePartDefinition GetPart(string PartName)
+        {
+            if (!this.PartInformation.ContainsKey(PartName))
+            {
+                return null;
+            }
+            return this.PartInformation[PartName];
         }
 
         public ConfigCreator(CLIOptions Options)

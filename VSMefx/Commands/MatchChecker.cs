@@ -109,13 +109,13 @@ namespace VSMefx.Commands
         private void CheckMatch(string ExportPartName, string ImportPartName)
         {
             //Deal with the case that one of the parts doesn't exist 
-            ComposablePartDefinition ExportPart = GetPart(ExportPartName);
+            ComposablePartDefinition ExportPart = Creator.GetPart(ExportPartName);
             if (ExportPart == null)
             {
                 Console.WriteLine("Couldn't find part with name " + ExportPartName);
                 return;
             }
-            ComposablePartDefinition ImportPart = GetPart(ImportPartName);
+            ComposablePartDefinition ImportPart = Creator.GetPart(ImportPartName);
             if (ImportPart == null)
             {
                 Console.WriteLine("Couldn't find part with name " + ImportPartName);

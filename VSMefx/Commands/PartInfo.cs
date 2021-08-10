@@ -23,7 +23,7 @@ namespace VSMefx.Commands
         private void ListAllParts()
         {
             ComposableCatalog Catalog = this.Creator.Catalog;
-            foreach (ComposablePartDefinition Part in Catalog.Parts)
+            foreach (var Part in Catalog.Parts)
             {
                
                 Console.WriteLine(GetName(Part, "[Part]"));
@@ -39,7 +39,7 @@ namespace VSMefx.Commands
        
         private void GetPartInfo(string PartName)
         {
-            ComposablePartDefinition Definition = this.GetPart(PartName); 
+            ComposablePartDefinition Definition = Creator.GetPart(PartName); 
             if(Definition == null)
             {
                 Console.WriteLine("Couldn't find part with name " + PartName);
@@ -100,11 +100,17 @@ namespace VSMefx.Commands
         /// <param name="ContractName">The contract name whose exporters we want</param>
         private void ListTypeExporter(string ContractName)
         {
-            Console.WriteLine("Exporting parts for " + ContractName + ":");
             var ExportingParts = GetContractExporters(ContractName);
-            foreach(var Part in ExportingParts)
+            if(ExportingParts.Count() == 0)
             {
-                Console.WriteLine(GetName(Part, "[Part]"));
+                Console.WriteLine("Couldn't find any parts exporting " + ContractName);
+            } else
+            {
+                Console.WriteLine("Exporting parts for " + ContractName + ":");
+                foreach (var Part in ExportingParts)
+                {
+                    Console.WriteLine(GetName(Part, "[Part]"));
+                }
             }
         }
 
@@ -136,12 +142,19 @@ namespace VSMefx.Commands
         /// <param name="ContractName"> The contract name we want to analyze</param>
         private void ListTypeImporter(string ContractName)
         {
-            Console.WriteLine("Importing parts for " + ContractName + ":");
             var ImportingParts = GetContractImporters(ContractName);
-            foreach (var Part in ImportingParts)
+            if(ImportingParts.Count() == 0)
             {
-                Console.WriteLine(GetName(Part, "[Part]"));
+                Console.WriteLine("Couldn't find any parts importing " + ContractName);
+            } else
+            {
+                Console.WriteLine("Importing parts for " + ContractName + ":");
+                foreach (var Part in ImportingParts)
+                {
+                    Console.WriteLine(GetName(Part, "[Part]"));
+                }
             }
+            
         }
 
         /// <summary>
