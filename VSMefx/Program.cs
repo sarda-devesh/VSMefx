@@ -47,7 +47,7 @@ namespace VSMefx
         /// <param name="rejected">List the rejection causes for a given part (use all to list every rejection error)</param>
         /// <param name="graph">Save a DGML graph to visualize the rejection chain</param>
         /// <param name="whitelist">A file which lists the parts we expect to be rejected</param>
-        /// <param name="regex">A boolean to toggle if we want to treat the text in the whitelist file as regular expressions</param>
+        /// <param name="regex">Treat the text in the whitelist file as regular expressions</param>
         /// <param name="cache">Specify the name of the output file to store the loaded parts</param>
         static async Task Main(bool verbose = false, 
             List<string> file = null, 

@@ -34,8 +34,7 @@ namespace VSMefx.Commands
             //Get the error stack from the composition configuration
             CompositionConfiguration Config = this.Creator.Config;
             var Errors = Config.CompositionErrors;
-            int LevelNumber = Errors.Count();
-            this.MaxLevels = LevelNumber;
+            int LevelNumber = 1;
             while (Errors.Count() > 0)
             {
                 //Process all the parts present in the current level of the stack
@@ -73,8 +72,9 @@ namespace VSMefx.Commands
                 }
                 //Get the next level of the stack
                 Errors = Errors.Pop();
-                LevelNumber -= 1;
+                LevelNumber += 1;
             }
+            this.MaxLevels = LevelNumber - 1;
         }
 
         public RejectionTracer(ConfigCreator DerivedInfo, CLIOptions Arguments) : base(DerivedInfo, Arguments)
@@ -118,7 +118,7 @@ namespace VSMefx.Commands
 
         private void ListAllRejections()
         {
-            for (int Level = 1; Level <= MaxLevels; Level++)
+            for (int Level = MaxLevels; Level > 0; Level--)
             {
                 ListErrorsinLevel(Level);
             }
@@ -167,9 +167,9 @@ namespace VSMefx.Commands
 
             Queue<PartNode> CurrentLevelNodes = new Queue<PartNode>();
             CurrentLevelNodes.Enqueue(RejectionGraph[PartName]);
-            int CurrentLevel = 1;
             while (CurrentLevelNodes.Count() > 0)
             {
+                int CurrentLevel = CurrentLevelNodes.Peek().Level;
                 Console.WriteLine("Errors in Level " + CurrentLevel);
                 //Iterate through all the nodes in the current level
                 int NumNodes = CurrentLevelNodes.Count();
@@ -191,7 +191,6 @@ namespace VSMefx.Commands
                         }
                     }
                 }
-                CurrentLevel += 1;
                 if (!Options.Verbose)
                 {
                     Console.WriteLine();
