@@ -73,7 +73,7 @@ namespace VSMefx.Commands
         /// </summary>
         /// <param name="Import">The ImportDefintion we want to match against</param>
         /// <param name="MatchingExports">A list of ExportDefinitions that we want to match against the import</param>
-        private void PerformDefintionChecking(ImportDefinition Import, List<Tuple<ExportDefinition, string>> MatchingExports)
+        private void PerformDefintionChecking(ImportDefinition Import, List<PartExport> MatchingExports)
         {
             bool PrintExportDetails = MatchingExports.Count() > 1;
             int Total = 0;
@@ -81,9 +81,9 @@ namespace VSMefx.Commands
             {
                 if (PrintExportDetails)
                 {
-                    Console.WriteLine("Considering exporting field " + Export.Item2);
+                    Console.WriteLine("Considering exporting field " + Export.ExportingField);
                 }
-                var Result = CheckDefinitionMatch(Import, Export.Item1);
+                var Result = CheckDefinitionMatch(Import, Export.ExportDetails);
                 if (Result.Item1)
                 {
                     Total += 1;
@@ -123,22 +123,22 @@ namespace VSMefx.Commands
             }
             Console.WriteLine("Finding matches from " + ExportPartName + " to " + ImportPartName);
             //Get all the exports of the exporting part, indexed by the export contract name
-            Dictionary<string, List<Tuple<ExportDefinition, string>>> AllExportDefinitions;
-            AllExportDefinitions = new Dictionary<string, List<Tuple<ExportDefinition, string>>>();
+            Dictionary<string, List<PartExport>> AllExportDefinitions;
+            AllExportDefinitions = new Dictionary<string, List<PartExport>>();
             foreach (var Export in ExportPart.ExportDefinitions)
             {
                 var ExportDetails = Export.Value;
                 string ExportName = ExportDetails.ContractName;
                 if (!AllExportDefinitions.ContainsKey(ExportName))
                 {
-                    AllExportDefinitions.Add(ExportName, new List<Tuple<ExportDefinition, string>>());
+                    AllExportDefinitions.Add(ExportName, new List<PartExport>());
                 }
                 string ExportLabel = "Entire Part";
                 if (Export.Key != null)
                 {
                     ExportLabel = Export.Key.Name;
                 }
-                AllExportDefinitions[ExportName].Add(Tuple.Create(ExportDetails, ExportLabel));
+                AllExportDefinitions[ExportName].Add(new PartExport(ExportDetails, ExportLabel));
 
             }
             bool FoundMatch = false;
@@ -187,5 +187,19 @@ namespace VSMefx.Commands
                 Console.WriteLine("Please provide an even number of part names to the match option\n");
             }
         }
-    }
+
+        private class PartExport
+        {
+            public ExportDefinition ExportDetails { get; private set; }
+
+            public string ExportingField { get; private set; }
+
+            public PartExport(ExportDefinition Name, string Field)
+            {
+                this.ExportDetails = Name;
+                this.ExportingField = Field; 
+            }
+        }
+    } 
+
 }
