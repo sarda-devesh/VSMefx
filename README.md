@@ -5,9 +5,7 @@ A Composition Analysis Tool for VS-MEF
 
 ![A image of all the command Options](Images/Options.jpg)
 
-## Example Commands
-
-### Part Information Getter 
+## Part Information Getter 
 
 The following command illustrates the basic functionality to get information about parts and thier dependencies: 
 ```
@@ -50,7 +48,7 @@ Importing parts for ExtendedOperations.ChainOne:
 ExtendedOperations.Modulo
 ```
 
-### General Rejection Information
+## General Rejection Information
 
 The following command showcases the ability of Mefx to share rejection information for all the input files and folders: 
 
@@ -89,7 +87,7 @@ The DGML diagram that is saved when we run the above command looks like
 
 To help the users, quickly diagonse import errors, the edges in the DGML diagram are labeled with the field name in the importing part, i.e. the part at the head of the directed edge. For example, we can quickly derive from the above diagram that the import issue with ExtendedOperations.ChainOne in ExtendedOperations.Modulo is associated with the field addInput in Modulo.   
 
-### Specific Rejection Information 
+## Specific Rejection Information 
 
 When working with large projects and libraries with tons of .dll and .exe files, it will get painful to list/visualize a graph for all the import issues when we care about a single or only a couple of parts. Thus, Mefx allows users to indicate which part(s) they want to trace the rejection information about through commands such as: 
 ```
@@ -127,7 +125,7 @@ Comparing this output to the previous output, we see that Mefx automatically fil
 
 ![DGML Graph for specific rejection](Images/Modulo_Trace.jpg)
 
-### Whitelisting
+## Whitelisting
 
 The whitelist options allows you to a specify a text file that lists parts that are expected to be rejected. For example, let us say that we have a file named expected.txt which contains the text "ExtendedOperations.ChainOne" and we run the command from above with this as the whitelist: 
 
@@ -169,27 +167,55 @@ In the DGML file, Mefx indicates which parts have been whitelisted by changing t
 
 ![DGML Graph with whitelisting](Images/WhitelistExample.jpg)
 
-### Matching
+## General Matching
 
 The match option provides users an option to easily check the import/export relationship between two given parts and analyze causes of import failures between them. This feature is especially useful when paired with the rejection options as it provides specific information about how the import and export of the specified parts relate and why the exports fail to satisfy the import requirements. For example, the following command indicates how to properly use the match feature:
 
 ```
---match MefCalculator.AddIn ExtendedOperations.ChainOne MefCalculator.ExportMeta MefCalculator.ImportTest --file MefCalculator.dll --directory Extensions
+--match MefCalculator.ExportMeta MefCalculator.ImportTest --file MefCalculator.dll --directory Extensions
 ```
 
-Mefx allows you to list multiple pairs of parts in the match option but make sure you list the part who exports you want to consider before the part who imports you want to consider. Mefx analyzes the pairs from left to right and thus it interprets the above command as try to match the exports of MefCalculator.AddIn with the imports of ExtendedOperations.ChainOne as well as try to match the exports of MefCalculator.ExportMeta with the imports of MefCalculator.ImportTest. In general specify parts to the match command in the following order: `ExportPart1 ImportPart1 ExportPart2 ImportPart2 ...`
+Mefx analyzes the pairs from left to right and thus it interprets the above command as try to match the exports of MefCalculator.ExportMeta with the imports of MefCalculator.ImportTest. In general specify parts to the match command in the following order: `ExportPartName ImportPartName`
 
 The output of the above command is:
 
 ```
-Finding matches from MefCalculator.AddIn to ExtendedOperations.ChainOne
-
-Found 1 potential match(es) for importing field Adder
-Export matches all import constraints
-
 Finding matches from MefCalculator.ExportMeta to MefCalculator.ImportTest
 
-Found 2 potential match(es) for importing field IntInput
+
+Found potential match(es) for importing field IntInput
+Considering exporting field ExportOne
+Export matches all import constraints
+
+Considering exporting field ExportTwo
+Export fails to sastify constraint of [Type: System.Int32]
+
+1/2 export(s) satisfy the import constraints
+```
+
+Let us analyze this output to understand how the match functionality works. In general matching, Mefx performs the detailed match check between a pair of imports and exports only in they first match on contract name. If there is more than one export in the specified part that matches the importing contract name, then Mefx matches all of them against the import requirements individually. In the example above, the exporting fields ExportOne and ExportTwo both match the contract name for the importing field IntInput and thus the program considers both of them seperately. It then reports back to the user either that the export meets the import requirements or the reason why the export failed to meet the import requirements. Going back to the example, we see that the exporting field ExportOne meets all the import requirements but ExportTwo failes to meet the requirement that the exporting type be of System.Int32. 
+
+## Specific Matching
+
+Mefx includes two other options in order to filter the fields that matching in performed on in `--match-exports` and the `--match-imports`. The arguments should be field names in the exporting part, for match-exports, and field names in the importing part, for the match-imports, that you want to consider, and ignore all others. More specifically, Mefx tries to match every field in the match-imports with every possible field in match-export and thus if you specify 2 fields in match-import and 3 fields in match-export then Mefx performs 6 total matches. 
+
+If the exporting part is exporting itself and you want to specify to perform matching using it, pass in the name of the part into the match-exports argument. Additionally, if you only specify one of the above filtering option then Mefx automatically pairs those fields with all the fields in the coressponding part. For example, if you specify one field name in match-export and don't include the match-import option then Mefx tries to match that exporting field with every field in the importing part. 
+
+We will illustrate the above functionality and the different cases by including a couple of example commands and what thier output looks like.
+
+
+### Specify both exporting and importing fields
+
+Command:
+```
+--match MefCalculator.ExportMeta MefCalculator.ImportTest --match-exports ExportOne ExportTwo --match-imports IntInput --file MefCalculator.dll --directory Extensions
+```
+
+Output:
+```
+Finding matches from MefCalculator.ExportMeta to MefCalculator.ImportTest
+
+Performing matching for importing field IntInput
 Considering exporting field ExportOne
 Export matches all import constraints
 Considering exporting field ExportTwo
@@ -197,6 +223,51 @@ Export fails to sastify constraint of [Type: System.Int32]
 1/2 export(s) satisfy the import constraints
 ```
 
-Let us analyze this output to understand how the match functionality works. For this first match pair, we found one export in MefCalculator.AddIn that satisfies the import constraints specified by the importing field Adder. This represents the ideal case where there is one export that satifies the import constraints without any composition failures.  
+### Specify only exporting field
 
-Now lets us process the second output in detail as it showcases how Mefx deals with the non normal cases. If there is more than one export in the specified part that matches the importing contract name, then Mefx matches all of them against the import requirements individually. In the example above, exporting fields ExportOne and ExportTwo both match the contract name for the importing field IntInput and thus the program considers both of them seperately. It then reports back to the user either that the export meets the import requirements or the reason why the export failed to meet the import requirements. Going back to the example, we see that the exporting field ExportOne meets all the import requirements but ExportTwo failes to meet the requirement that the exporting type be of System.Int32. 
+Command:
+```
+--match MefCalculator.ExportMeta MefCalculator.ImportTest --match-exports MefCalculator.ExportMeta --file MefCalculator.dll --directory Extensions
+```
+
+Output:
+```
+Finding matches from MefCalculator.ExportMeta to MefCalculator.ImportTest
+
+Performing matching for importing field Operations
+Considering exporting field MefCalculator.ExportMeta
+Export fails to sastify constraint of [Contract Name: MefCalculator.MefCalculatorInterfaces+IOperation]
+Export fails to sastify constraint of [Type: MefCalculator.MefCalculatorInterfaces+IOperation]
+
+Performing matching for importing field failingField
+Considering exporting field MefCalculator.ExportMeta
+Export fails to sastify constraint of [Contract Name: MissingField]
+Export fails to sastify constraint of [Type: System.String]
+
+Performing matching for importing field IntInput
+Considering exporting field MefCalculator.ExportMeta
+Export fails to sastify constraint of [Contract Name: MetadataTest]
+Export fails to sastify constraint of [Type: System.Int32]
+```
+
+### Specify only importing field
+
+Command:
+```
+--match MefCalculator.ExportMeta MefCalculator.ImportTest --match-imports IntInput --file MefCalculator.dll --directory Extensions
+```
+
+Output:
+```
+Finding matches from MefCalculator.ExportMeta to MefCalculator.ImportTest
+
+Performing matching for importing field IntInput
+Considering exporting field MefCalculator.ExportMeta
+Export fails to sastify constraint of [Contract Name: MetadataTest]
+Export fails to sastify constraint of [Type: System.Int32]
+Considering exporting field ExportOne
+Export matches all import constraints
+Considering exporting field ExportTwo
+Export fails to sastify constraint of [Type: System.Int32]
+1/3 export(s) satisfy the import constraints
+```

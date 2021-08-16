@@ -43,12 +43,14 @@ namespace VSMefx
         /// <param name="detail">Specify the parts we want to get more information about</param>
         /// <param name="importer">List the parts who import the specified contract name(s)</param>
         /// <param name="exporter">List the parts who export the specified contract name(s)</param>
-        /// <param name="match">Check relationship between given part pairs in order: ExportPart ImportPart</param>
         /// <param name="rejected">List the rejection causes for a given part (use all to list every rejection error)</param>
         /// <param name="graph">Save a DGML graph to visualize the rejection chain</param>
         /// <param name="whitelist">A file which lists the parts we expect to be rejected</param>
         /// <param name="regex">Treat the text in the whitelist file as regular expressions</param>
         /// <param name="cache">Specify the name of the output file to store the loaded parts</param>
+        /// <param name="match">Check relationship between given part which are provided in order: ExportPart ImportPart</param>
+        /// <param name="matchExports">List of fields in the export part that we want to consider</param>
+        /// <param name="matchImports">List of fields in the import part that we want to consider</param>
         static async Task Main(bool verbose = false, 
             List<string> file = null, 
             List<string> directory = null,
@@ -56,12 +58,14 @@ namespace VSMefx
             List<string> detail = null,
             List<string> importer = null,
             List<string> exporter = null,
-            List<string> match = null,
             List<string> rejected = null, 
             bool graph = false, 
             string whitelist = "", 
             bool regex = false,
-            string cache = "")
+            string cache = "",
+            List<string> match = null,
+            List<string> matchExports = null,
+            List<string> matchImports = null)
         {
             SetWorkingDirectory(); //TODO: Remove this call in the main application since this for the current repo's file structure
             CLIOptions Options = new CLIOptions
@@ -73,15 +77,23 @@ namespace VSMefx
                 PartDetails = detail,
                 ImportDetails = importer,
                 ExportDetails = exporter,
-                MatchParts = match,
                 RejectedDetails = rejected,
                 SaveGraph = graph,
                 WhiteListFile = whitelist,
                 UseRegex = regex,
-                CacheFile = cache
+                CacheFile = cache,
+                MatchParts = match,
+                MatchExports = matchExports,
+                MatchImports = matchImports
             };
-            await RunOptions(Options);
-            Console.WriteLine("Finished Running Command");
+            try
+            {
+                await RunOptions(Options);
+                Console.WriteLine("Finished Running Command");  
+            } catch(Exception Error)
+            {
+                Console.WriteLine("Error of " + Error.Message + " with trace of " + Error.StackTrace);
+            }
             Console.ReadKey();
         }
  

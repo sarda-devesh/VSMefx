@@ -17,21 +17,19 @@ namespace VSMefx
 
         public bool Verbose { get; set; }
 
-        public IEnumerable<string> Files { get; set; }
+        public List<string> Files { get; set; }
 
-        public IEnumerable<string> Folders { get; set; }
+        public List<string> Folders { get; set; }
 
         public bool ListParts { get; set; }
 
-        public IEnumerable<string> PartDetails { get; set; }
+        public List<string> PartDetails { get; set; }
 
-        public IEnumerable<string> ImportDetails { get; set; }
+        public List<string> ImportDetails { get; set; }
 
-        public IEnumerable<string> ExportDetails { get; set; }
+        public List<string> ExportDetails { get; set; }
 
-        public IEnumerable<string> MatchParts { get; set; }
-
-        public IEnumerable<string> RejectedDetails { get; set; }
+        public List<string> RejectedDetails { get; set; }
 
         public bool SaveGraph { get; set; }
 
@@ -40,6 +38,12 @@ namespace VSMefx
         public bool UseRegex { get; set;  }
 
         public string CacheFile { get; set; }
+
+        public List<string> MatchParts { get; set; }
+
+        public List<string> MatchExports { get; set; }
+
+        public List<string> MatchImports { get; set; }
 
     }
 }

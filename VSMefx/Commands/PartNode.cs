@@ -32,6 +32,7 @@ namespace VSMefx.Commands
         public PartNode(ComposablePartDefinition Definition, string Message, int CurrLevel)
         {
             this.Part = Definition;
+            this.IsWhiteListed = Part.Metadata.ContainsKey("RejectionExpectex"); 
             this.VerboseMessages = new List<string> { Message };
             ImportRejects = new HashSet<PartEdge>();
             RejectsCaused = new HashSet<PartEdge>();

@@ -44,28 +44,34 @@ namespace VSMefx.Commands
         /// <param name="Import">The ImportDefinition that we want to check against</param>
         /// <param name="Export">The ExportDefinition we want to compare with</param>
         /// <returns> 
-        /// A Tuple whose first field is a boolean indicating if the export satifies the import
-        /// and whose second field is a list of messages to output to the user about the match
+        /// A Match Result Object indicating if there was a sucessful matches along with messages to
+        /// print out to the user
         /// </returns>
-        private Tuple<bool, List<string>> CheckDefinitionMatch(ImportDefinition Import, ExportDefinition Export)
+        private MatchResult CheckDefinitionMatch(ImportDefinition Import, ExportDefinition Export)
         {
-            bool SucessfulMatch = true;
-            List<string> OutputMessages = new List<string>();
-            //Import = Import.AddExportConstraint(new ExportMetadataValueImportConstraint("Bound to fail", "32"));
+            MatchResult Output = new MatchResult();
+            //Make sure that the contract name matches
+            Output.SucessfulMatch = Import.ContractName.Equals(Export.ContractName);
+            if(!Output.SucessfulMatch)
+            {
+                string ContractConstraint = "[Contract Name: " + Import.ContractName + "]";
+                Output.Messages.Add("Export fails to sastify constraint of " + ContractConstraint);
+            }
+            //Check all the Import Constraints
             foreach (var Constraint in Import.ExportConstraints)
             {
                 if (!Constraint.IsSatisfiedBy(Export))
                 {
                     string ConstraintDetail = GetConstraintString(Constraint);
-                    OutputMessages.Add("Export fails to sastify constraint of " + ConstraintDetail);
-                    SucessfulMatch = false;
+                    Output.Messages.Add("Export fails to sastify constraint of " + ConstraintDetail);
+                    Output.SucessfulMatch = false;
                 }
             }
-            if (SucessfulMatch)
+            if (Output.SucessfulMatch)
             {
-                OutputMessages.Add("Export matches all import constraints");
+                Output.Messages.Add("Export matches all import constraints");
             }
-            return new Tuple<bool, List<string>>(SucessfulMatch, OutputMessages);
+            return Output;
         }
 
         /// <summary>
@@ -75,26 +81,21 @@ namespace VSMefx.Commands
         /// <param name="MatchingExports">A list of ExportDefinitions that we want to match against the import</param>
         private void PerformDefintionChecking(ImportDefinition Import, List<PartExport> MatchingExports)
         {
-            bool PrintExportDetails = MatchingExports.Count() > 1;
             int Total = 0;
             foreach (var Export in MatchingExports)
             {
-                if (PrintExportDetails)
-                {
-                    Console.WriteLine("Considering exporting field " + Export.ExportingField);
-                }
+                Console.WriteLine("Considering exporting field " + Export.ExportingField);
                 var Result = CheckDefinitionMatch(Import, Export.ExportDetails);
-                if (Result.Item1)
+                if (Result.SucessfulMatch)
                 {
                     Total += 1;
                 }
-                foreach (var Message in Result.Item2)
+                foreach (var Message in Result.Messages)
                 {
                     Console.WriteLine(Message);
                 }
             }
-            bool PrintMatchSummary = PrintExportDetails;
-            if (PrintMatchSummary)
+            if (MatchingExports.Count() > 1)
             {
                 Console.WriteLine(Total + "/" + MatchingExports.Count() + " export(s) satisfy the import constraints");
             }
@@ -104,24 +105,10 @@ namespace VSMefx.Commands
         ///  Method to check if there is a relationship between two given parts
         ///  and print information regarding that match to the user
         /// </summary>
-        /// <param name="ExportPartName">The name of the part whose exports we want to consider</param>
-        /// <param name="ImportPartName">The name of the part whose imports we want to consider</param>
-        private void CheckMatch(string ExportPartName, string ImportPartName)
+        /// <param name="ExportPart">The definition of part whose exports we want to consider</param>
+        /// <param name="ImportPart">The definition whose imports we want to consider</param>
+        private void CheckGeneralMatch(ComposablePartDefinition ExportPart, ComposablePartDefinition ImportPart)
         {
-            //Deal with the case that one of the parts doesn't exist 
-            ComposablePartDefinition ExportPart = Creator.GetPart(ExportPartName);
-            if (ExportPart == null)
-            {
-                Console.WriteLine("Couldn't find part with name " + ExportPartName);
-                return;
-            }
-            ComposablePartDefinition ImportPart = Creator.GetPart(ImportPartName);
-            if (ImportPart == null)
-            {
-                Console.WriteLine("Couldn't find part with name " + ImportPartName);
-                return;
-            }
-            Console.WriteLine("Finding matches from " + ExportPartName + " to " + ImportPartName);
             //Get all the exports of the exporting part, indexed by the export contract name
             Dictionary<string, List<PartExport>> AllExportDefinitions;
             AllExportDefinitions = new Dictionary<string, List<PartExport>>();
@@ -133,7 +120,7 @@ namespace VSMefx.Commands
                 {
                     AllExportDefinitions.Add(ExportName, new List<PartExport>());
                 }
-                string ExportLabel = "Entire Part";
+                string ExportLabel = ExportPart.Type.FullName;
                 if (Export.Key != null)
                 {
                     ExportLabel = Export.Key.Name;
@@ -149,13 +136,14 @@ namespace VSMefx.Commands
                 string CurrentContractName = CurrentImportDefintion.ContractName;
                 if (AllExportDefinitions.ContainsKey(CurrentContractName))
                 {
-                    string FieldName = "Part Constructor";
+                    Console.WriteLine();
+                    string FieldName = ImportPart.Type.FullName;
                     if (Import.ImportingMember != null)
                     {
                         FieldName = Import.ImportingMember.Name;
                     }
                     var PotentialMatches = AllExportDefinitions[CurrentContractName];
-                    Console.WriteLine("\nFound " + PotentialMatches.Count() + " potential match(es) for importing field " + FieldName);
+                    Console.WriteLine("Found potential match(es) for importing field " + FieldName);
                     FoundMatch = true;
                     PerformDefintionChecking(CurrentImportDefintion, PotentialMatches);
                 }
@@ -164,27 +152,114 @@ namespace VSMefx.Commands
             {
                 Console.WriteLine("Couldn't find any potential matches between the two given parts");
             }
-            Console.WriteLine();
         }
+
+        /// <summary>
+        /// Perform matching using the narrowd 
+        /// </summary>
+        /// <param name="ExportPart">The defintion of the part whose exports we want to consider</param>
+        /// <param name="ImportPart">The definition of the part whose imports we want to consider</param>
+        /// <param name="ExportingFields">A list of all the exporting fields we want to consider</param>
+        /// <param name="ImportingFields">A list of all the importing fields we want to consider</param>
+        private void CheckSpecificMatch(ComposablePartDefinition ExportPart,
+            ComposablePartDefinition ImportPart,
+            List<string> ExportingFields,
+            List<string> ImportingFields)
+        {
+            List<PartExport> ConsideringExports = new List<PartExport>();
+            bool IncludeAllExports = ExportingFields == null;
+            //Find all the exports we want to consider during the matching phase
+            foreach (var Export in ExportPart.ExportDefinitions)
+            {
+                var ExportDetails = Export.Value;
+                string ExportLabel = ExportPart.Type.FullName;
+                if (Export.Key != null)
+                {
+                    ExportLabel = Export.Key.Name;
+                }
+                bool ConsiderExport = IncludeAllExports || ExportingFields.Contains(ExportLabel);
+                if (ConsiderExport)
+                {
+                    ConsideringExports.Add(new PartExport(ExportDetails, ExportLabel));
+                    if(!IncludeAllExports)
+                    {
+                        ExportingFields.Remove(ExportLabel);
+                    }
+                }
+            }
+            //Print message about which exporting fields couldn't be found
+            if (!IncludeAllExports && ExportingFields.Count() > 0)
+            {
+                Console.WriteLine("\nCouldn't find the following exporting fields: ");
+                ExportingFields.ForEach(Field => Console.WriteLine(Field));
+                Console.WriteLine();
+            }
+            //Perform matching against all considering imports
+            bool CheckAllImports = ImportingFields == null;
+            foreach (var Import in ImportPart.Imports)
+            {
+                var CurrentImportDefintion = Import.ImportDefinition;
+                string ImportingField = ImportPart.Type.FullName;
+                if (Import.ImportingMember != null)
+                {
+                    ImportingField = Import.ImportingMember.Name;
+                }
+                bool PerformMatching = CheckAllImports || ImportingFields.IndexOf(ImportingField) >= 0;
+                if (PerformMatching)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("Performing matching for importing field " + ImportingField); 
+                    PerformDefintionChecking(CurrentImportDefintion, ConsideringExports);
+                    if(!CheckAllImports)
+                    {
+                        ImportingFields.Remove(ImportingField);
+                    }
+                } 
+            }
+            //Print message about which importing fields couldn't be found
+            if(!CheckAllImports && ImportingFields.Count() > 0)
+            {
+                Console.WriteLine("\nCouldn't find the following importing fields: ");
+                ImportingFields.ForEach(Field => Console.WriteLine(Field));
+                Console.WriteLine();
+            }
+        }       
 
         /// <summary>
         /// Method to perform matching on the input options and output the result to the user
         /// </summary>
         public void PerformMatching()
         {
-            if (Options.MatchParts.Count() % 2 == 0)
+            if (Options.MatchParts.Count() == 2)
             {
-                IEnumerable<string> ConsideringParts = Options.MatchParts;
-                for (int Index = 0; Index < ConsideringParts.Count(); Index += 2)
+                string ExportPartName = Options.MatchParts.ElementAt(0).Trim();
+                string ImportPartName = Options.MatchParts.ElementAt(1).Trim();
+                //Deal with the case that one of the parts doesn't exist 
+                ComposablePartDefinition ExportPart = Creator.GetPart(ExportPartName);
+                if (ExportPart == null)
                 {
-                    string ExportPart = ConsideringParts.ElementAt(Index).Trim();
-                    string ImportPart = ConsideringParts.ElementAt(Index + 1).Trim();
-                    this.CheckMatch(ExportPart, ImportPart);
+                    Console.WriteLine("Couldn't find part with name " + ExportPartName);
+                    return;
                 }
+                ComposablePartDefinition ImportPart = Creator.GetPart(ImportPartName);
+                if (ImportPart == null)
+                {
+                    Console.WriteLine("Couldn't find part with name " + ImportPartName);
+                    return;
+                }
+                Console.WriteLine("Finding matches from " + ExportPartName + " to " + ImportPartName);
+                if(Options.MatchExports == null && Options.MatchImports == null)
+                {
+                    this.CheckGeneralMatch(ExportPart, ImportPart);
+                } else
+                {
+                    this.CheckSpecificMatch(ExportPart, ImportPart, Options.MatchExports, Options.MatchImports);
+                }
+                Console.WriteLine();
             }
             else
             {
-                Console.WriteLine("Please provide an even number of part names to the match option\n");
+                Console.WriteLine("Please provide exactly two parts to the match option\n");
             }
         }
 
@@ -194,11 +269,25 @@ namespace VSMefx.Commands
 
             public string ExportingField { get; private set; }
 
-            public PartExport(ExportDefinition Name, string Field)
+            public PartExport(ExportDefinition Details, string Field)
             {
-                this.ExportDetails = Name;
+                this.ExportDetails = Details;
                 this.ExportingField = Field; 
             }
+        }
+
+        private class MatchResult
+        {
+            public bool SucessfulMatch { get; set; }
+
+            public List<string> Messages { get; set; }
+
+            public MatchResult()
+            {
+                this.SucessfulMatch = true;
+                this.Messages = new List<string>();
+            }
+
         }
     } 
 
