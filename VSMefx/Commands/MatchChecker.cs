@@ -12,7 +12,7 @@ namespace VSMefx.Commands
 
         public MatchChecker(ConfigCreator DerivedInfo, CLIOptions Arguments) : base(DerivedInfo, Arguments)
         {
-            
+             
         }
 
         /// <summary>
@@ -32,7 +32,8 @@ namespace VSMefx.Commands
             if (Constraint is ExportMetadataValueImportConstraint)
             {
                 var MetadataConstraint = (ExportMetadataValueImportConstraint)Constraint;
-                return "[Metadata: " + MetadataConstraint.Name + "]";
+                return "[Metadata: Key - " + MetadataConstraint.Name + ", Value - " + 
+                    MetadataConstraint.Value.ToString() + "]";
             }
             //If it is neither just return the constraint type
             return Constraint.ToString();
@@ -49,6 +50,7 @@ namespace VSMefx.Commands
         /// </returns>
         private MatchResult CheckDefinitionMatch(ImportDefinition Import, ExportDefinition Export)
         {
+            //Import = Import.AddExportConstraint(new ExportMetadataValueImportConstraint("Test", 10));
             MatchResult Output = new MatchResult();
             //Make sure that the contract name matches
             Output.SucessfulMatch = Import.ContractName.Equals(Export.ContractName);

@@ -182,14 +182,11 @@ The output of the above command is:
 ```
 Finding matches from MefCalculator.ExportMeta to MefCalculator.ImportTest
 
-
 Found potential match(es) for importing field IntInput
 Considering exporting field ExportOne
 Export matches all import constraints
-
 Considering exporting field ExportTwo
 Export fails to sastify constraint of [Type: System.Int32]
-
 1/2 export(s) satisfy the import constraints
 ```
 
