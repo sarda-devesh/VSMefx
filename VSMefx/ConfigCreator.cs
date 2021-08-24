@@ -202,14 +202,22 @@ namespace VSMefx
             if (ExtensionIndex >= 0 && FileName.Substring(ExtensionIndex + 1).Equals(CacheExtension))
             {
                 string FilePath = Path.Combine(Directory.GetCurrentDirectory(), FileName);
-                CachedCatalog CacheWriter = new CachedCatalog();
-                var FileWriter = File.Create(FilePath);
-                await CacheWriter.SaveAsync(this.Catalog, FileWriter);
-                Console.WriteLine("Saved catalog to file " + FileName + "\n");
+                try
+                {
+                    CachedCatalog CacheWriter = new CachedCatalog();
+                    var FileWriter = File.Create(FilePath);
+                    await CacheWriter.SaveAsync(this.Catalog, FileWriter);
+                    Console.WriteLine("Saved catalog to file " + FileName);
+                    FileWriter.Flush();
+                    FileWriter.Dispose();
+                } catch(Exception Error)
+                {
+                    Console.WriteLine("Failed to save cache file due to error : " + Error.Message);
+                }
             }
             else
             {
-                Console.WriteLine("Couldn't save catalog to file " + FileName + "\n");
+                Console.WriteLine("Invalid file name of " + FileName);
             }
             Console.WriteLine();
         }

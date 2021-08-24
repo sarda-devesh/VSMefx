@@ -206,11 +206,10 @@ namespace VSMefx.Commands
                 {
                     ImportingField = Import.ImportingMember.Name;
                 }
-                bool PerformMatching = CheckAllImports || ImportingFields.IndexOf(ImportingField) >= 0;
+                bool PerformMatching = CheckAllImports || ImportingFields.Contains(ImportingField);
                 if (PerformMatching)
                 {
-                    Console.WriteLine();
-                    Console.WriteLine("Performing matching for importing field " + ImportingField); 
+                    Console.WriteLine("\nPerforming matching for importing field " + ImportingField); 
                     PerformDefintionChecking(CurrentImportDefintion, ConsideringExports);
                     if(!CheckAllImports)
                     {
@@ -236,6 +235,7 @@ namespace VSMefx.Commands
             {
                 string ExportPartName = Options.MatchParts.ElementAt(0).Trim();
                 string ImportPartName = Options.MatchParts.ElementAt(1).Trim();
+                Console.WriteLine("Finding matches from " + ExportPartName + " to " + ImportPartName);
                 //Deal with the case that one of the parts doesn't exist 
                 ComposablePartDefinition ExportPart = Creator.GetPart(ExportPartName);
                 if (ExportPart == null)
@@ -249,7 +249,7 @@ namespace VSMefx.Commands
                     Console.WriteLine("Couldn't find part with name " + ImportPartName);
                     return;
                 }
-                Console.WriteLine("Finding matches from " + ExportPartName + " to " + ImportPartName);
+                //Perform either general matching or specific matching
                 if(Options.MatchExports == null && Options.MatchImports == null)
                 {
                     this.CheckGeneralMatch(ExportPart, ImportPart);
@@ -257,12 +257,12 @@ namespace VSMefx.Commands
                 {
                     this.CheckSpecificMatch(ExportPart, ImportPart, Options.MatchExports, Options.MatchImports);
                 }
-                Console.WriteLine();
             }
             else
             {
-                Console.WriteLine("Please provide exactly two parts to the match option\n");
+                Console.WriteLine("Please provide exactly two parts to the match option");
             }
+            Console.WriteLine();
         }
 
         private class PartExport

@@ -39,13 +39,13 @@ namespace VSMefx.Commands
        
         private void GetPartInfo(string PartName)
         {
+            Console.WriteLine("Printing out details for part " + PartName);
             ComposablePartDefinition Definition = Creator.GetPart(PartName); 
             if(Definition == null)
             {
                 Console.WriteLine("Couldn't find part with name " + PartName);
                 return;
             }
-            Console.WriteLine("Printing out details for part " + PartName);
             //Print details about the exports of the given part
             foreach(var ExportPair in Definition.ExportDefinitions)
             {
