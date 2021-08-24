@@ -12,7 +12,7 @@ namespace VSMefx
     class Program
     {
 
-        private static readonly string TestFolder = "Basic"; //Name of the test folder to navigate to
+        private static readonly string TestFolder = ""; //Name of the test folder to navigate to
 
          ///  <summary>
          ///  Configure the working directory of the current application for testing purposes based on the testFolder string. 

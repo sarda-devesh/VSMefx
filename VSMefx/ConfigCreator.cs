@@ -237,7 +237,7 @@ namespace VSMefx
         public async Task Initialize()
         {
             PartDiscovery Discovery = PartDiscovery.Combine(
-                new AttributedPartDiscovery(Resolver.DefaultInstance),
+                new AttributedPartDiscovery(Resolver.DefaultInstance, isNonPublicSupported : true),
                 new AttributedPartDiscoveryV1(Resolver.DefaultInstance));
             if(this.AssemblyPaths.Count() > 0)
             {
