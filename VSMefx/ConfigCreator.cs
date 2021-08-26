@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.Composition;
-using System.Text.RegularExpressions;
+﻿
 
 namespace VSMefx
 {
-    class ConfigCreator
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Text;
+    using System.Text.RegularExpressions;
+    using System.Threading.Tasks;
+    using Microsoft.VisualStudio.Composition;
+
+    internal class ConfigCreator
     {
         //Ensure that the cache extension is the last one since it needs to be processed seperately
         private static readonly string[] ValidExtensions = { "dll", "exe", "cache"}; //File extensions that are considered valid 
@@ -223,7 +225,7 @@ namespace VSMefx
         }
 
         /// <summary>
-        /// Method to print any discovery errors encountered during catalog creation
+        /// Method to print any discovery errors encountered during catalog creation.
         /// </summary>
         private void PrintDiscoveryErrors()
         {
@@ -233,24 +235,26 @@ namespace VSMefx
                 Console.WriteLine("Encountered the following errors when trying to parse input files: ");
                 foreach(var Error in DiscoveryErrors)
                 {
-                    Console.WriteLine("Encountered error of " + Error.Message + " with assembly " + Error.AssemblyPath);
+                    Console.WriteLine("Encountered error of " + Error.Message);
                 }
                 Console.WriteLine();
             }
         }
-        
-         /// <summary>
-         /// Method to intialize the catalog and configuration objects from the input files
-         /// </summary>
+
+        /// <summary>
+        /// Method to intialize the catalog and configuration objects from the input files
+        /// </summary>
+        /// <returns>A Task object when all the assembly have between loaded in and configured</returns>
         public async Task Initialize()
         {
             PartDiscovery Discovery = PartDiscovery.Combine(
-                new AttributedPartDiscovery(Resolver.DefaultInstance, isNonPublicSupported : true),
+                new AttributedPartDiscovery(Resolver.DefaultInstance, isNonPublicSupported: true),
                 new AttributedPartDiscoveryV1(Resolver.DefaultInstance));
             if(this.AssemblyPaths.Count() > 0)
             {
                 this.Catalog = ComposableCatalog.Create(Resolver.DefaultInstance)
                 .AddParts(await Discovery.CreatePartsAsync(this.AssemblyPaths));
+                this.PrintDiscoveryErrors();
             }
             if(this.CachePaths.Count() > 0)
             {
@@ -258,7 +262,7 @@ namespace VSMefx
             }
             if(this.Catalog != null)
             {
-                this.PrintDiscoveryErrors();
+                
                 this.Config = CompositionConfiguration.Create(this.Catalog);
                 if (OutputCacheFile.Length > 0)
                 {

@@ -21,7 +21,7 @@ namespace VSMefx
         {
             string CurrentFile = Assembly.GetExecutingAssembly().Location;
             string CurrentFolder = Path.GetDirectoryName(CurrentFile);
-            string RootFolder = Path.GetFullPath(Path.Combine(CurrentFolder, "..\\..\\.."));
+            string RootFolder = Path.GetFullPath(Path.Combine(CurrentFolder, "..\\..\\..\\.."));
             string TestLocation = Path.Combine(RootFolder, "Tests");
             if(TestFolder.Length > 0)
             {
@@ -67,7 +67,22 @@ namespace VSMefx
             List<string> matchExports = null,
             List<string> matchImports = null)
         {
-            SetWorkingDirectory(); //TODO: Remove this call in the main application since this for the current repo's file structure
+            //SetWorkingDirectory(); 
+            Console.WriteLine("Current working directory of " + Directory.GetCurrentDirectory());
+            if(file != null)
+            {
+                foreach (var FileName in file)
+                {
+                    Console.WriteLine("File name of " + FileName);
+                }
+            }
+            if(directory != null)
+            {
+                foreach (var FolderName in directory)
+                {
+                    Console.WriteLine("Folder name is " + FolderName);
+                }
+            }
             CLIOptions Options = new CLIOptions
             {
                 Verbose = verbose,

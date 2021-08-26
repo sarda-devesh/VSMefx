@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "VSMefx": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Users\\Pankaj\\Documents\\Github Repos\\VSMefx\\VSMefx\\bin\\Debug\\net5.0\\VSMefx.exe",
+      "commandLineArgs": "--parts --directory Basic",
+      "workingDirectory": "C:\\Users\\Pankaj\\Documents\\Github Repos\\VSMefx\\Tests"
+    }
+  }
+}

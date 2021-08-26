@@ -45,7 +45,7 @@ namespace VSMefx.Commands
         /// <param name="Import">The ImportDefinition that we want to check against</param>
         /// <param name="Export">The ExportDefinition we want to compare with</param>
         /// <returns> 
-        /// A Match Result Object indicating if there was a sucessful matches along with messages to
+        /// A Match Result object indicating if there was a sucessful matches along with messages to
         /// print out to the user
         /// </returns>
         private MatchResult CheckDefinitionMatch(ImportDefinition Import, ExportDefinition Export)
