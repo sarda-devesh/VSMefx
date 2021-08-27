@@ -56,7 +56,7 @@ namespace VSMefx.Commands
                     foreach (var Import in Definition.Imports)
                     {
                         string ImportName = Import.ImportingSiteType.FullName;
-                        string ImportLabel = "Constructor";
+                        string ImportLabel = CurrentName;
                         if (Import.ImportingMember != null)
                         {
                             ImportLabel = Import.ImportingMember.Name;

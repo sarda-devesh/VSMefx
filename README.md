@@ -13,13 +13,13 @@ The following command illustrates the basic functionality to get information abo
 ```
 
 This command performs a variety of different operations and thus we will break down the command by the specified options to understand
-its functionality. We specify that we want to perform analysis on the MefCalculator.dll file as well as the Extensions folder through ` --files MefCalculator.dll --directory Extensions `. When a folder is specified, Mefx automatically finds all valid files present in the folder itself along with its subfolders. 
+its functionality. We specify that we want to perform analysis on the MefCalculator.dll file as well as the Extensions folder through ` --files MefCalculator.dll --directory Extensions`. When a folder is specified, Mefx automatically finds all valid files present in the folder itself along with its subfolders. 
 
 Currently, Mefx considers any file with the extensions .dll, .exe, or .cache as valid files. Please note that the .cache file must have been created using the SaveAsync of the Cached Catalog in the main MEF library for Mefx to be able to properly process the file. Mefx allows users to store the catalog created from the files specified in the input argument by specifiying the output file name in the `--cache` option and thus can be called by including something like `--cache Combined.cache` in the command. 
 
-The `--parts` option of the commands tells Mefx to list all the parts present in the input files and folders. The `--detail` argument allows us to get more information on a particular part by printing out all the imports and exports associated with the specified part name. 
+The `--parts` option of the commands tells Mefx to list all the parts present in the input files and folders. The `--detail` argument allows us to get more information on a particular part(s) by printing out all the imports and exports associated with the specified part name. 
 
-The `--exporter` option can be used to find the exporters of a given contract name like `--exporter MefCalculator.MefCalculatorInterfaces+IOperation` finds all exports with the contract name of IOperation. Finally, the `--importer` option can be used to find the parts that contains imports with a given contract name like `--importer MajorRevision` finds all the parts that contain a import with the contract name of MajorRevision. 
+The `--exporter` option can be used to find the exporters of a given contract name like `--exporter MefCalculator.MefCalculatorInterfaces+IOperation` finds all exports with the contract name of IOperation. Finally, the `--importer` option can be used to find the parts that contains imports with a given contract name like `--importer ExtendedOperations.ChainOne` finds all the parts that contain a import with contract name of ExtendedOperations.ChainOne. 
 
 The above commands gives us the following output which shows the workings of all the features above: 
 ```

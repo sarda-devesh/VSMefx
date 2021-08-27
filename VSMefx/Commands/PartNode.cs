@@ -40,14 +40,13 @@ namespace VSMefx.Commands
             this.IsWhiteListed = false;
 
             this.ExportingContracts = new List<string>();
-            var NodeName = this.GetName();
             foreach (var Export in Part.ExportDefinitions)
             {
-                var ContractName = Export.Value.ContractName;
-                if(!ContractName.Equals(NodeName))
+                if(Export.Key == null)
                 {
-                    ExportingContracts.Add(ContractName);
+                    continue;
                 }
+                ExportingContracts.Add(Export.Value.ContractName);
             }
         }
 

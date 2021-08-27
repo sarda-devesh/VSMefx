@@ -1,11 +1,10 @@
-﻿
-
-namespace VSMefx
+﻿namespace VSMefx
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
@@ -233,11 +232,7 @@ namespace VSMefx
             if (DiscoveryErrors.Count() > 0)
             {
                 Console.WriteLine("Encountered the following errors when trying to parse input files: ");
-                foreach(var Error in DiscoveryErrors)
-                {
-                    Console.WriteLine("Encountered error of " + Error.Message);
-                }
-                Console.WriteLine();
+                DiscoveryErrors.ForEach(Error => Console.WriteLine(Error + "\n"));
             }
         }
 
@@ -252,8 +247,10 @@ namespace VSMefx
                 new AttributedPartDiscoveryV1(Resolver.DefaultInstance));
             if(this.AssemblyPaths.Count() > 0)
             {
-                this.Catalog = ComposableCatalog.Create(Resolver.DefaultInstance)
-                .AddParts(await Discovery.CreatePartsAsync(this.AssemblyPaths));
+                this.Catalog = ComposableCatalog.Create(Resolver.DefaultInstance);
+                var FileAssemblies = this.AssemblyPaths.Select(FilePath => Assembly.LoadFrom(FilePath)).ToArray();
+                var Parts = await Discovery.CreatePartsAsync(FileAssemblies);
+                this.Catalog = this.Catalog.AddParts(Parts);
                 this.PrintDiscoveryErrors();
             }
             if(this.CachePaths.Count() > 0)
@@ -262,7 +259,6 @@ namespace VSMefx
             }
             if(this.Catalog != null)
             {
-                
                 this.Config = CompositionConfiguration.Create(this.Catalog);
                 if (OutputCacheFile.Length > 0)
                 {

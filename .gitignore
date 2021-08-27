@@ -396,3 +396,5 @@ packages/*
 **/*csproj*
 *.sln
 !Tests/**/*.cache
+*.upgrade-assistant
+*log.txt

@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Linq;
 using System.Threading.Tasks;
 using VSMefx.Commands;
+using Microsoft.VisualStudio.Composition;
 
 namespace VSMefx
 {
@@ -67,22 +68,8 @@ namespace VSMefx
             List<string> matchExports = null,
             List<string> matchImports = null)
         {
-            //SetWorkingDirectory(); 
-            Console.WriteLine("Current working directory of " + Directory.GetCurrentDirectory());
-            if(file != null)
-            {
-                foreach (var FileName in file)
-                {
-                    Console.WriteLine("File name of " + FileName);
-                }
-            }
-            if(directory != null)
-            {
-                foreach (var FolderName in directory)
-                {
-                    Console.WriteLine("Folder name is " + FolderName);
-                }
-            }
+            
+            // SetWorkingDirectory();
             CLIOptions Options = new CLIOptions
             {
                 Verbose = verbose,
@@ -99,12 +86,24 @@ namespace VSMefx
                 CacheFile = cache,
                 MatchParts = match,
                 MatchExports = matchExports,
-                MatchImports = matchImports
-            };
+                MatchImports = matchImports,
+            }; 
             try
             {
+                /*
+                string FilePath = "C:\\Users\\Pankaj\\Documents\\Github Repos\\VSMefx\\Tests\\FrameworkTest\\MEF-Match-Sample.dll";
+                var PartAssembly = Assembly.LoadFrom(FilePath);
+                Console.WriteLine("Assembly has Name of " + PartAssembly.FullName + " at " + PartAssembly.Location);
+                PartDiscovery Discovery = PartDiscovery.Combine(
+                new AttributedPartDiscovery(Resolver.DefaultInstance, isNonPublicSupported: true),
+                new AttributedPartDiscoveryV1(Resolver.DefaultInstance));
+                var catalog = ComposableCatalog.Create(Resolver.DefaultInstance);
+                var Parts = await Discovery.CreatePartsAsync(PartAssembly);
+                catalog = catalog.AddParts(Parts);
+                Console.Write("Number of parts in catalog is " + catalog.Parts.Count);
+                */
                 await RunOptions(Options);
-                Console.WriteLine("Finished Running Command");  
+                Console.WriteLine("Finished Running Command");
             } catch(Exception Error)
             {
                 Console.WriteLine("Error of " + Error.Message + " with trace of " + Error.StackTrace);
