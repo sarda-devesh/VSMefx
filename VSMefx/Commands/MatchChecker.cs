@@ -167,7 +167,7 @@
                 {
                     total += 1;
                     Console.WriteLine(result.Messages.First());
-                } 
+                }
                 else
                 {
                     for (int i = 0; i < result.Messages.Count; i++)
@@ -209,6 +209,7 @@
                 {
                     exportLabel = export.Key.Name;
                 }
+
                 allExportDefinitions[exportName].Add(new PartExport(exportDetails, exportLabel));
             }
 
