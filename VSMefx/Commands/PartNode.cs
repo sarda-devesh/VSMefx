@@ -1,108 +1,146 @@
-﻿using Microsoft.VisualStudio.Composition;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace VSMefx.Commands
+﻿namespace VSMefx.Commands
 {
-    class PartNode
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using Microsoft.VisualStudio.Composition;
+
+    /// <summary>
+    /// Node object to represent parts when performing rejection tracing.
+    /// </summary>
+    internal class PartNode
     {
-        public ComposablePartDefinition Part { get; set; } //Represents the part associated with the current node
-        public List<string> VerboseMessages { get; set; } //Rejection Message(s) associated with the current part
-        
-         /// <summary>
-         /// Stores the "children" of the current node, which represents parts that the current
-         /// node imports that have import issues themselves
-         /// </summary>
-        public HashSet<PartEdge> ImportRejects;
-
         /// <summary>
-        /// Stores the "parent" of the current node, which represents parts that the current
-        /// node caused import issues in due to its failure 
+        /// Initializes a new instance of the <see cref="PartNode"/> class.
         /// </summary>
-        public HashSet<PartEdge> RejectsCaused; 
-        public int Level { get; private set; } //An indicator of its depth in the rejection stack 
-
-        public bool IsWhiteListed { get; private set;  } //A boolean if this part was specified in the whitelist file
-
-        public List<string> ExportingContracts { get; private set; }
-
-        public PartNode(ComposablePartDefinition Definition, string Message, int CurrLevel)
+        /// <param name="definition">The definition of the part associated with the node.</param>
+        /// <param name="message">Initialize rejection message in error stack.</param>
+        /// <param name="currLevel">The depth of the part in the stack.</param>
+        public PartNode(ComposablePartDefinition definition, string message, int currLevel)
         {
-            this.Part = Definition;
-            this.IsWhiteListed = Part.Metadata.ContainsKey("RejectionExpectex"); 
-            this.VerboseMessages = new List<string> { Message };
-            ImportRejects = new HashSet<PartEdge>();
-            RejectsCaused = new HashSet<PartEdge>();
-            this.Level = CurrLevel;
+            this.Part = definition;
+            this.IsWhiteListed = this.Part.Metadata.ContainsKey("RejectionExpectex");
+            this.VerboseMessages = new List<string> { message };
+            this.ImportRejects = new HashSet<PartEdge>();
+            this.RejectsCaused = new HashSet<PartEdge>();
+            this.Level = currLevel;
             this.IsWhiteListed = false;
 
             this.ExportingContracts = new List<string>();
-            foreach (var Export in Part.ExportDefinitions)
+            foreach (var export in this.Part.ExportDefinitions)
             {
-                if(Export.Key == null)
+                if (export.Key == null)
                 {
                     continue;
                 }
-                ExportingContracts.Add(Export.Value.ContractName);
+
+                this.ExportingContracts.Add(export.Value.ContractName);
             }
         }
 
+        /// <summary>
+        /// Gets the definition associated with the current part.
+        /// </summary>
+        public ComposablePartDefinition Part { get; private set; } // Represents the part associated with the current node
+
+        /// <summary>
+        /// Gets the verbose rejection messages associated with the current part.
+        /// </summary>
+        public List<string> VerboseMessages { get; private set; } // Rejection Message(s) associated with the current part
+
+         /// <summary>
+         /// Gets the "children" of the current node, which represents parts that the current
+         /// node imports that have import issues themselves.
+         /// </summary>
+        public HashSet<PartEdge> ImportRejects { get; private set; }
+
+        /// <summary>
+        /// Gets the "parent" of the current node, which represents parts that the current
+        /// node caused import issues in due to its failure.
+        /// </summary>
+        public HashSet<PartEdge> RejectsCaused { get; private set; }
+
+        /// <summary>
+        /// Gets the level of the current node, which serves as an indicator
+        /// of its depth in the rejection stack.
+        /// </summary>
+        public int Level { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the current node has been whitelisted by the user.
+        /// </summary>
+        public bool IsWhiteListed { get; private set;  }
+
+        /// <summary>
+        /// Gets the name of contracts exported by the part other than itself.
+        /// </summary>
+        public List<string> ExportingContracts { get; private set; }
+
+        /// <summary>
+        /// Method to get the label for the node.
+        /// </summary>
+        /// <returns>The name of the associated part.</returns>
         public string GetName()
         {
             return this.Part.Type.FullName;
         }
-        
+
         /// <summary>
-        /// Method to check if the given node imports any parts with import issues
+        /// Method to check if the given node imports any parts with import issues.
         /// </summary>
-        /// <returns> A boolean indicating it the given node is a leaf node</returns>
+        /// <returns> A boolean indicating it the given node is a leaf node.</returns>
         public bool IsLeafNode()
         {
-            return ImportRejects.Count() == 0;
+            return this.ImportRejects.Count == 0;
         }
 
-        public void AddChild(PartNode Node, string Description = "")
+        /// <summary>
+        /// Method to add a node that caused a rejection error in the current node.
+        /// </summary>
+        /// <param name="node">The node that is the cause of the error.</param>
+        /// <param name="description">Label to use when visualizing the edge.</param>
+        public void AddChild(PartNode node, string description = "")
         {
-            ImportRejects.Add(new PartEdge(Node, Description));
+            this.ImportRejects.Add(new PartEdge(node, description));
         }
 
-        public void AddParent(PartNode Node, string Description = "")
+        /// <summary>
+        /// Method to add a node that the current node caused a rejection error in.
+        /// </summary>
+        /// <param name="node">The node that the current node caused the error in.</param>
+        /// <param name="description">Label to use when visualizing the edge.</param>
+        public void AddParent(PartNode node, string description = "")
         {
-            RejectsCaused.Add(new PartEdge(Node, Description));
+            this.RejectsCaused.Add(new PartEdge(node, description));
         }
 
-        public void SetWhiteListed(bool Value)
+        /// <summary>
+        /// Method to update the whitelisted propert of the current node.
+        /// </summary>
+        /// <param name="value">New value of the whitelist property.</param>
+        public void SetWhiteListed(bool value)
         {
-            this.IsWhiteListed = Value; 
+            this.IsWhiteListed = value;
         }
 
-        public void AddErrorMessage(string Message)
+        /// <summary>
+        /// Method to add error message to display as output.
+        /// </summary>
+        /// <param name="message">The text associated with the error.</param>
+        public void AddErrorMessage(string message)
         {
-            this.VerboseMessages.Add(Message); 
+            this.VerboseMessages.Add(message);
         }
 
+        /// <summary>
+        /// Method to check if the part exports any fields.
+        /// </summary>
+        /// <returns>A boolean indicating if the part exports any fields.</returns>
         public bool HasExports()
         {
-            return this.ExportingContracts.Count() > 0;
-        }
-
-    }
-
-    /// <summary>
-    /// A class to represent a simple edge between nodes
-    /// </summary>
-    class PartEdge
-    {
-        public PartNode Target; //The node that is at the head of the directed edge
-        public string Label; //A label to display when drawing the directed edge 
-
-        public PartEdge(PartNode Other, string Description)
-        {
-            this.Target = Other;
-            this.Label = Description;
+            return this.ExportingContracts.Count > 0;
         }
     }
 }

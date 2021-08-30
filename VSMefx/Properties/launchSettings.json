@@ -3,7 +3,7 @@
     "VSMefx": {
       "commandName": "Executable",
       "executablePath": "C:\\Users\\Pankaj\\Documents\\Github Repos\\VSMefx\\VSMefx\\bin\\Debug\\net5.0\\VSMefx.exe",
-      "commandLineArgs": "--verbose --graph --rejected ExtendedOperations.Modulo  --file MefCalculator.dll --directory Extensions",
+      "commandLineArgs": "--parts --detail MefCalculator.ImportTest --exporter MefCalculator.MefCalculatorInterfaces+IOperation --importer ExtendedOperations.ChainOne  --file MefCalculator.dll --directory Extensions",
       "workingDirectory": "C:\\Users\\Pankaj\\Documents\\Github Repos\\VSMefx\\Tests\\Basic"
     }
   }
