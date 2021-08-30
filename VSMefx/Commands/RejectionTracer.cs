@@ -244,7 +244,7 @@ namespace VSMefx.Commands
         /// </summary>
         public void PerformRejectionTracing()
         {
-            if (Options.RejectedDetails.Contains("all"))
+            if (Options.RejectedDetails.Contains("all") || Options.RejectedDetails.Contains("All"))
             {
                 this.ListAllRejections();
             }
