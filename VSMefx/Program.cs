@@ -1,76 +1,58 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Linq;
-using System.Threading.Tasks;
-using VSMefx.Commands;
-using Microsoft.VisualStudio.Composition;
-
-namespace VSMefx
+﻿namespace VSMefx
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using System.Threading.Tasks;
+    using Microsoft.VisualStudio.Composition;
+    using VSMefx.Commands;
 
-    class Program
+    /// <summary>
+    /// Main class that process and runs the user's command.
+    /// </summary>
+    public class Program
     {
-
-        private static readonly string TestFolder = ""; //Name of the test folder to navigate to
-
-         ///  <summary>
-         ///  Configure the working directory of the current application for testing purposes based on the testFolder string. 
-         /// </summary> 
-        private static void SetWorkingDirectory()
-        {
-            string CurrentFile = Assembly.GetExecutingAssembly().Location;
-            string CurrentFolder = Path.GetDirectoryName(CurrentFile);
-            string RootFolder = Path.GetFullPath(Path.Combine(CurrentFolder, "..\\..\\..\\.."));
-            string TestLocation = Path.Combine(RootFolder, "Tests");
-            if(TestFolder.Length > 0)
-            {
-                TestLocation = Path.Combine(TestLocation, TestFolder); 
-            }
-            if (Directory.Exists(TestLocation))
-            {
-                Directory.SetCurrentDirectory(TestLocation);
-            }
-        }
+        private static readonly string TestFolder = string.Empty; // Name of the test folder to navigate to
 
         /// <summary>
-        /// A command line application to diagonse composition failures in MEF applications
+        /// A command line application to diagonse composition failures in MEF applications.
         /// </summary>
-        /// <param name="verbose">An boolean option to toggle the detail level of the text output</param>
-        /// <param name="file">Specify files from which we want to load parts from</param>
-        /// <param name="directory">Specify folders from which we want to load parts from</param>
-        /// <param name="parts">An boolean to toggle if we want to print out all the parts</param>
-        /// <param name="detail">Specify the parts we want to get more information about</param>
-        /// <param name="importer">List the parts who import the specified contract name(s)</param>
-        /// <param name="exporter">List the parts who export the specified contract name(s)</param>
-        /// <param name="rejected">List the rejection causes for a given part (use all to list every rejection error)</param>
-        /// <param name="graph">Save a DGML graph to visualize the rejection chain</param>
-        /// <param name="whitelist">A file which lists the parts we expect to be rejected</param>
-        /// <param name="regex">Treat the text in the whitelist file as regular expressions</param>
-        /// <param name="cache">Specify the name of the output file to store the loaded parts</param>
-        /// <param name="match">Check relationship between given part which are provided in order: ExportPart ImportPart</param>
-        /// <param name="matchExports">List of fields in the export part that we want to consider</param>
-        /// <param name="matchImports">List of fields in the import part that we want to consider</param>
-        static async Task Main(bool verbose = false, 
-            List<string> file = null, 
+        /// <param name="verbose">An boolean option to toggle the detail level of the text output.</param>
+        /// <param name="file">Specify files from which we want to load parts from.</param>
+        /// <param name="directory">Specify folders from which we want to load parts from.</param>
+        /// <param name="parts">An boolean to toggle if we want to print out all the parts.</param>
+        /// <param name="detail">Specify the parts we want to get more information about.</param>
+        /// <param name="importer">List the parts who import the specified contract name(s).</param>
+        /// <param name="exporter">List the parts who export the specified contract name(s).</param>
+        /// <param name="rejected">List the rejection causes for a given part (use all to list every rejection error).</param>
+        /// <param name="graph">Save a DGML graph to visualize the rejection chain.</param>
+        /// <param name="whitelist">A file which lists the parts we expect to be rejected.</param>
+        /// <param name="regex">Treat the text in the whitelist file as regular expressions.</param>
+        /// <param name="cache">Specify the name of the output file to store the loaded parts.</param>
+        /// <param name="match">Check relationship between given part which are provided in order: ExportPart ImportPart.</param>
+        /// <param name="matchExports">List of fields in the export part that we want to consider.</param>
+        /// <param name="matchImports">List of fields in the import part that we want to consider.</param>
+        public static async Task Main(
+            bool verbose = false,
+            List<string> file = null,
             List<string> directory = null,
             bool parts = false,
             List<string> detail = null,
             List<string> importer = null,
             List<string> exporter = null,
-            List<string> rejected = null, 
-            bool graph = false, 
-            string whitelist = "", 
+            List<string> rejected = null,
+            bool graph = false,
+            string whitelist = "",
             bool regex = false,
             string cache = "",
             List<string> match = null,
             List<string> matchExports = null,
             List<string> matchImports = null)
         {
-            
             // SetWorkingDirectory();
-            CLIOptions Options = new CLIOptions
+            CLIOptions options = new CLIOptions
             {
                 Verbose = verbose,
                 Files = file,
@@ -87,56 +69,67 @@ namespace VSMefx
                 MatchParts = match,
                 MatchExports = matchExports,
                 MatchImports = matchImports,
-            }; 
+            };
             try
             {
-                /*
-                string FilePath = "C:\\Users\\Pankaj\\Documents\\Github Repos\\VSMefx\\Tests\\FrameworkTest\\MEF-Match-Sample.dll";
-                var PartAssembly = Assembly.LoadFrom(FilePath);
-                Console.WriteLine("Assembly has Name of " + PartAssembly.FullName + " at " + PartAssembly.Location);
-                PartDiscovery Discovery = PartDiscovery.Combine(
-                new AttributedPartDiscovery(Resolver.DefaultInstance, isNonPublicSupported: true),
-                new AttributedPartDiscoveryV1(Resolver.DefaultInstance));
-                var catalog = ComposableCatalog.Create(Resolver.DefaultInstance);
-                var Parts = await Discovery.CreatePartsAsync(PartAssembly);
-                catalog = catalog.AddParts(Parts);
-                Console.Write("Number of parts in catalog is " + catalog.Parts.Count);
-                */
-                await RunOptions(Options);
+                await RunOptions(options);
                 Console.WriteLine("Finished Running Command");
-            } catch(Exception Error)
-            {
-                Console.WriteLine("Error of " + Error.Message + " with trace of " + Error.StackTrace);
             }
+            catch (Exception error)
+            {
+                Console.WriteLine("Error of " + error.Message + " with trace of " + error.StackTrace);
+            }
+
             Console.ReadKey();
         }
- 
+
         /// <summary>
-        /// Performs the operations and commands specified in the input arguments 
-        /// </summary>        
-        static async Task RunOptions(CLIOptions Options)
+        ///  Configure the working directory of the current application for testing purposes based on the testFolder string.
+        /// </summary>
+        private static void SetWorkingDirectory()
         {
-            ConfigCreator Creator = new ConfigCreator(Options);
-            await Creator.Initialize();
-            if(Creator.Catalog == null)
+            string currentFile = Assembly.GetExecutingAssembly().Location;
+            string currentFolder = Path.GetDirectoryName(currentFile);
+            string rootFolder = Path.GetFullPath(Path.Combine(currentFolder, "..\\..\\..\\.."));
+            string testLocation = Path.Combine(rootFolder, "Tests");
+            if(TestFolder.Length > 0)
+            {
+                testLocation = Path.Combine(testLocation, TestFolder);
+            }
+
+            if (Directory.Exists(testLocation))
+            {
+                Directory.SetCurrentDirectory(testLocation);
+            }
+        }
+
+        /// <summary>
+        /// Performs the operations and commands specified in the input arguments.
+        /// </summary>
+        private static async Task RunOptions(CLIOptions Options)
+        {
+            ConfigCreator creator = new ConfigCreator(Options);
+            await creator.Initialize();
+            if (creator.Catalog == null)
             {
                 Console.WriteLine("Couldn't find any parts in the input files and folders");
                 return;
             }
-            PartInfo InfoGetter = new PartInfo(Creator, Options);
-            InfoGetter.PrintRequestedInfo();
+
+            PartInfo infoGetter = new PartInfo(creator, Options);
+            infoGetter.PrintRequestedInfo();
             if (Options.MatchParts != null && Options.MatchParts.Count() > 0)
             {
-                MatchChecker Checker = new MatchChecker(Creator, Options);
-                Checker.PerformMatching();
+                MatchChecker checker = new MatchChecker(creator, Options);
+                checker.PerformMatching();
             }
-            //Perform rejection tracing as well as visualization if specified
+
+            // Perform rejection tracing as well as visualization if specified
             if (Options.RejectedDetails != null && Options.RejectedDetails.Count() > 0)
             {
-                RejectionTracer Tracer = new RejectionTracer(Creator, Options);
-                Tracer.PerformRejectionTracing();
+                RejectionTracer tracer = new RejectionTracer(creator, Options);
+                tracer.PerformRejectionTracing();
             }
         }
-
     }
 }
