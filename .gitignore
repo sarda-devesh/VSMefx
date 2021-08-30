@@ -398,3 +398,4 @@ packages/*
 !Tests/**/*.cache
 *.upgrade-assistant
 *log.txt
+**/launchSettings.json

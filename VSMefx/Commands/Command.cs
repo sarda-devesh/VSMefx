@@ -1,69 +1,77 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.Composition;
-
-namespace VSMefx.Commands
+﻿namespace VSMefx.Commands
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using Microsoft.VisualStudio.Composition;
 
     /// <summary>
-    /// A general command class which serves a parent class for all the commands that can be run by application 
+    /// A general command class which serves a parent class for all the commands that can be run by application .
     /// </summary>
-    class Command
+    internal class Command
     {
-        protected ConfigCreator Creator { get; private set; } //Stores the catalog and config information for the input files 
-        protected CLIOptions Options { get; private set; } //The command line arguments specified by the user 
-
-        private Dictionary<string, ComposablePartDefinition> PartInformation { get; set; }
-
-        public Command(ConfigCreator DerivedInfo, CLIOptions Arguments)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Command"/> class.
+        /// </summary>
+        /// <param name="derivedInfo">The ConfigCreator for the input files.</param>
+        /// <param name="arguments">The command line arguments from the user.</param>
+        public Command(ConfigCreator derivedInfo, CLIOptions arguments)
         {
-            this.Creator = DerivedInfo;
-            this.Options = Arguments;
+            this.Creator = derivedInfo;
+            this.Options = arguments;
             this.PartInformation = new Dictionary<string, ComposablePartDefinition>();
-            if(Creator.Catalog.Parts != null)
+            if (this.Creator.Catalog.Parts != null)
             {
-                foreach (ComposablePartDefinition part in Creator.Catalog.Parts)
+                foreach (ComposablePartDefinition part in this.Creator.Catalog.Parts)
                 {
                     this.PartInformation.Add(part.Type.FullName, part);
                 }
             }
-            
         }
 
-        
-         /// <summary>
-         /// Method to get the name of the given its definition
-         /// </summary>
-         /// <param name="Part"> The defintion of the part whose name we want </param>
-         /// <param name="VerboseLabel"> Label to add before the verbose description of the part</param>
-         /// <returns> A string representing either the simple or verbose name of the part based
-         ///          on if verbose was specified as an input argument </returns>
+        /// <summary>
+        /// Gets the composable catalog and configuration.
+        /// </summary>
+        protected ConfigCreator Creator { get; private set; } // Stores the catalog and config information for the input files.
 
-        protected string GetName(ComposablePartDefinition Part, string VerboseLabel = "")
+        /// <summary>
+        /// Gets the command line arguments passed in by the user.
+        /// </summary>
+        protected CLIOptions Options { get; private set; } // The command line arguments specified by the user.
+
+        private Dictionary<string, ComposablePartDefinition> PartInformation { get; set; }
+
+        /// <summary>
+        /// Method to get the name of the given its definition.
+        /// </summary>
+        /// <param name="part"> The defintion of the part whose name we want.</param>
+        /// <param name="verboseLabel"> Label to add before the verbose description of the part.</param>
+        /// <returns> A string representing either the simple or verbose name of the part based
+        ///          on if verbose was specified as an input argument.</returns>
+        protected string GetName(ComposablePartDefinition part, string verboseLabel = "")
         {
-            if(Part == null)
+            if (part == null)
             {
                 throw new ArgumentException("Request name of a null part");
             }
-            Type PartType = Part.Type;
+
+            Type partType = part.Type;
             if (this.Options.Verbose)
             {
-                string Divider = " "; 
-                if(VerboseLabel.Length == 0)
+                string divider = " ";
+                if (verboseLabel.Length == 0)
                 {
-                    Divider = "";
+                    divider = string.Empty;
                 }
-                return VerboseLabel + Divider + PartType.AssemblyQualifiedName;
+
+                return verboseLabel + divider + partType.AssemblyQualifiedName;
             }
             else
             {
-                return PartType.FullName;
+                return partType.FullName;
             }
         }
-
     }
-
 }

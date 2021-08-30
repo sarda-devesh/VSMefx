@@ -92,7 +92,7 @@
             string currentFolder = Path.GetDirectoryName(currentFile);
             string rootFolder = Path.GetFullPath(Path.Combine(currentFolder, "..\\..\\..\\.."));
             string testLocation = Path.Combine(rootFolder, "Tests");
-            if(TestFolder.Length > 0)
+            if (TestFolder.Length > 0)
             {
                 testLocation = Path.Combine(testLocation, TestFolder);
             }
@@ -106,9 +106,9 @@
         /// <summary>
         /// Performs the operations and commands specified in the input arguments.
         /// </summary>
-        private static async Task RunOptions(CLIOptions Options)
+        private static async Task RunOptions(CLIOptions options)
         {
-            ConfigCreator creator = new ConfigCreator(Options);
+            ConfigCreator creator = new ConfigCreator(options);
             await creator.Initialize();
             if (creator.Catalog == null)
             {
@@ -116,18 +116,18 @@
                 return;
             }
 
-            PartInfo infoGetter = new PartInfo(creator, Options);
+            PartInfo infoGetter = new PartInfo(creator, options);
             infoGetter.PrintRequestedInfo();
-            if (Options.MatchParts != null && Options.MatchParts.Count() > 0)
+            if (options.MatchParts != null && options.MatchParts.Count() > 0)
             {
-                MatchChecker checker = new MatchChecker(creator, Options);
+                MatchChecker checker = new MatchChecker(creator, options);
                 checker.PerformMatching();
             }
 
             // Perform rejection tracing as well as visualization if specified
-            if (Options.RejectedDetails != null && Options.RejectedDetails.Count() > 0)
+            if (options.RejectedDetails != null && options.RejectedDetails.Count() > 0)
             {
-                RejectionTracer tracer = new RejectionTracer(creator, Options);
+                RejectionTracer tracer = new RejectionTracer(creator, options);
                 tracer.PerformRejectionTracing();
             }
         }
