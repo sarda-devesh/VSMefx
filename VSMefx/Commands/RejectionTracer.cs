@@ -53,7 +53,6 @@
             }
         }
 
-
         /// <summary>
         /// Method to initialize the part nodes and thier "pointers" based on the error
         /// stack from the config.
