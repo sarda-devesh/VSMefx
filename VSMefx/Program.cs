@@ -35,20 +35,20 @@
         /// <param name="matchImports">List of fields in the import part that we want to consider.</param>
         public static async Task Main(
             bool verbose = false,
-            List<string> file = null,
-            List<string> directory = null,
+            List<string>? file = null,
+            List<string>? directory = null,
             bool parts = false,
-            List<string> detail = null,
-            List<string> importer = null,
-            List<string> exporter = null,
-            List<string> rejected = null,
+            List<string>? detail = null,
+            List<string>? importer = null,
+            List<string>? exporter = null,
+            List<string>? rejected = null,
             bool graph = false,
             string whitelist = "",
             bool regex = false,
             string cache = "",
-            List<string> match = null,
-            List<string> matchExports = null,
-            List<string> matchImports = null)
+            List<string>? match = null,
+            List<string>? matchExports = null,
+            List<string>? matchImports = null)
         {
             // SetWorkingDirectory();
             CLIOptions options = new CLIOptions
