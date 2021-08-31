@@ -35,7 +35,7 @@
             }
 
             // Get more detailed information about a specific part.
-            if (this.Options.PartDetails != null && this.Options.PartDetails.Count() > 0)
+            if (this.Options.PartDetails != null && this.Options.PartDetails.Count > 0)
             {
                 foreach (string partName in this.Options.PartDetails)
                 {
@@ -45,7 +45,7 @@
             }
 
             // Get parts that export a given type
-            if (this.Options.ExportDetails != null && this.Options.ExportDetails.Count() > 0)
+            if (this.Options.ExportDetails != null && this.Options.ExportDetails.Count > 0)
             {
                 foreach (string exportType in this.Options.ExportDetails)
                 {
@@ -55,7 +55,7 @@
             }
 
             // Get parts that import a given part or type
-            if (this.Options.ImportDetails != null && this.Options.ImportDetails.Count() > 0)
+            if (this.Options.ImportDetails != null && this.Options.ImportDetails.Count > 0)
             {
                 foreach (string importType in this.Options.ImportDetails)
                 {

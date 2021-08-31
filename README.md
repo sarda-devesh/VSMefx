@@ -186,7 +186,8 @@ Found potential match(es) for importing field IntInput
 Considering exporting field ExportOne
 Export matches all import constraints
 Considering exporting field ExportTwo
-Export fails to sastify constraint of [Type: System.Int32]
+Failed Constraint #1
+Expected: [Type - System.Int32], Found: [Type - System.String]
 1/2 export(s) satisfy the import constraints
 ```
 
@@ -216,7 +217,8 @@ Performing matching for importing field IntInput
 Considering exporting field ExportOne
 Export matches all import constraints
 Considering exporting field ExportTwo
-Export fails to sastify constraint of [Type: System.Int32]
+Failed Constraint #1
+Expected: [Type - System.Int32], Found: [Type - System.String]
 1/2 export(s) satisfy the import constraints
 ```
 
@@ -231,20 +233,26 @@ Output:
 ```
 Finding matches from MefCalculator.ExportMeta to MefCalculator.ImportTest
 
-Performing matching for importing field Operations
+Performing matching for importing field IntInput
 Considering exporting field MefCalculator.ExportMeta
-Export fails to sastify constraint of [Contract Name: MefCalculator.MefCalculatorInterfaces+IOperation]
-Export fails to sastify constraint of [Type: MefCalculator.MefCalculatorInterfaces+IOperation]
+Failed Constraint #1
+Expected: [Contract Name - MetadataTest], Found: [Contract Name - MefCalculator.ExportMeta]
+Failed Constraint #2
+Expected: [Type - System.Int32], Found: [Type - MefCalculator.ExportMeta]
 
 Performing matching for importing field failingField
 Considering exporting field MefCalculator.ExportMeta
-Export fails to sastify constraint of [Contract Name: MissingField]
-Export fails to sastify constraint of [Type: System.String]
+Failed Constraint #1
+Expected: [Contract Name - MissingField], Found: [Contract Name - MefCalculator.ExportMeta]
+Failed Constraint #2
+Expected: [Type - System.String], Found: [Type - MefCalculator.ExportMeta]
 
-Performing matching for importing field IntInput
+Performing matching for importing field Operations
 Considering exporting field MefCalculator.ExportMeta
-Export fails to sastify constraint of [Contract Name: MetadataTest]
-Export fails to sastify constraint of [Type: System.Int32]
+Failed Constraint #1
+Expected: [Contract Name - MefCalculator.MefCalculatorInterfaces+IOperation], Found: [Contract Name - MefCalculator.ExportMeta]
+Failed Constraint #2
+Expected: [Type - MefCalculator.MefCalculatorInterfaces+IOperation], Found: [Type - MefCalculator.ExportMeta]
 ```
 
 ### Specify only importing field
@@ -260,11 +268,14 @@ Finding matches from MefCalculator.ExportMeta to MefCalculator.ImportTest
 
 Performing matching for importing field IntInput
 Considering exporting field MefCalculator.ExportMeta
-Export fails to sastify constraint of [Contract Name: MetadataTest]
-Export fails to sastify constraint of [Type: System.Int32]
+Failed Constraint #1
+Expected: [Contract Name - MetadataTest], Found: [Contract Name - MefCalculator.ExportMeta]
+Failed Constraint #2
+Expected: [Type - System.Int32], Found: [Type - MefCalculator.ExportMeta]
 Considering exporting field ExportOne
 Export matches all import constraints
 Considering exporting field ExportTwo
-Export fails to sastify constraint of [Type: System.Int32]
+Failed Constraint #1
+Expected: [Type - System.Int32], Found: [Type - System.String]
 1/3 export(s) satisfy the import constraints
 ```

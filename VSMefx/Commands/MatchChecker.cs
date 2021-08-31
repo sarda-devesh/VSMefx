@@ -70,7 +70,7 @@
         /// <param name="constraint">The Constraint which we want information about.</param>
         /// <param name="export">The export we are matching the constraint against.</param>
         /// <returns>A string providing some details about the given constraint.</returns>
-        private string GetConstraintString(IImportSatisfiabilityConstraint constraint, ExportDefinition export)
+        private string GetConstraintString(IImportSatisfiabilityConstraint constraint, PartExport export)
         {
             if (constraint == null)
             {
@@ -81,28 +81,27 @@
             if (constraint is ExportTypeIdentityConstraint)
             {
                 var identityConstraint = (ExportTypeIdentityConstraint)constraint;
-                string constraintString = "[Type: " + identityConstraint.TypeIdentityName + "]";
-                return "Expected: " + constraintString;
+                string constraintString = "[Type - " + identityConstraint.TypeIdentityName + "]";
+                string actualValue = "[Type - " + export.ExportingType + "]";
+                return "Expected: " + constraintString + ", Found: " + actualValue;
             }
 
             // Try to treat the constraint as an metadata constraint
             if (constraint is ExportMetadataValueImportConstraint)
             {
                 var metadataConstraint = (ExportMetadataValueImportConstraint)constraint;
+                var exportDetails = export.ExportDetails;
                 string keyName = metadataConstraint.Name;
-                string constraintString = "[Metadata: Key - " + keyName + ", Value - " +
+                string constraintString = "[Metadata - Key: " + keyName + ", Value: " +
                     metadataConstraint.Value + "]";
-                string actualValue;
-                if (export.Metadata.ContainsKey(keyName))
+                string pairValue = "null";
+                if (exportDetails.Metadata.ContainsKey(keyName))
                 {
-                    actualValue = "[Metadata: Key - " + keyName + ", Value - " +
-                        export.Metadata[keyName] + "]";
-                }
-                else
-                {
-                    actualValue = "[Metadata: Key - null, Value - null]";
+                    var keyValue = exportDetails.Metadata[keyName];
+                    pairValue = keyValue != null ? keyValue.ToString() : "null";
                 }
 
+                string actualValue = "[Metadata - Key: " + keyName + ", Value: " + pairValue + "]";
                 return "Expected: " + constraintString + ", Found: " + actualValue;
             }
 
@@ -114,28 +113,28 @@
         /// Method to check if a export satifies the import requirements and print that result to the user.
         /// </summary>
         /// <param name="import">The ImportDefinition that we want to check against.</param>
-        /// <param name="export">The ExportDefinition we want to compare with.</param>
+        /// <param name="export">The export we want to compare with.</param>
         /// <returns>
         /// A Match Result object indicating if there was a sucessful matches along with messages to
         /// print out to the user.
         /// </returns>
-        private MatchResult CheckDefinitionMatch(ImportDefinition import, ExportDefinition export)
+        private MatchResult CheckDefinitionMatch(ImportDefinition import, PartExport export)
         {
             MatchResult output = new MatchResult();
-
+            var exportDetails = export.ExportDetails;
             // Make sure that the contract name matches
-            output.SucessfulMatch = import.ContractName.Equals(export.ContractName);
+            output.SucessfulMatch = import.ContractName.Equals(exportDetails.ContractName);
             if (!output.SucessfulMatch)
             {
-                string contractConstraint = "[Contract Name: " + import.ContractName + "]";
-                string actualValue = "[Contract Name: " + export.ContractName + "]";
+                string contractConstraint = "[Contract Name - " + import.ContractName + "]";
+                string actualValue = "[Contract Name - " + exportDetails.ContractName + "]";
                 output.Messages.Add("Expected: " + contractConstraint + ", Found: " + actualValue);
             }
 
             // Check all the Import Constraints
             foreach (var constraint in import.ExportConstraints)
             {
-                if (!constraint.IsSatisfiedBy(export))
+                if (!constraint.IsSatisfiedBy(exportDetails))
                 {
                     string constraintMessage = this.GetConstraintString(constraint, export);
                     output.Messages.Add(constraintMessage);
@@ -162,7 +161,7 @@
             foreach (var export in matchingExports)
             {
                 Console.WriteLine("Considering exporting field " + export.ExportingField);
-                var result = this.CheckDefinitionMatch(import, export.ExportDetails);
+                var result = this.CheckDefinitionMatch(import, export);
                 if (result.SucessfulMatch)
                 {
                     total += 1;
@@ -284,7 +283,6 @@
             {
                 Console.WriteLine("\nCouldn't find the following exporting fields: ");
                 exportingFields.ForEach(field => Console.WriteLine(field));
-                Console.WriteLine();
             }
 
             // Perform matching against all considering imports
@@ -315,21 +313,34 @@
             {
                 Console.WriteLine("\nCouldn't find the following importing fields: ");
                 importingFields.ForEach(field => Console.WriteLine(field));
-                Console.WriteLine();
             }
         }
 
         private class PartExport
         {
+            /// <summary>
+            /// Name of key to use when getting type of a given export.
+            /// </summary>
+            private static readonly string TypeKey = "ExportTypeIdentity";
+
             public PartExport(ExportDefinition details, string field)
             {
                 this.ExportDetails = details;
                 this.ExportingField = field;
+                var exportType = details.ContractName;
+                if (details.Metadata.ContainsKey(TypeKey))
+                {
+                    exportType = details.Metadata[TypeKey].ToString();
+                }
+
+                this.ExportingType = exportType;
             }
 
             public ExportDefinition ExportDetails { get; private set; }
 
             public string ExportingField { get; private set; }
+
+            public string ExportingType { get; private set; }
         }
 
         private class MatchResult
