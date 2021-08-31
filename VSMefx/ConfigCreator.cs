@@ -20,7 +20,7 @@
         /// <remarks>
         /// Ensure that the cache extension remains last since the program operates on that assumption.
         /// </remarks>
-        private static readonly string[] ValidExtensions = { "dll", "exe", "cache" };
+        private static readonly string[] ValidExtensions = { "dll", "cache" };
 
         // Constants associated with the Regex's for the expressions specified in the whitelist
         private static readonly TimeSpan MaxRegexTime = new TimeSpan(0, 0, 5);
@@ -44,7 +44,7 @@
                 {
                     if (!this.AddFile(currentFolder, file))
                     {
-                        Console.WriteLine("Couldn't add file " + file + "\n");
+                        Console.WriteLine("Couldn't add file " + file);
                     }
                 }
             }
@@ -62,7 +62,7 @@
                     }
                     else
                     {
-                        Console.WriteLine("Couldn't add files from folder " + folder + "\n");
+                        Console.WriteLine("Couldn't add files from folder " + folder);
                     }
                 }
             }
@@ -211,7 +211,11 @@
                 this.PartInformation = new Dictionary<string, ComposablePartDefinition>();
                 foreach (ComposablePartDefinition part in this.Catalog.Parts)
                 {
-                    this.PartInformation.Add(part.Type.FullName, part);
+                    string partName = part.Type.FullName;
+                    if (!this.PartInformation.ContainsKey(partName))
+                    {
+                        this.PartInformation.Add(partName, part);
+                    }
                 }
             }
         }

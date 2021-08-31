@@ -18,14 +18,6 @@
         {
             this.Creator = derivedInfo;
             this.Options = arguments;
-            this.PartInformation = new Dictionary<string, ComposablePartDefinition>();
-            if (this.Creator.Catalog.Parts != null)
-            {
-                foreach (ComposablePartDefinition part in this.Creator.Catalog.Parts)
-                {
-                    this.PartInformation.Add(part.Type.FullName, part);
-                }
-            }
         }
 
         /// <summary>
@@ -37,8 +29,6 @@
         /// Gets the command line arguments passed in by the user.
         /// </summary>
         protected CLIOptions Options { get; private set; } // The command line arguments specified by the user.
-
-        private Dictionary<string, ComposablePartDefinition> PartInformation { get; set; }
 
         /// <summary>
         /// Method to get the name of the given its definition.

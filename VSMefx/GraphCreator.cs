@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using OpenSoftware.DgmlTools;
     using OpenSoftware.DgmlTools.Builders;
     using OpenSoftware.DgmlTools.Model;

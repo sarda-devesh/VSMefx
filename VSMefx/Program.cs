@@ -87,8 +87,7 @@
         /// </summary>
         private static void SetWorkingDirectory()
         {
-            string currentFile = Assembly.GetExecutingAssembly().Location;
-            string currentFolder = Path.GetDirectoryName(currentFile);
+            string currentFolder = Directory.GetCurrentDirectory();
             string rootFolder = Path.GetFullPath(Path.Combine(currentFolder, "..\\..\\..\\.."));
             string testLocation = Path.Combine(rootFolder, "Tests");
             if (TestFolder.Length > 0)

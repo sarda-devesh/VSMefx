@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using Microsoft.VisualStudio.Composition;
 
@@ -193,7 +194,8 @@
 
             // Store just the nodes that are involved in the current rejection chain to use when generating the graph
             Dictionary<string, PartNode> relevantNodes = null;
-            if (this.Options.SaveGraph)
+            bool saveGraph = this.Options.SaveGraph;
+            if (saveGraph)
             {
                 relevantNodes = new Dictionary<string, PartNode>();
             }
@@ -216,7 +218,7 @@
                 {
                     // Process the current node by displaying its import issue and adding it to the graph
                     PartNode current = currentLevelNodes.Dequeue();
-                    if (this.Options.SaveGraph)
+                    if (saveGraph)
                     {
                         relevantNodes.Add(current.GetName(), current);
                     }
@@ -240,7 +242,7 @@
             }
 
             // Save the output graph if the user request it
-            if (this.Options.SaveGraph)
+            if (saveGraph)
             {
                 GraphCreator creater = new GraphCreator(relevantNodes);
 
