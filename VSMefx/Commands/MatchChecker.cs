@@ -122,6 +122,7 @@
         {
             MatchResult output = new MatchResult();
             var exportDetails = export.ExportDetails;
+
             // Make sure that the contract name matches
             output.SucessfulMatch = import.ContractName.Equals(exportDetails.ContractName);
             if (!output.SucessfulMatch)

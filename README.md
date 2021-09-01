@@ -9,7 +9,7 @@ A Composition Analysis Tool for VS-MEF
 
 The following command illustrates the basic functionality to get information about parts and thier dependencies: 
 ```
---parts --detail MefCalculator.ImportTest --exporter MefCalculator.MefCalculatorInterfaces+IOperation --importer ExtendedOperations.ChainOne  --file MefCalculator.dll --directory Extensions
+--parts --detail MefCalculator.ImportTest --exporter MefCalculator.MefCalculatorInterfaces+IOperation --importer ExtendedOperations.ChainOne --file MefCalculator.dll --directory Extensions
 ```
 
 This command performs a variety of different operations and thus we will break down the command by the specified options to understand

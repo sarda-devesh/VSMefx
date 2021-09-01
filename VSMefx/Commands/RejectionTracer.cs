@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
     using Microsoft.VisualStudio.Composition;
 
@@ -88,30 +87,6 @@
 
                     PartNode currentNode = new PartNode(definition, element.Message, levelNumber);
                     currentNode.SetWhiteListed(this.Creator.IsWhiteListed(currentName));
-
-                    // Get the imports for the current part to update the pointers associated with the current node
-                    foreach (var import in definition.Imports)
-                    {
-                        string importName = import.ImportingSiteType.FullName;
-                        if (importName == null)
-                        {
-                            continue;
-                        }
-
-                        string importLabel = currentName;
-                        if (import.ImportingMember != null)
-                        {
-                            importLabel = import.ImportingMember.Name;
-                        }
-
-                        if (this.RejectionGraph.ContainsKey(importName))
-                        {
-                            PartNode childNode = this.RejectionGraph[importName];
-                            childNode.AddParent(currentNode, importLabel);
-                            currentNode.AddChild(childNode, importLabel);
-                        }
-                    }
-
                     this.RejectionGraph.Add(currentName, currentNode);
                 }
 
@@ -121,6 +96,32 @@
             }
 
             this.MaxLevels = levelNumber - 1;
+            foreach (var nodePair in this.RejectionGraph)
+            {
+                var node = nodePair.Value;
+                var currentNodeName = node.GetName();
+                var nodeDefinition = node.Part;
+
+                // Get the imports for the current part to update the pointers associated with the current node
+                foreach (var import in nodeDefinition.Imports)
+                {
+                    string importName = import.ImportingSiteType.FullName;
+                    if (importName == null || !this.RejectionGraph.ContainsKey(importName))
+                    {
+                        continue;
+                    }
+
+                    string importLabel = importName;
+                    if (import.ImportingMember != null)
+                    {
+                        importLabel = import.ImportingMember.Name;
+                    }
+
+                    PartNode childNode = this.RejectionGraph[importName];
+                    childNode.AddParent(node, importLabel);
+                    node.AddChild(childNode, importLabel);
+                }
+            }
         }
 
         /// <summary>
@@ -157,6 +158,7 @@
         /// </remarks>
         private void ListAllRejections()
         {
+            Console.WriteLine("Listing all the rejection issues");
             for (int level = this.MaxLevels; level > 0; level--)
             {
                 this.ListErrorsinLevel(level);

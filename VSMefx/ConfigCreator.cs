@@ -34,6 +34,7 @@
         {
             this.AssemblyPaths = new List<string>();
             this.CachePaths = new List<string>();
+            this.PartInformation = new Dictionary<string, ComposablePartDefinition>();
 
             // Add all the files in the input argument to the list of paths
             string currentFolder = Directory.GetCurrentDirectory();
@@ -97,6 +98,11 @@
         public CompositionConfiguration? Config { get; private set; }
 
         /// <summary>
+        /// Gets or sets a dictionary storing parts indexed by thier parts name for easy lookup.
+        /// </summary>
+        public Dictionary<string, ComposablePartDefinition>? PartInformation { get; set; }
+
+        /// <summary>
         /// Gets or sets the path of the cache file to store the processed parts.
         /// </summary>
         private string? OutputCacheFile { get; set; }
@@ -110,11 +116,6 @@
         /// Gets or sets the paths to the cache files we want to read.
         /// </summary>
         private List<string> CachePaths { get; set; }
-
-        /// <summary>
-        /// Gets or sets a dictionary storing parts indexed by thier parts name for easy lookup.
-        /// </summary>
-        private Dictionary<string, ComposablePartDefinition>? PartInformation { get; set; }
 
         /// <summary>
         /// Gets or sets a list of regex expression when doing whitelisting using regex.
@@ -185,20 +186,13 @@
             PartDiscovery discovery = PartDiscovery.Combine(
                 new AttributedPartDiscovery(Resolver.DefaultInstance, isNonPublicSupported: true),
                 new AttributedPartDiscoveryV1(Resolver.DefaultInstance));
-            if (this.AssemblyPaths.Count() > 0)
+            await this.AddToCatalog(this.AssemblyPaths, discovery);
+            if (this.CachePaths.Count > 0)
             {
-                this.Catalog = ComposableCatalog.Create(Resolver.DefaultInstance);
-                var fileAssemblies = this.AssemblyPaths.Select(filePath => Assembly.LoadFrom(filePath)).ToArray();
-                var parts = await discovery.CreatePartsAsync(fileAssemblies);
-                this.Catalog = this.Catalog.AddParts(parts);
-                this.PrintDiscoveryErrors();
+                await this.ReadCacheFiles(discovery);
             }
 
-            if (this.CachePaths.Count() > 0)
-            {
-                await this.ReadCacheFiles();
-            }
-
+            this.PrintDiscoveryErrors();
             if (this.Catalog != null)
             {
                 this.Config = CompositionConfiguration.Create(this.Catalog);
@@ -208,7 +202,6 @@
                 }
 
                 // Add all the parts to the dictionary for lookup
-                this.PartInformation = new Dictionary<string, ComposablePartDefinition>();
                 foreach (ComposablePartDefinition part in this.Catalog.Parts)
                 {
                     string partName = part.Type.FullName;
@@ -321,9 +314,46 @@
         }
 
         /// <summary>
+        /// Method to add parts to the catalog from the given assemblies.
+        /// </summary>
+        /// <param name="assemblyPaths">The paths of the assemblies we want to add parts from.</param>
+        /// <param name="discovery">The Part Discovery object to extract the parts from the assembly.</param>
+        private async Task AddToCatalog(IEnumerable<string> assemblyPaths, PartDiscovery discovery)
+        {
+            if (assemblyPaths.Count() == 0)
+            {
+                return;
+            }
+
+            List<Assembly> assemblies = new List<Assembly>();
+            foreach (var assemblyPath in assemblyPaths)
+            {
+                try
+                {
+                    Assembly current = Assembly.LoadFrom(assemblyPath);
+                    assemblies.Add(current);
+                }
+                catch (Exception error)
+                {
+                }
+            }
+
+            if (assemblies.Count > 0)
+            {
+                var parts = await discovery.CreatePartsAsync(assemblies);
+                if (this.Catalog == null)
+                {
+                    this.Catalog = ComposableCatalog.Create(Resolver.DefaultInstance);
+                }
+
+                this.Catalog = this.Catalog.AddParts(parts);
+            }
+        }
+
+        /// <summary>
         /// Method to read the input parts stored in cache files and add them to the existing Catalog.
         /// </summary>
-        private async Task ReadCacheFiles()
+        private async Task ReadCacheFiles(PartDiscovery discovery)
         {
             foreach (string filePath in this.CachePaths)
             {
@@ -331,19 +361,26 @@
                 {
                     FileStream inputStream = File.OpenRead(filePath);
                     CachedCatalog catalogReader = new CachedCatalog();
-                    ComposableCatalog currentCatalog = await catalogReader.LoadAsync(inputStream, Resolver.DefaultInstance);
-                    if (this.Catalog == null)
+                    ComposableCatalog cacheParts = await catalogReader.LoadAsync(inputStream, Resolver.DefaultInstance);
+                    var inputAssemblies = cacheParts.GetInputAssemblies();
+                    List<string> assemblyPaths = new List<string>();
+                    foreach (var inputAssembly in inputAssemblies)
                     {
-                        this.Catalog = currentCatalog;
+                        try
+                        {
+                            string assemblyPath = new Uri(inputAssembly.CodeBase).LocalPath;
+                            assemblyPaths.Add(assemblyPath);
+                        }
+                        catch (Exception error)
+                        {
+                        }
                     }
-                    else
-                    {
-                        this.Catalog = this.Catalog.AddCatalog(currentCatalog);
-                    }
+
+                    await this.AddToCatalog(assemblyPaths, discovery);
                 }
                 catch (Exception error)
                 {
-                    Console.WriteLine("Encountered the following error: " + error.Message + " when trying to read " +
+                    Console.WriteLine("Encountered the following error: \"" + error.Message + "\" when trying to read " +
                         " file " + filePath);
                 }
             }
@@ -387,11 +424,14 @@
         /// </summary>
         private void PrintDiscoveryErrors()
         {
-            var discoveryErrors = this.Catalog.DiscoveredParts.DiscoveryErrors;
-            if (discoveryErrors.Count() > 0)
+            if (this.Catalog != null)
             {
-                Console.WriteLine("Encountered the following errors when trying to parse input files: ");
-                discoveryErrors.ForEach(error => Console.WriteLine(error + "\n"));
+                var discoveryErrors = this.Catalog.DiscoveredParts.DiscoveryErrors;
+                if (discoveryErrors.Count() > 0)
+                {
+                    Console.WriteLine("Encountered the following errors when trying to parse input files: ");
+                    discoveryErrors.ForEach(error => Console.WriteLine(error + "\n"));
+                }
             }
         }
     }

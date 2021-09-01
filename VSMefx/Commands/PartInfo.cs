@@ -70,10 +70,10 @@
         /// </summary>
         private void ListAllParts()
         {
-            ComposableCatalog catalog = this.Creator.Catalog;
-            foreach (var part in catalog.Parts)
+            var allParts = this.Creator.PartInformation;
+            foreach (var partPair in allParts)
             {
-                Console.WriteLine(this.GetName(part, "[Part]"));
+                Console.WriteLine(this.GetName(partPair.Value, "[Part]"));
             }
         }
 
@@ -128,8 +128,9 @@
         private List<ComposablePartDefinition> GetContractExporters(string contractName)
         {
             List<ComposablePartDefinition> exportingParts = new List<ComposablePartDefinition>();
-            foreach (var part in this.Creator.Catalog.Parts)
+            foreach (var partPair in this.Creator.PartInformation)
             {
+                var part = partPair.Value;
                 foreach (var export in part.ExportDefinitions)
                 {
                     if (export.Value.ContractName.Equals(contractName))
@@ -172,8 +173,9 @@
         private List<ComposablePartDefinition> GetContractImporters(string contractName)
         {
             List<ComposablePartDefinition> importingParts = new List<ComposablePartDefinition>();
-            foreach (var part in this.Creator.Catalog.Parts)
+            foreach (var partPair in this.Creator.PartInformation)
             {
+                var part = partPair.Value;
                 foreach (var import in part.Imports)
                 {
                     if (import.ImportDefinition.ContractName.Equals(contractName))

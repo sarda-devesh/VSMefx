@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
     using System.Threading.Tasks;
     using VSMefx.Commands;
 
@@ -69,17 +68,7 @@
                 MatchExports = matchExports,
                 MatchImports = matchImports,
             };
-            try
-            {
-                await RunOptions(options);
-                Console.WriteLine("Finished Running Command");
-            }
-            catch (Exception error)
-            {
-                Console.WriteLine("Error of " + error.Message + " with trace of " + error.StackTrace);
-            }
-
-            Console.ReadKey();
+            await RunOptions(options);
         }
 
         /// <summary>
