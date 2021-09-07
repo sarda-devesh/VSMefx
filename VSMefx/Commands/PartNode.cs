@@ -18,7 +18,7 @@
         {
             this.Part = definition;
             this.IsWhiteListed = this.Part.Metadata.ContainsKey("RejectionExpectex");
-            this.VerboseMessages = new List<string> { message };
+            this.VerboseMessages = new HashSet<string> { message };
             this.ImportRejects = new HashSet<PartEdge>();
             this.RejectsCaused = new HashSet<PartEdge>();
             this.Level = currLevel;
@@ -44,7 +44,7 @@
         /// <summary>
         /// Gets the verbose rejection messages associated with the current part.
         /// </summary>
-        public List<string> VerboseMessages { get; private set; } // Rejection Message(s) associated with the current part
+        public HashSet<string> VerboseMessages { get; private set; } // Rejection Message(s) associated with the current part
 
          /// <summary>
          /// Gets the "children" of the current node, which represents parts that the current

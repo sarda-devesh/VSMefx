@@ -20,7 +20,7 @@
         /// <remarks>
         /// Ensure that the cache extension remains last since the program operates on that assumption.
         /// </remarks>
-        private static readonly string[] ValidExtensions = { "dll", "cache" };
+        private static readonly string[] ValidExtensions = { "dll", "exe", "cache" };
 
         // Constants associated with the Regex's for the expressions specified in the whitelist
         private static readonly TimeSpan MaxRegexTime = new TimeSpan(0, 0, 5);
@@ -353,6 +353,7 @@
         /// <summary>
         /// Method to read the input parts stored in cache files and add them to the existing Catalog.
         /// </summary>
+        /// <param name="discovery">Part Discovery object to use when discovering parts in assembly.</param>
         private async Task ReadCacheFiles(PartDiscovery discovery)
         {
             foreach (string filePath in this.CachePaths)
