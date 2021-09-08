@@ -74,19 +74,11 @@
         /// <summary>
         /// Method to save the generated graph to an output file.
         /// </summary>
-        /// <param name="outputFileName"> The complete path of the file to which we want to save the DGML graph.</param>
-        public void SaveGraph(string outputFileName)
+        /// <param name="outputFilePath"> The complete path of the file to which we want to save the DGML graph.</param>
+        public void SaveGraph(string outputFilePath)
         {
-            int extensionIndex = outputFileName.LastIndexOf('.');
-            string extension = outputFileName.Substring(extensionIndex + 1);
-            if (!extension.Equals("dgml"))
-            {
-                Console.WriteLine("Can't save graph to ouput file " + outputFileName);
-                return;
-            }
-
-            this.Dgml.WriteToFile(outputFileName);
-            Console.WriteLine("Saved rejection graph to " + outputFileName);
+            this.Dgml.WriteToFile(outputFilePath);
+            Console.WriteLine("Saved rejection graph to " + outputFilePath);
         }
 
         private static string GetNodeName(PartNode current)

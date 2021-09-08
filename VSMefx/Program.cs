@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
     using VSMefx.Commands;
 
@@ -25,7 +26,7 @@
         /// <param name="importer">List the parts who import the specified contract name(s).</param>
         /// <param name="exporter">List the parts who export the specified contract name(s).</param>
         /// <param name="rejected">List the rejection causes for a given part (use all to list every rejection error).</param>
-        /// <param name="graph">Save a DGML graph to visualize the rejection chain.</param>
+        /// <param name="graph">Specify path to directory to save the rejection DGML file.</param>
         /// <param name="whitelist">A file which lists the parts we expect to be rejected.</param>
         /// <param name="regex">Treat the text in the whitelist file as regular expressions.</param>
         /// <param name="cache">Specify the name of the output file to store the loaded parts.</param>
@@ -41,7 +42,7 @@
             List<string>? importer = null,
             List<string>? exporter = null,
             List<string>? rejected = null,
-            bool graph = false,
+            string graph = "",
             string whitelist = "",
             bool regex = false,
             string cache = "",
@@ -60,7 +61,7 @@
                 ImportDetails = importer,
                 ExportDetails = exporter,
                 RejectedDetails = rejected,
-                SaveGraph = graph,
+                GraphPath = graph,
                 WhiteListFile = whitelist,
                 UseRegex = regex,
                 CacheFile = cache,

@@ -52,9 +52,9 @@
         public List<string>? RejectedDetails { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether we should save the rejection errors to a graph.
+        /// Gets or sets the relative path to store the DGML files in.
         /// </summary>
-        public bool SaveGraph { get; set; }
+        public string GraphPath { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the whitelist file to use.

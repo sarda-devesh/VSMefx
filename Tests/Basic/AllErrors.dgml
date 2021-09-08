@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <DirectedGraph xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" DataVirtualized="false" NeighborhoodDistance="0" xmlns="http://schemas.microsoft.com/vs/2009/dgml">
   <Nodes>
-    <Node Id="MefCalculator.ImportTest" Category="Error" Level="1" />
     <Node Id="Part: MefCalculator.ExportTest" Category="Error" Group="Expanded" Level="1" />
+    <Node Id="MefCalculator.ImportTest" Category="Error" Level="1" />
     <Node Id="MefCalculator.AddIn" Category="Error" Level="1" />
     <Node Id="ExtendedOperations.ChainOne" Category="Error" Level="2" />
     <Node Id="ExtendedOperations.Modulo" Category="Error" Level="3" />

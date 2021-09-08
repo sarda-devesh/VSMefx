@@ -56,7 +56,7 @@
             {
                 foreach (string folder in folders)
                 {
-                    string folderPath = Path.Combine(currentFolder, folder);
+                    string folderPath = Path.GetFullPath(Path.Combine(currentFolder, folder));
                     if (Directory.Exists(folderPath))
                     {
                         this.SearchFolder(folderPath);
@@ -230,7 +230,7 @@
                 string extension = fileName.Substring(extensionIndex + 1);
                 if (ValidExtensions.Contains(extension))
                 {
-                    string fullPath = Path.Combine(folderPath, fileName);
+                    string fullPath = Path.GetFullPath(Path.Combine(folderPath, fileName));
                     if (File.Exists(fullPath))
                     {
                         bool isCacheFile = extension.Equals(ValidExtensions[ValidExtensions.Length - 1]);
@@ -330,7 +330,7 @@
             {
                 try
                 {
-                    Assembly current = Assembly.LoadFrom(assemblyPath);
+                    var current = Assembly.LoadFrom(assemblyPath);
                     assemblies.Add(current);
                 }
                 catch (Exception error)
@@ -398,12 +398,13 @@
             if (extensionIndex >= 0 && fileName.Substring(extensionIndex + 1).Equals(cacheExtension))
             {
                 string filePath = Path.Combine(Directory.GetCurrentDirectory(), fileName);
+                filePath = Path.GetFullPath(filePath);
                 try
                 {
                     CachedCatalog cacheWriter = new CachedCatalog();
                     var fileWriter = File.Create(filePath);
                     await cacheWriter.SaveAsync(this.Catalog, fileWriter);
-                    Console.WriteLine("Saved catalog to file " + fileName);
+                    Console.WriteLine("Saved cache of current catalog to " + filePath);
                     fileWriter.Flush();
                     fileWriter.Dispose();
                 }

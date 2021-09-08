@@ -53,25 +53,26 @@ ExtendedOperations.Modulo
 The following command showcases the ability of Mefx to share rejection information for all the input files and folders: 
 
 ```
---graph --rejected all  --file MefCalculator.dll --directory Extensions
+--graph . --rejected all  --file MefCalculator.dll --directory Extensions
 ```
 
-The main things that we want to focus on in this section are the `--graph` and the `--rejected all` sections of the command. The `--rejected all` tells Mefx that we want information about all the rejections, and in the next example we will see how we can get rejection information about particular parts. The `--graph` command tells Mefx to generate a [DGML file](https://docs.microsoft.com/en-us/visualstudio/modeling/directed-graph-markup-language-dgml-reference?view=vs-2019) to visualize the rejection graph and see which imports and parts are causing issues. 
+The main things that we want to focus on in this section are the `--graph` and the `--rejected all` sections of the command. The `--rejected all` tells Mefx that we want information about all the rejections, and in the next example we will see how we can get rejection information about particular parts. The `--graph` option tells Mefx to generate a [DGML file](https://docs.microsoft.com/en-us/visualstudio/modeling/directed-graph-markup-language-dgml-reference?view=vs-2019) to visualize the rejection graph and see which imports and parts are causing issues. A path, either relative or absolute, needs to be specified to the graph command to indicate which folder to save the rejection graph in. If an invalid path is specified, then Mefx automatically saves the rejection graph in the current working directory.
 
 The output of running the above command looks like: 
 ```
-Listing errors in level 3
+Listing all the rejection issues
+Errors in level 3
 ExtendedOperations.Modulo
 
-Listing errors in level 2
+Errors in level 2
 ExtendedOperations.ChainOne
 
-Listing errors in level 1
+Errors in level 1
 MefCalculator.ExportTest
-MefCalculator.AddIn
 MefCalculator.ImportTest
+MefCalculator.AddIn
 
-Saved rejection graph to All.dgml
+Saved rejection graph to <Path to Output Folder>\AllErrors.dgml
 ```
 
 Mefx classify parts that have import issues into different levels based on the cause of thier import issues. Parts on higher levels, i.e. parts with larger level numbers, generally tend to have rejection issues because of the fact that they are importing a part that has failed imports itself, which means that the part they are trying to import will have a lower level number. 
@@ -91,7 +92,7 @@ To help the users, quickly diagonse import errors, the edges in the DGML diagram
 
 When working with large projects and libraries with tons of .dll and .exe files, it will get painful to list/visualize a graph for all the import issues when we care about a single or only a couple of parts. Thus, Mefx allows users to indicate which part(s) they want to trace the rejection information about through commands such as: 
 ```
---verbose --graph --rejected ExtendedOperations.Modulo  --file MefCalculator.dll --directory Extensions
+--verbose --graph . --rejected ExtendedOperations.Modulo  --file MefCalculator.dll --directory Extensions
 ```
 
 When a user specifies a part to get rejection information about, Mefx automatically finds parts whose import issues impact the specified part. Thus, when displaying information or generating a graph, Mefx only presents import issues that impact the specified part, both directly and indirectly, and ignores all others. The `--verbose` command can be used to print out additional information about the issues and the parts involved. 
@@ -118,7 +119,7 @@ MefCalculator.AddIn.fieldOne: expected exactly 1 export matching constraints:
     TypeIdentityName: System.String
 but found 0.
 
-Saved rejection graph to ExtendedOperations_Modulo.dgml
+Saved rejection graph to <Path to Output Folder>\ExtendedOperations_Modulo.dgml
 ```
 
 Comparing this output to the previous output, we see that Mefx automatically filtered out the rejections to only include those that affect the ExtendedOperations.Modulo part. Since the verbose option was chosen, Mefx prints out detailed information about the cause of the issue which can be used to quickly pinpoint and resolve the issue. We can see this filtering take place in the output DGML file as well, which now looks like: 
@@ -130,7 +131,7 @@ Comparing this output to the previous output, we see that Mefx automatically fil
 The whitelist options allows you to a specify a text file that lists parts that are expected to be rejected. For example, let us say that we have a file named expected.txt which contains the text "ExtendedOperations.ChainOne" and we run the command from above with this as the whitelist: 
 
 ```
---verbose --graph --rejected ExtendedOperations.Modulo  --file MefCalculator.dll --directory Extensions --whitelist expected.txt
+--verbose --graph . --rejected ExtendedOperations.Modulo  --file MefCalculator.dll --directory Extensions --whitelist expected.txt
 ```
 
 Currently, all Mefx does with the whitelist file is indicated to the user which parts have been whitelisted in both the textual and visual outputs. Rather than automatically removing parts which may introduce additional confusion, Mefx instead tries to make it to clear the user which parts have been whitelisted and let them decide how to best go about fixing this error with the above information in mind. 
@@ -157,7 +158,7 @@ MefCalculator.AddIn.fieldOne: expected exactly 1 export matching constraints:
     TypeIdentityName: System.String
 but found 0.
 
-Saved rejection graph to ExtendedOperations_Modulo.dgml
+Saved rejection graph to <Path to Output Folder>\ExtendedOperations_Modulo.dgml
 ```
 
 Additionally, Mefx also allows the user to treat the lines in the whitelist files as regular expression through the `--regex` option. For example, if we wanted to whitelist all the parts from the ExtendedOperations project, we could modify the line in expected.txt to contain the line "ExtendedOperations\\..*" and include the `--regex` option in our command.

@@ -94,7 +94,7 @@
                 string keyName = metadataConstraint.Name;
                 string constraintString = "[Metadata - Key: " + keyName + ", Value: " +
                     metadataConstraint.Value + "]";
-                string pairValue = "null";
+                string pairValue = "No Such Key in Export";
                 if (exportDetails.Metadata.ContainsKey(keyName))
                 {
                     var keyValue = exportDetails.Metadata[keyName];

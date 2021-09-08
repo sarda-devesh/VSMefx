@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using Microsoft.VisualStudio.Composition;
 
@@ -130,7 +131,7 @@
         /// <param name="currentLevel">An integer representing the level we are intrested in.</param>
         private void ListErrorsinLevel(int currentLevel)
         {
-            Console.WriteLine("Listing errors in level " + currentLevel);
+            Console.WriteLine("Errors in level " + currentLevel);
             foreach (var pair in this.RejectionGraph)
             {
                 PartNode currentNode = pair.Value;
@@ -144,6 +145,27 @@
             {
                 Console.WriteLine();
             }
+        }
+
+        /// <summary>
+        /// Method to get path to save the dgml file in.
+        /// </summary>
+        /// <param name="fileName">Name of the dgml file whose path we want to determine.</param>
+        /// <returns>The complete absolute path to save the dgml file in.</returns>
+        private string GetGraphPath(string fileName)
+        {
+            string relativePath = this.Options.GraphPath;
+            string currentDirectory = Directory.GetCurrentDirectory();
+            string outputDirectory = Path.GetFullPath(Path.Combine(currentDirectory, relativePath));
+            if (!Directory.Exists(outputDirectory))
+            {
+                string missingMessage = "Couldn't find directory " + relativePath + " so saving rejection graph to current directory";
+                Console.WriteLine(missingMessage);
+                outputDirectory = currentDirectory;
+            }
+
+            string outputPath = Path.GetFullPath(Path.Combine(outputDirectory, fileName));
+            return outputPath;
         }
 
         /// <summary>
@@ -164,10 +186,11 @@
                 this.ListErrorsinLevel(level);
             }
 
-            if (this.Options.SaveGraph)
+            bool saveGraph = this.Options.GraphPath.Length > 0;
+            if (saveGraph)
             {
                 GraphCreator creater = new GraphCreator(this.RejectionGraph);
-                creater.SaveGraph("AllErrors.dgml");
+                creater.SaveGraph(GetGraphPath("AllErrors.dgml"));
                 Console.WriteLine();
             }
         }
@@ -196,7 +219,7 @@
 
             // Store just the nodes that are involved in the current rejection chain to use when generating the graph
             Dictionary<string, PartNode> relevantNodes = null;
-            bool saveGraph = this.Options.SaveGraph;
+            bool saveGraph = this.Options.GraphPath.Length > 0;
             if (saveGraph)
             {
                 relevantNodes = new Dictionary<string, PartNode>();
@@ -250,7 +273,7 @@
 
                 // Replacing '.' with '_' in the fileName to ensure that the '.' is associated with the file extension
                 string fileName = partName.Replace(".", "_") + ".dgml";
-                creater.SaveGraph(fileName);
+                creater.SaveGraph(GetGraphPath(fileName));
                 Console.WriteLine();
             }
         }
